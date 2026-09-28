@@ -599,7 +599,7 @@ export const MarketPrices: React.FC<MarketPricesProps> = ({ setActiveTab }) => {
           <div>
             <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
               <MapPin className="w-3.5 h-3.5 text-emerald-600" />
-              <span>1. Select State (రాష్ట్రం)</span>
+              <span>{t('selectStatePrompt')}</span>
             </label>
             <select
               value={selectedState}
@@ -609,7 +609,7 @@ export const MarketPrices: React.FC<MarketPricesProps> = ({ setActiveTab }) => {
               }}
               className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 bg-stone-50 font-semibold text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
             >
-              <option value="ALL">🇮🇳 All India (అన్ని రాష్ట్రాలు / सभी राज्य)</option>
+              <option value="ALL">{t('allIndia')}</option>
               {regions.map(r => (
                 <option key={r.state} value={r.state}>
                   {r.state}
@@ -622,7 +622,7 @@ export const MarketPrices: React.FC<MarketPricesProps> = ({ setActiveTab }) => {
           <div>
             <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
               <Building2 className="w-3.5 h-3.5 text-teal-600" />
-              <span>2. Select District (జిల్లా)</span>
+              <span>{t('selectDistrictPrompt')}</span>
             </label>
             <select
               value={selectedDistrict}
@@ -631,8 +631,8 @@ export const MarketPrices: React.FC<MarketPricesProps> = ({ setActiveTab }) => {
             >
               <option value="ALL">
                 {selectedState === 'ALL'
-                  ? 'All Districts across India (అన్ని జిల్లాలు)'
-                  : `All Districts in ${selectedState}`}
+                  ? t('allDistrictsIndia')
+                  : t('allDistrictsInState', { state: selectedState })}
               </option>
               {availableDistricts.map(d => (
                 <option key={d} value={d}>
@@ -1062,7 +1062,7 @@ export const MarketPrices: React.FC<MarketPricesProps> = ({ setActiveTab }) => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
-                    State (రాష్ట్రం) *
+                    {t('stateLabel')} *
                   </label>
                   <select
                     value={formState}
@@ -1080,7 +1080,7 @@ export const MarketPrices: React.FC<MarketPricesProps> = ({ setActiveTab }) => {
 
                 <div>
                   <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
-                    District (జిల్లా) *
+                    {t('districtLabel')} *
                   </label>
                   <select
                     value={formDistrict}

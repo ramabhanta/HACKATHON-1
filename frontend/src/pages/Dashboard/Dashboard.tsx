@@ -406,7 +406,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
               className="px-3.5 py-2.5 bg-emerald-900/60 hover:bg-emerald-900 text-amber-300 rounded-xl border border-emerald-500/40 text-sm font-semibold transition flex items-center gap-1.5"
             >
               <span>🎙️</span>
-              <span className="hidden sm:inline">Voice Assistant</span>
+              <span className="hidden sm:inline">{t('voiceAssistant')}</span>
             </button>
           </div>
         </div>
@@ -450,7 +450,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
                 onClick={refreshWeather}
                 disabled={weatherRefreshing}
                 className="p-2.5 text-gray-400 hover:text-emerald-700 hover:bg-emerald-50 rounded-xl transition shrink-0 ml-1"
-                title="Refresh Live Weather"
+                title={t('refreshWeather')}
               >
                 <RefreshCw className={`w-4 h-4 ${weatherRefreshing ? 'animate-spin text-emerald-600' : ''}`} />
               </button>
@@ -472,7 +472,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
       {/* 3. SIX LARGE HERO PRIMARY ACTION BUTTONS */}
       <div>
         <h2 className="text-base font-extrabold text-gray-900 mb-3 uppercase tracking-wider flex items-center gap-2">
-          <span>⚡</span> Quick Farm Actions
+          <span>⚡</span> {t('quickFarmActions')}
         </h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
           {/* Ask AI */}
@@ -487,7 +487,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
               <span className="text-xs font-bold text-gray-900 block group-hover:text-emerald-800">
                 {t('askAiBtn')}
               </span>
-              <span className="text-[10px] text-gray-500">AI Diagnosis & Chat</span>
+              <span className="text-[10px] text-gray-500">{t('askAiDesc')}</span>
             </div>
           </button>
 
@@ -503,7 +503,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
               <span className="text-xs font-bold text-gray-900 block group-hover:text-amber-800">
                 {t('scanCropBtn')}
               </span>
-              <span className="text-[10px] text-gray-500">Pest & Leaf Scan</span>
+              <span className="text-[10px] text-gray-500">{t('scanCropDesc')}</span>
             </div>
           </button>
 
@@ -519,7 +519,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
               <span className="text-xs font-bold text-gray-900 block group-hover:text-lime-800">
                 {t('checkSoilBtn')}
               </span>
-              <span className="text-[10px] text-gray-500">NPK & Fertilizer Plan</span>
+              <span className="text-[10px] text-gray-500">{t('checkSoilDesc')}</span>
             </div>
           </button>
 
@@ -535,7 +535,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
               <span className="text-xs font-bold text-gray-900 block group-hover:text-teal-800">
                 {t('buyInputsBtn')}
               </span>
-              <span className="text-[10px] text-gray-500">Seeds & Fertilizers</span>
+              <span className="text-[10px] text-gray-500">{t('buyInputsDesc')}</span>
             </div>
           </button>
 
@@ -551,7 +551,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
               <span className="text-xs font-bold text-gray-900 block group-hover:text-indigo-800">
                 {t('findShopsBtn')}
               </span>
-              <span className="text-[10px] text-gray-500">Authorized Dealers</span>
+              <span className="text-[10px] text-gray-500">{t('findShopsDesc')}</span>
             </div>
           </button>
 
@@ -567,7 +567,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
               <span className="text-xs font-bold text-gray-900 block group-hover:text-orange-800">
                 {t('sellProduceBtn')}
               </span>
-              <span className="text-[10px] text-gray-500">Direct Buyer Bids</span>
+              <span className="text-[10px] text-gray-500">{t('sellProduceDesc')}</span>
             </div>
           </button>
 
@@ -581,9 +581,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
             </div>
             <div className="mt-3">
               <span className="text-xs font-bold text-gray-900 block group-hover:text-pink-800">
-                {t('mandiPrices')}
+                {t('mandiPricesCard')}
               </span>
-              <span className="text-[10px] text-gray-500">All India & Flower Rates</span>
+              <span className="text-[10px] text-gray-500">{t('mandiPricesCardDesc')}</span>
             </div>
           </button>
         </div>
@@ -599,18 +599,18 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
             <div>
               <div className="flex items-center gap-2 flex-wrap">
                 <h3 className="text-base sm:text-lg font-black text-gray-900">
-                  Live Mandi & Flower Prices (మార్కెట్ & పూల ధరలు)
+                  {t('mandiFlowerHeading')}
                 </h3>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-pink-100 text-pink-800 border border-pink-200">
-                  🌸 Floriculture + Crops
+                  {t('mandiFlowerBadge')}
                 </span>
                 <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  Live Today
+                  {t('liveTodayBadge')}
                 </span>
               </div>
               <p className="text-xs text-gray-500 mt-0.5">
-                Real-time wholesale daily APMC rates for Flowers (Jasmine, Rose, Marigold, Crossandra) & Crops across all Indian districts.
+                {t('mandiFlowerDesc')}
               </p>
             </div>
           </div>
@@ -621,13 +621,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
               className="px-3.5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-amber-950 text-xs font-black transition shadow-xs flex items-center gap-1.5 active:scale-95"
             >
               <Plus className="w-3.5 h-3.5" />
-              <span>+ Report Price</span>
+              <span>{t('reportPriceBtn')}</span>
             </button>
             <button
               onClick={() => setActiveTab('prices')}
               className="px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-xs active:scale-95"
             >
-              <span>Explore All (20+)</span>
+              <span>{t('exploreAllPrices')}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -638,7 +638,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
           <div>
             <label className="block text-[11px] font-bold text-gray-700 uppercase mb-1 flex items-center gap-1">
               <MapPin className="w-3 h-3 text-emerald-600" />
-              <span>State (రాష్ట్రం):</span>
+              <span>{t('stateLabel')}</span>
             </label>
             <select
               value={dashState}
@@ -648,7 +648,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
               }}
               className="w-full px-3 py-1.5 rounded-xl border border-gray-300 bg-white text-xs font-bold text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
             >
-              <option value="ALL">🇮🇳 All India (అన్ని రాష్ట్రాలు)</option>
+              <option value="ALL">{t('allIndia')}</option>
               {priceRegions.map(r => (
                 <option key={r.state} value={r.state}>{r.state}</option>
               ))}
@@ -658,7 +658,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
           <div>
             <label className="block text-[11px] font-bold text-gray-700 uppercase mb-1 flex items-center gap-1">
               <Sprout className="w-3 h-3 text-teal-600" />
-              <span>District (జిల్లా):</span>
+              <span>{t('districtLabel')}</span>
             </label>
             <select
               value={dashDistrict}
@@ -666,7 +666,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
               className="w-full px-3 py-1.5 rounded-xl border border-gray-300 bg-white text-xs font-bold text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
             >
               <option value="ALL">
-                {dashState === 'ALL' ? 'All Districts across India' : `All Districts in ${dashState}`}
+                {dashState === 'ALL'
+                  ? t('allDistrictsIndia')
+                  : t('allDistrictsInState', { state: dashState })}
               </option>
               {dashAvailableDistricts.map(d => (
                 <option key={d} value={d}>{d}</option>
@@ -676,15 +678,15 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
 
           <div>
             <label className="block text-[11px] font-bold text-gray-700 uppercase mb-1">
-              Category:
+              {t('categoryLabel')}
             </label>
             <div className="flex gap-1 overflow-x-auto pb-0.5">
               {[
-                { id: 'ALL', label: 'All', icon: '🌐' },
-                { id: 'FLOWER', label: '🌸 Flowers', icon: '🌸' },
-                { id: 'CROP', label: '🌾 Crops', icon: '🌾' },
-                { id: 'VEGETABLE', label: '🥕 Veg', icon: '🥕' },
-                { id: 'SPICE', label: '🌶️ Spice', icon: '🌶️' }
+                { id: 'ALL', label: t('catAll'), icon: '🌐' },
+                { id: 'FLOWER', label: t('catFlowers'), icon: '🌸' },
+                { id: 'CROP', label: t('catCrops'), icon: '🌾' },
+                { id: 'VEGETABLE', label: t('catVegetables'), icon: '🥕' },
+                { id: 'SPICE', label: t('catSpices'), icon: '🌶️' }
               ].map(cat => (
                 <button
                   key={cat.id}
@@ -707,7 +709,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
         {/* Live Rate Cards Grid */}
         {dashFilteredPrices.length === 0 ? (
           <div className="text-center py-6 bg-stone-50 rounded-2xl border border-stone-200 text-xs text-gray-500">
-            No prices found for selected criteria. You can report today's rate!
+            {t('noPricesFound')}
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
@@ -728,7 +730,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
                       <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full ${
                         isFlower ? 'bg-pink-100 text-pink-800' : 'bg-emerald-100 text-emerald-800'
                       }`}>
-                        {isFlower ? '🌸 FLOWER' : item.commodityType}
+                        {isFlower ? t('flowerBadge') : item.commodityType}
                       </span>
                       <span className="text-[10px] font-bold text-gray-400">{item.priceDate}</span>
                     </div>
@@ -744,7 +746,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
 
                   <div className="mt-3 pt-2.5 border-t border-gray-200/70 flex items-center justify-between">
                     <div>
-                      <span className="text-[10px] text-gray-400 block font-semibold">Modal Rate</span>
+                      <span className="text-[10px] text-gray-400 block font-semibold">{t('modalRate')}</span>
                       <div className="flex items-baseline gap-1">
                         <span className="text-xl font-black text-emerald-900">
                           ₹{item.modalPrice.toLocaleString('en-IN')}
@@ -757,7 +759,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
 
                     <div className="text-right">
                       <span className="text-[10px] text-gray-400 block font-semibold">
-                        Range: ₹{item.minPrice} - ₹{item.maxPrice}
+                        {t('priceRange')} ₹{item.minPrice} - ₹{item.maxPrice}
                       </span>
                       <span className={`inline-flex items-center gap-0.5 text-xs font-bold ${
                         item.trend === 'UP' ? 'text-emerald-600' : item.trend === 'DOWN' ? 'text-rose-600' : 'text-gray-500'
@@ -807,7 +809,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
             </div>
             <div className="flex items-center gap-2">
               <span className="px-3 py-1 bg-emerald-50 text-emerald-800 rounded-full text-xs font-extrabold border border-emerald-200">
-                {primaryFarm.totalArea} {primaryFarm.areaUnit || 'Acres'}
+                {primaryFarm.totalArea} {primaryFarm.areaUnit || t('acres')}
               </span>
               <button
                 onClick={() => {
@@ -815,9 +817,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
                   setShowAddFarmModal(true);
                 }}
                 className="px-3 py-1 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-xs transition active:scale-95 flex items-center gap-1"
-                title="Register New Farm"
+                title={t('registerFarmTitle')}
               >
-                <Plus className="w-3.5 h-3.5" /> Add Farm
+                <Plus className="w-3.5 h-3.5" /> {t('addFarm')}
               </button>
             </div>
           </div>
@@ -836,8 +838,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
               </span>
             </div>
             <div className="col-span-2 sm:col-span-1">
-              <span className="text-gray-400 block font-semibold">Active Season</span>
-              <span className="font-bold text-emerald-800">Kharif Main Cycle</span>
+              <span className="text-gray-400 block font-semibold">{t('activeSeason')}</span>
+              <span className="font-bold text-emerald-800">{t('kharifSeason')}</span>
             </div>
           </div>
 
@@ -850,19 +852,19 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
               onClick={openAddCropModal}
               className="text-xs text-emerald-700 font-bold hover:underline flex items-center gap-1"
             >
-              <Plus className="w-3.5 h-3.5" /> Add Crop
+              <Plus className="w-3.5 h-3.5" /> {t('addCrop')}
             </button>
           </div>
 
           <div className="space-y-3">
             {!primaryFarm.crops || primaryFarm.crops.length === 0 ? (
               <div className="p-6 text-center border border-dashed border-gray-200 rounded-2xl">
-                <p className="text-xs text-gray-400">No standing crops listed for this farm yet.</p>
+                <p className="text-xs text-gray-400">{t('noStandingCrops')}</p>
                 <button
                   onClick={openAddCropModal}
                   className="mt-2 text-xs font-bold text-emerald-700 hover:underline"
                 >
-                  + Add first crop
+                  {t('addFirstCrop')}
                 </button>
               </div>
             ) : (
@@ -878,7 +880,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
                     <div>
                       <h5 className="font-bold text-sm text-gray-900">{crop.cropName}</h5>
                       <p className="text-xs text-gray-500">
-                        Variety: <span className="font-medium text-gray-700">{crop.variety || 'Standard'}</span> • Stage:{' '}
+                        {t('variety')}: <span className="font-medium text-gray-700">{crop.variety || 'Standard'}</span> • {t('stage')}:{' '}
                         <span className="font-medium text-emerald-700 capitalize">{crop.growthStage?.toLowerCase() || 'Vegetative'}</span>
                       </p>
                     </div>
@@ -892,12 +894,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
                           : 'bg-amber-50 text-amber-700 border border-amber-200'
                       }`}
                     >
-                      {crop.healthStatus === 'HEALTHY' ? '✓ Healthy' : '⚠️ Needs Attention'}
+                      {crop.healthStatus === 'HEALTHY' ? t('healthy') : t('needsAttention')}
                     </span>
                     <button
                       onClick={() => openEditCropModal(crop)}
                       className="p-1.5 text-gray-400 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition"
-                      title="Edit crop"
+                      title={t('editCrop')}
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
@@ -905,7 +907,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
                       onClick={() => handleDeleteCrop(crop.id)}
                       disabled={deletingCropId === crop.id}
                       className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
-                      title="Delete crop"
+                      title={t('deleteCrop')}
                     >
                       {deletingCropId === crop.id ? (
                         <Loader2 className="w-4 h-4 animate-spin text-red-500" />
@@ -916,7 +918,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
                     <button
                       onClick={() => setActiveTab('scan')}
                       className="p-1.5 text-gray-400 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition"
-                      title="Scan this crop"
+                      title={t('scanThisCrop')}
                     >
                       <Camera className="w-4 h-4" />
                     </button>
@@ -938,13 +940,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
                 onClick={() => setActiveTab('farm-manager')}
                 className="text-xs text-emerald-700 font-bold hover:underline flex items-center"
               >
-                View all <ChevronRight className="w-3.5 h-3.5" />
+                {t('viewAll')} <ChevronRight className="w-3.5 h-3.5" />
               </button>
             </div>
 
             <div className="space-y-3">
               {tasks.length === 0 ? (
-                <p className="text-xs text-gray-400 text-center py-4">No scheduled tasks. Add one in Farm Manager.</p>
+                <p className="text-xs text-gray-400 text-center py-4">{t('noTasks')}</p>
               ) : (
                 tasks.slice(0, 3).map((task: any) => (
                   <div
@@ -970,11 +972,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
                       )}
                       <div className="flex items-center gap-2 mt-1.5">
                         <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-gray-100 text-gray-600">
-                          Due: {task.dueDate}
+                          {t('due')}: {task.dueDate}
                         </span>
                         {task.priority === 'HIGH' && (
                           <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-red-50 text-red-600 border border-red-100">
-                            High
+                            {t('priorityHigh')}
                           </span>
                         )}
                       </div>
@@ -990,7 +992,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
               onClick={() => setActiveTab('farm-manager')}
               className="w-full py-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5"
             >
-              <span>Manage Tasks & Expenses</span>
+              <span>{t('manageTasksBtn')}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -1007,7 +1009,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
             >
               <X className="w-5 h-5" />
             </button>
-            <h3 className="text-lg font-black text-gray-900">Register New Farm Parcel</h3>
+            <h3 className="text-lg font-black text-gray-900">{t('registerFarmTitle')}</h3>
 
             {farmError && (
               <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-800 text-xs flex items-center gap-2">
@@ -1018,31 +1020,31 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
 
             <form onSubmit={handleAddFarm} className="space-y-3 text-xs">
               <div>
-                <label className="font-bold text-gray-700 block mb-1">Farm Name *</label>
+                <label className="font-bold text-gray-700 block mb-1">{t('farmNameLabel')}</label>
                 <input
                   type="text"
                   value={farmName}
                   onChange={e => setFarmName(e.target.value)}
-                  placeholder="e.g. Sri Balaji Organic Plot"
+                  placeholder={t('farmNamePlaceholder')}
                   className="w-full p-2.5 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-emerald-500"
                   required
                 />
               </div>
 
               <div>
-                <label className="font-bold text-gray-700 block mb-1">Survey No. / Mandal Location</label>
+                <label className="font-bold text-gray-700 block mb-1">{t('surveyNoLabel')}</label>
                 <input
                   type="text"
                   value={farmLocation}
                   onChange={e => setFarmLocation(e.target.value)}
-                  placeholder="e.g. Survey #204/B, Kadiri Rural"
+                  placeholder={t('surveyNoPlaceholder')}
                   className="w-full p-2.5 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-emerald-500"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="font-bold text-gray-700 block mb-1">Total Area (Acres) *</label>
+                  <label className="font-bold text-gray-700 block mb-1">{t('totalAreaLabel')}</label>
                   <input
                     type="number"
                     step="0.1"
@@ -1055,32 +1057,32 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-gray-700 block mb-1">Soil Type</label>
+                  <label className="font-bold text-gray-700 block mb-1">{t('soilTypeLabel')}</label>
                   <select
                     value={farmSoilType}
                     onChange={e => setFarmSoilType(e.target.value)}
                     className="w-full p-2.5 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-emerald-500"
                   >
-                    <option value="RED_LOAM">Red Sandy Loam</option>
-                    <option value="BLACK_COTTON">Black Clay / Cotton</option>
-                    <option value="ALLUVIAL">Alluvial Loam</option>
-                    <option value="SANDY">Sandy</option>
-                    <option value="CLAY_LOAM">Clay Loam</option>
+                    <option value="RED_LOAM">{t('soilRedLoam')}</option>
+                    <option value="BLACK_COTTON">{t('soilBlackCotton')}</option>
+                    <option value="ALLUVIAL">{t('soilAlluvial')}</option>
+                    <option value="SANDY">{t('soilSandy')}</option>
+                    <option value="CLAY_LOAM">{t('soilClayLoam')}</option>
                   </select>
                 </div>
               </div>
 
               <div>
-                <label className="font-bold text-gray-700 block mb-1">Irrigation Source</label>
+                <label className="font-bold text-gray-700 block mb-1">{t('irrigationSourceLabel')}</label>
                 <select
                   value={farmIrrigation}
                   onChange={e => setFarmIrrigation(e.target.value)}
                   className="w-full p-2.5 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-emerald-500"
                 >
-                  <option value="BOREWELL">Borewell + Drip Irrigation</option>
-                  <option value="CANAL">Canal / River Water</option>
-                  <option value="RAIN_FED">Rain-fed (Monsoon)</option>
-                  <option value="FARM_POND">Farm Pond / Open Well</option>
+                  <option value="BOREWELL">{t('irrigBorewell')}</option>
+                  <option value="CANAL">{t('irrigCanal')}</option>
+                  <option value="RAIN_FED">{t('irrigRainfed')}</option>
+                  <option value="FARM_POND">{t('irrigPond')}</option>
                 </select>
               </div>
 
@@ -1092,10 +1094,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
                 {isSubmittingFarm ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Registering Farm...</span>
+                    <span>{t('registeringFarm')}</span>
                   </>
                 ) : (
-                  <span>Register Farm</span>
+                  <span>{t('registerFarmBtn')}</span>
                 )}
               </button>
             </form>
@@ -1117,7 +1119,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
               <X className="w-5 h-5" />
             </button>
             <h3 className="text-lg font-black text-gray-900">
-              {editingCrop ? 'Edit Standing Crop' : 'Register Standing Crop'}
+              {editingCrop ? t('editCropTitle') : t('registerCropTitle')}
             </h3>
 
             {cropError && (
@@ -1130,23 +1132,23 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
             <form onSubmit={handleSaveCrop} className="space-y-3 text-xs">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="font-bold text-gray-700 block mb-1">Crop Name *</label>
+                  <label className="font-bold text-gray-700 block mb-1">{t('cropNameLabel')}</label>
                   <input
                     type="text"
                     value={cropName}
                     onChange={e => setCropName(e.target.value)}
-                    placeholder="e.g. Groundnut"
+                    placeholder={t('cropNamePlaceholder')}
                     className="w-full p-2.5 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-emerald-500"
                     required
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-gray-700 block mb-1">Variety / Hybrid</label>
+                  <label className="font-bold text-gray-700 block mb-1">{t('cropVarietyLabel')}</label>
                   <input
                     type="text"
                     value={cropVariety}
                     onChange={e => setCropVariety(e.target.value)}
-                    placeholder="e.g. Kadiri-6"
+                    placeholder={t('cropVarietyPlaceholder')}
                     className="w-full p-2.5 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-emerald-500"
                   />
                 </div>
@@ -1154,7 +1156,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="font-bold text-gray-700 block mb-1">Area Planted (Acres)</label>
+                  <label className="font-bold text-gray-700 block mb-1">{t('areaPlantedLabel')}</label>
                   <input
                     type="number"
                     step="0.1"
@@ -1166,35 +1168,35 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-gray-700 block mb-1">Growth Stage</label>
+                  <label className="font-bold text-gray-700 block mb-1">{t('growthStageLabel')}</label>
                   <select
                     value={cropGrowthStage}
                     onChange={e => setCropGrowthStage(e.target.value)}
                     className="w-full p-2.5 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-emerald-500"
                   >
-                    <option value="SOWING">Sowing / Seedling</option>
-                    <option value="VEGETATIVE">Vegetative Growth</option>
-                    <option value="FLOWERING">Flowering / Pegging</option>
-                    <option value="POD_DEVELOPMENT">Pod / Fruit Development</option>
-                    <option value="MATURITY">Maturity / Ready to Harvest</option>
+                    <option value="SOWING">{t('stageSowing')}</option>
+                    <option value="VEGETATIVE">{t('stageVegetative')}</option>
+                    <option value="FLOWERING">{t('stageFlowering')}</option>
+                    <option value="POD_DEVELOPMENT">{t('stagePod')}</option>
+                    <option value="MATURITY">{t('stageMaturity')}</option>
                   </select>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="font-bold text-gray-700 block mb-1">Health Status</label>
+                  <label className="font-bold text-gray-700 block mb-1">{t('healthStatusLabel')}</label>
                   <select
                     value={cropHealthStatus}
                     onChange={e => setCropHealthStatus(e.target.value)}
                     className="w-full p-2.5 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-emerald-500"
                   >
-                    <option value="HEALTHY">Healthy (✓ Optimal)</option>
-                    <option value="NEEDS_ATTENTION">Needs Attention (⚠️ Leaf Spot / Pest)</option>
+                    <option value="HEALTHY">{t('healthy')}</option>
+                    <option value="NEEDS_ATTENTION">{t('needsAttention')}</option>
                   </select>
                 </div>
                 <div>
-                  <label className="font-bold text-gray-700 block mb-1">Expected Harvest Date</label>
+                  <label className="font-bold text-gray-700 block mb-1">{t('expectedHarvestLabel')}</label>
                   <input
                     type="date"
                     value={cropHarvestDate}
@@ -1212,10 +1214,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
                 {isSubmittingCrop ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Saving Crop Record...</span>
+                    <span>{t('savingCrop')}</span>
                   </>
                 ) : (
-                  <span>{editingCrop ? 'Update Crop Record' : 'Register Crop'}</span>
+                  <span>{editingCrop ? t('updateCropBtn') : t('saveCropBtn')}</span>
                 )}
               </button>
             </form>

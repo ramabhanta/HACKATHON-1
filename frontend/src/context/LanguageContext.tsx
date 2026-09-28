@@ -4,7 +4,7 @@ import { Language, translations, LanguageMeta, indianLanguages } from '../i18n/t
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: (keyOrText: string) => string;
+  t: (keyOrText: string, params?: Record<string, string | number>) => string;
   languages: LanguageMeta[];
   currentLangMeta: LanguageMeta;
 }
@@ -187,37 +187,51 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
     localStorage.setItem('agri_lang', lang);
+    if (typeof document !== 'undefined') {
+      document.documentElement.lang = lang;
+    }
   };
 
-  // Universal translation helper function
-  const t = (keyOrText: string): string => {
+  // Universal translation helper function with parameter interpolation support
+  const t = (keyOrText: string, params?: Record<string, string | number>): string => {
     if (!keyOrText) return '';
     const currentDict = translations[language] || translations['en'];
+    let text = '';
 
     // 1. Check direct translation key
     if (currentDict && currentDict[keyOrText]) {
-      return currentDict[keyOrText];
-    }
-
-    // 2. Check universal phrase dictionary
-    if (commonPhrases[keyOrText] && commonPhrases[keyOrText][language]) {
-      return commonPhrases[keyOrText][language];
-    }
-
-    // 3. Check case-insensitive phrase match
-    const lowerKey = keyOrText.trim().toLowerCase();
-    for (const [phrase, map] of Object.entries(commonPhrases)) {
-      if (phrase.toLowerCase() === lowerKey && map[language]) {
-        return map[language];
+      text = currentDict[keyOrText];
+    } else if (commonPhrases[keyOrText] && commonPhrases[keyOrText][language]) {
+      text = commonPhrases[keyOrText][language];
+    } else {
+      // 2. Case-insensitive phrase match
+      const lowerKey = keyOrText.trim().toLowerCase();
+      let found = false;
+      for (const [phrase, map] of Object.entries(commonPhrases)) {
+        if (phrase.toLowerCase() === lowerKey && map[language]) {
+          text = map[language];
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        // 3. Fallback to English dictionary
+        if (translations['en'] && translations['en'][keyOrText]) {
+          text = translations['en'][keyOrText];
+        } else {
+          text = keyOrText;
+        }
       }
     }
 
-    // 4. Check English dictionary fallback
-    if (translations['en'] && translations['en'][keyOrText]) {
-      return translations['en'][keyOrText];
+    // 4. Parameter interpolation (e.g. {state} -> Andhra Pradesh)
+    if (params && typeof text === 'string') {
+      for (const [paramKey, paramVal] of Object.entries(params)) {
+        text = text.replace(new RegExp(`\\{${paramKey}\\}`, 'g'), String(paramVal));
+      }
     }
 
-    return keyOrText;
+    return text;
   };
 
   const currentLangMeta = indianLanguages.find(l => l.code === language) || indianLanguages[0];

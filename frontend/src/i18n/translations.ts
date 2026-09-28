@@ -1,3 +1,8 @@
+import enLocale from './locales/en.json';
+import teLocale from './locales/te.json';
+
+export { enLocale, teLocale };
+
 export type Language = 'en' | 'hi' | 'te' | 'ta' | 'kn' | 'ml' | 'mr' | 'bn' | 'gu' | 'pa' | 'or';
 
 export interface LanguageMeta {
@@ -24,6 +29,7 @@ export const indianLanguages: LanguageMeta[] = [
 
 export const translations: Record<Language, Record<string, string>> = {
   en: {
+    ...enLocale,
     appName: 'AgroDex',
     tagline: 'AI for Every Farmer — Diagnose, Decide, Buy, Sell and Grow',
     home: 'My Farm',
@@ -260,6 +266,7 @@ export const translations: Record<Language, Record<string, string>> = {
   },
   
   te: {
+    ...teLocale,
     appName: 'అగ్రోడెక్స్ (AgroDex)',
     tagline: 'ప్రతి రైతుకు AI — గుర్తించండి, నిర్ణయించండి, కొనండి, అమ్మండి మరియు ఎదగండి',
     home: 'నా పొలం',

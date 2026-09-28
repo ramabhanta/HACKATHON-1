@@ -38,7 +38,41 @@ aiRouter.post('/chat', optionalAuthenticate, async (req: AuthenticatedRequest, r
   }
 });
 
-// 2. Deep Learning Crop Disease Scan
+// 1b. Real-time streaming conversational assistant for sub-second latency
+aiRouter.post('/chat/stream', optionalAuthenticate, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const userId = req.user?.id || 'usr-farmer-1';
+    const { message, language, farmId, cropId } = req.body;
+
+    if (!message) {
+      return res.status(400).json({ error: 'Message content is required' });
+    }
+
+    const farm = farmId ? db.findById('farms', farmId) : db.findOne('farms', f => f.userId === userId);
+    const crop = cropId ? db.findById('crops', cropId) : (farm ? db.findOne('crops', c => c.farmId === farm.id) : undefined);
+    const soil = farm ? db.findOne('soil_tests', s => s.farmId === farm.id) : undefined;
+
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache, no-transform');
+    res.setHeader('Connection', 'keep-alive');
+    res.flushHeaders?.();
+
+    for await (const chunk of AiService.streamGeminiChat(message, language || req.user?.language || 'en', { farm, crop, soil })) {
+      res.write(`data: ${JSON.stringify({ text: chunk })}\n\n`);
+    }
+
+    res.write('data: [DONE]\n\n');
+    return res.end();
+  } catch (err: any) {
+    if (!res.headersSent) {
+      return res.status(500).json({ error: err.message || 'AI streaming error' });
+    }
+    res.write(`data: ${JSON.stringify({ error: err.message })}\n\n`);
+    return res.end();
+  }
+});
+
+// 2. Deep Learning Crop Disease Scan (Optimized for Sub-3-Second Latency)
 aiRouter.post('/crop-disease', optionalAuthenticate, upload.single('image'), async (req: AuthenticatedRequest, res: Response) => {
   try {
     const userId = req.user?.id || 'usr-farmer-1';
@@ -53,24 +87,7 @@ aiRouter.post('/crop-disease', optionalAuthenticate, upload.single('image'), asy
       }
     }
 
-    // 1. If an image file was uploaded, upload directly to Supabase Storage 'scan-images'
-    let supabaseImageUrl: string | undefined = undefined;
-    if (req.file) {
-      try {
-        const filePath = req.file.path || path.join(config.uploadDir, req.file.filename);
-        if (fs.existsSync(filePath)) {
-          const fileBuf = fs.readFileSync(filePath);
-          supabaseImageUrl = await uploadScanImageToStorage(
-            fileBuf,
-            req.file.originalname || req.file.filename,
-            req.file.mimetype || 'image/jpeg'
-          );
-        }
-      } catch (uploadErr) {
-        console.warn('Direct Supabase image upload note:', uploadErr);
-      }
-    }
-
+    // Run deep learning multimodal diagnosis immediately without blocking on Supabase cloud network
     const diagnosis = await AiService.diagnoseDisease(
       userId,
       req.file,
@@ -79,16 +96,31 @@ aiRouter.post('/crop-disease', optionalAuthenticate, upload.single('image'), asy
       parsedMetadata
     );
 
-    // If Supabase storage returned a public URL, store that in diagnosis
-    if (supabaseImageUrl && supabaseImageUrl.startsWith('http')) {
-      diagnosis.imageUrl = supabaseImageUrl;
-    }
+    // Asynchronously sync image and diagnosis record to Supabase Storage and DB in background
+    (async () => {
+      try {
+        if (req.file) {
+          const filePath = req.file.path || path.join(config.uploadDir, req.file.filename);
+          if (fs.existsSync(filePath)) {
+            const fileBuf = fs.readFileSync(filePath);
+            const supabaseImageUrl = await uploadScanImageToStorage(
+              fileBuf,
+              req.file.originalname || req.file.filename,
+              req.file.mimetype || 'image/jpeg'
+            );
+            if (supabaseImageUrl && supabaseImageUrl.startsWith('http')) {
+              diagnosis.imageUrl = supabaseImageUrl;
+            }
+          }
+        }
+        await SupabaseDataService.saveDiagnosis(diagnosis);
+      } catch (uploadErr) {
+        console.warn('[Background Supabase Scan Sync Note]:', uploadErr);
+      }
+    })();
 
-    // Persist diagnosis directly to Supabase ai_diagnoses table
-    await SupabaseDataService.saveDiagnosis(diagnosis);
-
-    // Fetch details of matched products from Supabase products table
-    const allProducts = await SupabaseDataService.getProducts();
+    // Fetch matched verified inputs from instant in-memory cache (0ms)
+    const allProducts = db.getTable('products');
     const matchedProducts = allProducts.filter(p => diagnosis.recommendedProductIds.includes(p.id));
 
     return res.json({

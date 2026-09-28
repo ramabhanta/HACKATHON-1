@@ -147,6 +147,8 @@ export interface AiDiagnosis {
   recommendedProductIds: string[];
   isExpertReviewed: boolean;
   expertNotes?: string;
+  clarificationPrompt?: string;
+  cropIdentified?: boolean;
   followUpQuestions?: string[];
   createdAt: string;
 }

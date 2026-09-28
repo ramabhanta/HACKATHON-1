@@ -27,6 +27,60 @@ import {
   PhotoTelemetryInfo
 } from '../../utils/photoTelemetry';
 
+const compressImageFile = async (file: File): Promise<File> => {
+  return new Promise((resolve) => {
+    if (!file.type.startsWith('image/')) {
+      return resolve(file);
+    }
+    const img = new Image();
+    const objectUrl = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(objectUrl);
+      const canvas = document.createElement('canvas');
+      const MAX_DIM = 800;
+      let width = img.width;
+      let height = img.height;
+
+      if (width > height) {
+        if (width > MAX_DIM) {
+          height = Math.round((height * MAX_DIM) / width);
+          width = MAX_DIM;
+        }
+      } else {
+        if (height > MAX_DIM) {
+          width = Math.round((width * MAX_DIM) / height);
+          height = MAX_DIM;
+        }
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return resolve(file);
+
+      ctx.drawImage(img, 0, 0, width, height);
+      canvas.toBlob(
+        (blob) => {
+          if (blob && blob.size < file.size) {
+            const compressed = new File(
+              [blob],
+              file.name.replace(/\.[^/.]+$/, '') + '.jpg',
+              { type: 'image/jpeg', lastModified: Date.now() }
+            );
+            resolve(compressed);
+          } else {
+            resolve(file);
+          }
+        },
+        'image/jpeg',
+        0.70
+      );
+    };
+    img.onerror = () => resolve(file);
+    img.src = objectUrl;
+  });
+};
+
 interface DiseaseScanProps {
   setActiveTab: (tab: string) => void;
 }
@@ -36,7 +90,6 @@ export const DiseaseScan: React.FC<DiseaseScanProps> = ({ setActiveTab }) => {
   const { addToCart } = useCart();
   const { user } = useAuth();
 
-  const [selectedCrop, setSelectedCrop] = useState('Groundnut');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [photoTelemetry, setPhotoTelemetry] = useState<PhotoTelemetryInfo | null>(null);
@@ -66,14 +119,15 @@ export const DiseaseScan: React.FC<DiseaseScanProps> = ({ setActiveTab }) => {
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setImageFile(file);
-      setSelectedImage(URL.createObjectURL(file));
+      const originalFile = e.target.files[0];
+      const compressed = await compressImageFile(originalFile);
+      setImageFile(compressed);
+      setSelectedImage(URL.createObjectURL(compressed));
       setDiagnosis(null);
       setScanError(null);
 
       // Extract real-time date, time, file metrics, and field geolocation
-      const telemetry = await extractPhotoTelemetry(file, {
+      const telemetry = await extractPhotoTelemetry(compressed, {
         latitude: user?.latitude || 14.1165,
         longitude: user?.longitude || 78.1634,
         locationName: `${user?.village ? user.village + ', ' : ''}${user?.district || 'Sri Sathya Sai'}, ${user?.state || 'Andhra Pradesh'}`
@@ -83,7 +137,6 @@ export const DiseaseScan: React.FC<DiseaseScanProps> = ({ setActiveTab }) => {
   };
 
   const handleSelectSample = (sample: typeof sampleLeaves[0]) => {
-    setSelectedCrop(sample.crop);
     setSelectedImage(sample.url);
     setImageFile(null);
     setDiagnosis(null);
@@ -101,16 +154,16 @@ export const DiseaseScan: React.FC<DiseaseScanProps> = ({ setActiveTab }) => {
     setScanStep(1);
     setScanError(null);
 
-    // Step simulation for visual feedback
-    const timer1 = setTimeout(() => setScanStep(2), 600);
-    const timer2 = setTimeout(() => setScanStep(3), 1200);
+    // Fast step simulation for visual feedback
+    const stepInterval = setInterval(() => {
+      setScanStep(prev => (prev < 3 ? prev + 1 : prev));
+    }, 400);
 
     try {
       const formData = new FormData();
       if (imageFile) {
         formData.append('image', imageFile);
       }
-      formData.append('cropName', selectedCrop);
       const headers: Record<string, string> = {
         Authorization: `Bearer ${localStorage.getItem('agri_token') || ''}`
       };
@@ -121,27 +174,23 @@ export const DiseaseScan: React.FC<DiseaseScanProps> = ({ setActiveTab }) => {
         body: formData
       });
 
+      clearInterval(stepInterval);
+
       if (res.ok) {
         const data = await res.json();
-        setTimeout(() => {
-          setDiagnosis(data);
-          setIsAnalyzing(false);
-          setScanStep(0);
-        }, 1800);
+        setDiagnosis(data);
+        setIsAnalyzing(false);
+        setScanStep(0);
       } else {
         const err = await res.json();
         throw new Error(err.error || 'Scan diagnostic failed');
       }
     } catch (err: any) {
+      clearInterval(stepInterval);
       setIsAnalyzing(false);
       setScanStep(0);
       setScanError(err.message || 'Image processing failed. Please ensure the leaf is clearly visible and retry.');
     }
-
-    return () => {
-      clearTimeout(timer1);
-      clearTimeout(timer2);
-    };
   };
 
   return (
@@ -163,22 +212,12 @@ export const DiseaseScan: React.FC<DiseaseScanProps> = ({ setActiveTab }) => {
           </p>
         </div>
 
-        {/* Crop Selector */}
+        {/* AI Auto Crop Detection Badge */}
         <div className="flex items-center gap-2">
-          <label className="text-xs font-bold text-gray-500">Crop:</label>
-          <select
-            value={selectedCrop}
-            onChange={e => setSelectedCrop(e.target.value)}
-            className="bg-emerald-50 border border-emerald-200 text-emerald-900 font-bold text-xs rounded-xl px-3 py-2 focus:ring-2 focus:ring-emerald-500 outline-none"
-          >
-            <option value="Groundnut">Groundnut (వేరుశనగ)</option>
-            <option value="Tomato">Tomato (టమాటా)</option>
-            <option value="Rice">Rice / Paddy (వరి)</option>
-            <option value="Cotton">Cotton (ప్రత్తి)</option>
-            <option value="Chilli">Chilli (మిరప)</option>
-            <option value="Wheat">Wheat (గోధుమ)</option>
-            <option value="Maize">Maize (మొక్కజొన్న)</option>
-          </select>
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold shadow-2xs">
+            <span>🌱</span>
+            <span>AI Auto Crop Detection</span>
+          </div>
         </div>
       </div>
 
@@ -437,12 +476,30 @@ export const DiseaseScan: React.FC<DiseaseScanProps> = ({ setActiveTab }) => {
             </div>
           </div>
 
+          {/* Crop Clarification Prompt if Crop is Indistinguishable */}
+          {(diagnosis.clarificationPrompt || diagnosis.cropName?.includes('Unknown') || diagnosis.cropName?.includes('Unclear')) && (
+            <div className="p-4 rounded-2xl bg-amber-50 border-2 border-amber-300 text-amber-950 flex items-start gap-3">
+              <span className="text-xl shrink-0 mt-0.5">🌾</span>
+              <div className="space-y-1">
+                <h4 className="font-extrabold text-xs uppercase tracking-wide text-amber-900">
+                  Crop Clarification Needed
+                </h4>
+                <p className="text-xs text-amber-900 font-bold">
+                  {diagnosis.clarificationPrompt || 'Please tell us which crop this is.'}
+                </p>
+                <p className="text-[11px] text-amber-800">
+                  The leaf condition was identified, but the host crop is ambiguous in this close-up view. For crop-specific pesticide and fertilizer dosages, tell our AI Assistant which crop this leaf belongs to.
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Result Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 pb-4">
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-gray-400 uppercase tracking-wide">
-                  Crop: {diagnosis.cropName}
+                <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">
+                  Identified Crop: <strong className="text-emerald-700 font-extrabold">{diagnosis.cropName}</strong>
                 </span>
                 <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
                   {diagnosis.severity} Severity

@@ -92,8 +92,11 @@ export const AiAssistant: React.FC<AiAssistantProps> = ({ onOpenVoice, setActive
       Authorization: `Bearer ${localStorage.getItem('agri_token') || ''}`
     };
 
+    const aiMsgId = `ai-${Date.now()}`;
+    let accumulatedText = '';
+
     try {
-      const res = await fetch('/api/ai/chat', {
+      const res = await fetch('/api/ai/chat/stream', {
         method: 'POST',
         headers,
         body: JSON.stringify({
@@ -102,31 +105,100 @@ export const AiAssistant: React.FC<AiAssistantProps> = ({ onOpenVoice, setActive
         })
       });
 
-      if (res.ok) {
-        const data = await res.json();
-        const aiMsg: Message = {
-          id: `ai-${Date.now()}`,
-          sender: 'ai',
-          source: data.source,
-          text: data.reply,
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          suggestedActions: data.suggestedActions,
-          matchedProducts: data.matchedProducts
-        };
-        setMessages(prev => [...prev, aiMsg]);
+      if (res.ok && res.body) {
+        setIsTyping(false);
+        setMessages(prev => [
+          ...prev,
+          {
+            id: aiMsgId,
+            sender: 'ai',
+            source: 'GEMINI_AI',
+            text: '',
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          }
+        ]);
+
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || '';
+
+          for (const line of lines) {
+            const trimmed = line.trim();
+            if (trimmed.startsWith('data: ')) {
+              const dataStr = trimmed.slice(6).trim();
+              if (dataStr === '[DONE]') continue;
+              try {
+                const parsed = JSON.parse(dataStr);
+                if (parsed.text) {
+                  accumulatedText += parsed.text;
+                  setMessages(prev =>
+                    prev.map(m => (m.id === aiMsgId ? { ...m, text: accumulatedText } : m))
+                  );
+                }
+              } catch {
+                // not JSON chunk
+              }
+            }
+          }
+        }
+
+        if (!accumulatedText.trim()) {
+          throw new Error('Empty stream response');
+        }
       } else {
-        throw new Error('AI service error');
+        throw new Error('Streaming connection failed');
       }
     } catch {
-      setMessages(prev => [
-        ...prev,
-        {
-          id: `ai-err-${Date.now()}`,
-          sender: 'ai',
-          text: 'Unable to connect to the AI Gateway right now. Please check your network connection.',
-          timestamp: 'Just now'
+      // Fallback to standard chat endpoint
+      try {
+        const fallbackRes = await fetch('/api/ai/chat', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            message: textToSend,
+            language
+          })
+        });
+
+        if (fallbackRes.ok) {
+          const data = await fallbackRes.json();
+          setMessages(prev => {
+            const filtered = prev.filter(m => m.id !== aiMsgId);
+            return [
+              ...filtered,
+              {
+                id: aiMsgId,
+                sender: 'ai',
+                source: data.source,
+                text: data.reply,
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                suggestedActions: data.suggestedActions,
+                matchedProducts: data.matchedProducts
+              }
+            ];
+          });
+        } else {
+          throw new Error('Fallback failed');
         }
-      ]);
+      } catch {
+        setMessages(prev => [
+          ...prev.filter(m => m.id !== aiMsgId),
+          {
+            id: `ai-err-${Date.now()}`,
+            sender: 'ai',
+            text: 'Unable to connect to the AI Gateway right now. Please check your network connection.',
+            timestamp: 'Just now'
+          }
+        ]);
+      }
     } finally {
       setIsTyping(false);
     }

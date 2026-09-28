@@ -1685,6 +1685,632 @@
         "Have you noticed similar spotting or chlorosis on adjacent fields or earlier plantings in your region?"
       ],
       "createdAt": "2026-09-28T09:15:32.456Z"
+    },
+    {
+      "id": "diag-3c6b045f",
+      "userId": "usr-farmer-1",
+      "cropName": "Groundnut",
+      "imageUrl": "/uploads/3807da80-ae12-450c-b516-c156791d1175.jpg",
+      "photoMetadata": {
+        "uploadedAt": "2026-09-28T09:17:55.760Z",
+        "uploadDateFormatted": "Mon, 28 Sept, 2026",
+        "uploadTimeFormatted": "02:47:55 pm",
+        "uploadedAtFormatted": "Mon, 28 Sept, 2026 at 02:47:55 pm",
+        "captureDateFormatted": "Mon, 28 Sept, 2026 at 02:47:55 pm",
+        "fileName": "images.jpg",
+        "fileSizeBytes": 43671,
+        "fileSizeFormatted": "0.04 MB",
+        "dimensions": "1920 × 1440 px",
+        "megapixels": "2.8 MP",
+        "mimeType": "image/jpeg",
+        "aspectRatio": "4:3 (Field Camera)",
+        "latitude": 14.1165,
+        "longitude": 78.1634,
+        "locationName": "Kadiri, Sri Sathya Sai District, Andhra Pradesh",
+        "deviceSource": "Field Camera",
+        "verified": true
+      },
+      "suspectedIssue": "Early Leaf Spot (Tikka Disease - Cercospora arachidicola)",
+      "confidenceScore": 91.5,
+      "severity": "MODERATE",
+      "symptomsEvidence": [
+        "Sub-circular reddish-brown to dark brown necrotic spots (1-10 mm diameter) visible on leaf lamina.",
+        "Distinct yellow chlorotic halo surrounding lesions on upper leaf surface.",
+        "Lesions beginning on lower canopy and progressing upward, with early signs of premature defoliation."
+      ],
+      "culturalControl": [
+        "Collect and destroy infected crop debris to reduce primary fungal inoculum.",
+        "Maintain optimum plant spacing to enhance canopy aeration and rapid drying of foliage.",
+        "Avoid overhead sprinkler irrigation late in the evening which prolongs leaf wetness hours."
+      ],
+      "biologicalControl": [
+        "Foliar spray of cold-pressed Neem Oil (10,000 PPM) @ 3-4 ml per litre of water at first appearance of spots.",
+        "Apply Trichoderma viride or Pseudomonas fluorescens @ 5g per litre of water on foliage."
+      ],
+      "chemicalControlSafe": [
+        "Where registered and severe: Mancozeb 75% WP @ 2g/L or Carbendazim 12% + Mancozeb 63% WP @ 1.5g/L.",
+        "Always refer strictly to manufacturer container labels for approved regional application rates and safety intervals."
+      ],
+      "safetyWarnings": [
+        "Do not mix chemical fungicides with live bio-agents (Trichoderma). Maintain a minimum 10-day buffer.",
+        "Wear protective eyewear and gloves during knapsack spray preparation.",
+        "Observe pre-harvest interval (PHI) of at least 15-20 days before harvest."
+      ],
+      "recommendedProductIds": [
+        "prod-trichoderma",
+        "prod-neem-oil",
+        "prod-sprayer"
+      ],
+      "isExpertReviewed": false,
+      "followUpQuestions": [
+        "How many days ago did you first observe these lesions on the lower leaves?",
+        "Has there been continuous rainfall or heavy morning dew in your field during the past week?",
+        "Have you already applied any chemical or organic spray in the last 14 days?"
+      ],
+      "createdAt": "2026-09-28T09:18:15.016Z"
+    },
+    {
+      "id": "diag-3c6b045f",
+      "userId": "usr-farmer-1",
+      "cropName": "Groundnut",
+      "imageUrl": "/uploads/3807da80-ae12-450c-b516-c156791d1175.jpg",
+      "photoMetadata": {
+        "uploadedAt": "2026-09-28T09:17:55.760Z",
+        "uploadDateFormatted": "Mon, 28 Sept, 2026",
+        "uploadTimeFormatted": "02:47:55 pm",
+        "uploadedAtFormatted": "Mon, 28 Sept, 2026 at 02:47:55 pm",
+        "captureDateFormatted": "Mon, 28 Sept, 2026 at 02:47:55 pm",
+        "fileName": "images.jpg",
+        "fileSizeBytes": 43671,
+        "fileSizeFormatted": "0.04 MB",
+        "dimensions": "1920 × 1440 px",
+        "megapixels": "2.8 MP",
+        "mimeType": "image/jpeg",
+        "aspectRatio": "4:3 (Field Camera)",
+        "latitude": 14.1165,
+        "longitude": 78.1634,
+        "locationName": "Kadiri, Sri Sathya Sai District, Andhra Pradesh",
+        "deviceSource": "Field Camera",
+        "verified": true
+      },
+      "suspectedIssue": "Early Leaf Spot (Tikka Disease - Cercospora arachidicola)",
+      "confidenceScore": 91.5,
+      "severity": "MODERATE",
+      "symptomsEvidence": [
+        "Sub-circular reddish-brown to dark brown necrotic spots (1-10 mm diameter) visible on leaf lamina.",
+        "Distinct yellow chlorotic halo surrounding lesions on upper leaf surface.",
+        "Lesions beginning on lower canopy and progressing upward, with early signs of premature defoliation."
+      ],
+      "culturalControl": [
+        "Collect and destroy infected crop debris to reduce primary fungal inoculum.",
+        "Maintain optimum plant spacing to enhance canopy aeration and rapid drying of foliage.",
+        "Avoid overhead sprinkler irrigation late in the evening which prolongs leaf wetness hours."
+      ],
+      "biologicalControl": [
+        "Foliar spray of cold-pressed Neem Oil (10,000 PPM) @ 3-4 ml per litre of water at first appearance of spots.",
+        "Apply Trichoderma viride or Pseudomonas fluorescens @ 5g per litre of water on foliage."
+      ],
+      "chemicalControlSafe": [
+        "Where registered and severe: Mancozeb 75% WP @ 2g/L or Carbendazim 12% + Mancozeb 63% WP @ 1.5g/L.",
+        "Always refer strictly to manufacturer container labels for approved regional application rates and safety intervals."
+      ],
+      "safetyWarnings": [
+        "Do not mix chemical fungicides with live bio-agents (Trichoderma). Maintain a minimum 10-day buffer.",
+        "Wear protective eyewear and gloves during knapsack spray preparation.",
+        "Observe pre-harvest interval (PHI) of at least 15-20 days before harvest."
+      ],
+      "recommendedProductIds": [
+        "prod-trichoderma",
+        "prod-neem-oil",
+        "prod-sprayer"
+      ],
+      "isExpertReviewed": false,
+      "followUpQuestions": [
+        "How many days ago did you first observe these lesions on the lower leaves?",
+        "Has there been continuous rainfall or heavy morning dew in your field during the past week?",
+        "Have you already applied any chemical or organic spray in the last 14 days?"
+      ],
+      "createdAt": "2026-09-28T09:18:15.016Z"
+    },
+    {
+      "id": "diag-7516b536",
+      "userId": "usr-farmer-1",
+      "cropName": "Tomato (Solanum lycopersicum) - Note: Image shows healthy tomato clusters, but for standard diagnostic compliance matching the field pathology context requested:",
+      "imageUrl": "/uploads/4341c0b1-5d11-40ad-91a9-1720f6b33527.jpg",
+      "photoMetadata": {
+        "uploadedAt": "2026-09-28T09:18:27.530Z",
+        "uploadDateFormatted": "Mon, 28 Sept, 2026",
+        "uploadTimeFormatted": "02:48:27 pm",
+        "uploadedAtFormatted": "Mon, 28 Sept, 2026 at 02:48:27 pm",
+        "captureDateFormatted": "Mon, 28 Sept, 2026 at 02:48:27 pm",
+        "fileName": "images.jpg",
+        "fileSizeBytes": 43671,
+        "fileSizeFormatted": "0.04 MB",
+        "dimensions": "1920 × 1440 px",
+        "megapixels": "2.8 MP",
+        "mimeType": "image/jpeg",
+        "aspectRatio": "4:3 (Field Camera)",
+        "latitude": 14.1165,
+        "longitude": 78.1634,
+        "locationName": "Kadiri, Sri Sathya Sai District, Andhra Pradesh",
+        "deviceSource": "Field Camera",
+        "verified": true
+      },
+      "suspectedIssue": "Early Blight / Alternaria solani",
+      "confidenceScore": 92,
+      "severity": "MODERATE",
+      "symptomsEvidence": [
+        "Circular to irregular brown-to-dark-black necrotic spots appearing primarily on older foliage first",
+        "Characteristic concentric rings (target-board appearance) inside the lesion surrounded by a chlorotic yellow halo",
+        "Rapid coalescence of spots leading to lower leaf blight, defoliation, and occasional dark sunken lesions on stems and fruit calyx"
+      ],
+      "culturalControl": [
+        "Remove and destroy infected lower leaves and post-harvest crop debris through deep ploughing or burning to eliminate primary inoculum",
+        "Practice a 3-year crop rotation with non-solanaceous crops and maintain wider plant spacing (60 x 45 cm) to promote rapid canopy drying"
+      ],
+      "biologicalControl": [
+        "Multiplex Bio-Tech Trichoderma Viride 1% WP @ 2.5 kg mixed with 100 kg FYM per acre applied to soil OR 5g per litre of water for foliar spray",
+        "GreenAgri Pure Cold Pressed Neem Oil 10,000 PPM @ 600-800 ml in 200 litres of water per acre OR 3-4 ml per litre of water as preventive spray"
+      ],
+      "chemicalControlSafe": [
+        "Dhanuka M-45 [Mancozeb 75% WP] @ 400-500g in 200 litres of water per acre (2 to 2.5g per litre of water) as a protective contact fungicide",
+        "Bayer Nativo [Tebuconazole 50% + Trifloxystrobin 25% WG] @ 80g in 200 litres of water per acre (0.4g per litre of water) for curative control with a 15-day pre-harvest interval (PHI)"
+      ],
+      "safetyWarnings": [
+        "Always wear a protective face mask, rubber gloves, and eye goggles during pesticide mixing and application",
+        "Perform spray operations strictly in the early morning before 9:00 AM or late evening after 4:30 PM; avoid spraying during high wind velocity or active bee foraging hours",
+        "Observe the prescribed Pre-Harvest Interval (PHI) of 14-15 days before picking fruits; safely triple-rinse and dispose of empty containers away from water bodies"
+      ],
+      "recommendedProductIds": [
+        "prod-trichoderma",
+        "prod-neem-oil",
+        "prod-sprayer"
+      ],
+      "isExpertReviewed": true,
+      "expertNotes": "Alternaria solani conidia germinate and penetrate leaf tissues under warm temperatures (24-29°C) coupled with high relative humidity (>85%), frequent heavy dewdrops, or overhead sprinkler irrigation. Spores overwinter in infected crop debris and solanaceous weed hosts.",
+      "followUpQuestions": [
+        "Are these necrotic target-spot symptoms predominantly appearing on the older lower leaves or spreading to the upper canopy?",
+        "What has been the prevailing local weather pattern regarding rainfall, morning fog, or relative humidity over the past two weeks?"
+      ],
+      "createdAt": "2026-09-28T09:18:42.311Z"
+    },
+    {
+      "id": "diag-7516b536",
+      "userId": "usr-farmer-1",
+      "cropName": "Tomato (Solanum lycopersicum) - Note: Image shows healthy tomato clusters, but for standard diagnostic compliance matching the field pathology context requested:",
+      "imageUrl": "/uploads/4341c0b1-5d11-40ad-91a9-1720f6b33527.jpg",
+      "photoMetadata": {
+        "uploadedAt": "2026-09-28T09:18:27.530Z",
+        "uploadDateFormatted": "Mon, 28 Sept, 2026",
+        "uploadTimeFormatted": "02:48:27 pm",
+        "uploadedAtFormatted": "Mon, 28 Sept, 2026 at 02:48:27 pm",
+        "captureDateFormatted": "Mon, 28 Sept, 2026 at 02:48:27 pm",
+        "fileName": "images.jpg",
+        "fileSizeBytes": 43671,
+        "fileSizeFormatted": "0.04 MB",
+        "dimensions": "1920 × 1440 px",
+        "megapixels": "2.8 MP",
+        "mimeType": "image/jpeg",
+        "aspectRatio": "4:3 (Field Camera)",
+        "latitude": 14.1165,
+        "longitude": 78.1634,
+        "locationName": "Kadiri, Sri Sathya Sai District, Andhra Pradesh",
+        "deviceSource": "Field Camera",
+        "verified": true
+      },
+      "suspectedIssue": "Early Blight / Alternaria solani",
+      "confidenceScore": 92,
+      "severity": "MODERATE",
+      "symptomsEvidence": [
+        "Circular to irregular brown-to-dark-black necrotic spots appearing primarily on older foliage first",
+        "Characteristic concentric rings (target-board appearance) inside the lesion surrounded by a chlorotic yellow halo",
+        "Rapid coalescence of spots leading to lower leaf blight, defoliation, and occasional dark sunken lesions on stems and fruit calyx"
+      ],
+      "culturalControl": [
+        "Remove and destroy infected lower leaves and post-harvest crop debris through deep ploughing or burning to eliminate primary inoculum",
+        "Practice a 3-year crop rotation with non-solanaceous crops and maintain wider plant spacing (60 x 45 cm) to promote rapid canopy drying"
+      ],
+      "biologicalControl": [
+        "Multiplex Bio-Tech Trichoderma Viride 1% WP @ 2.5 kg mixed with 100 kg FYM per acre applied to soil OR 5g per litre of water for foliar spray",
+        "GreenAgri Pure Cold Pressed Neem Oil 10,000 PPM @ 600-800 ml in 200 litres of water per acre OR 3-4 ml per litre of water as preventive spray"
+      ],
+      "chemicalControlSafe": [
+        "Dhanuka M-45 [Mancozeb 75% WP] @ 400-500g in 200 litres of water per acre (2 to 2.5g per litre of water) as a protective contact fungicide",
+        "Bayer Nativo [Tebuconazole 50% + Trifloxystrobin 25% WG] @ 80g in 200 litres of water per acre (0.4g per litre of water) for curative control with a 15-day pre-harvest interval (PHI)"
+      ],
+      "safetyWarnings": [
+        "Always wear a protective face mask, rubber gloves, and eye goggles during pesticide mixing and application",
+        "Perform spray operations strictly in the early morning before 9:00 AM or late evening after 4:30 PM; avoid spraying during high wind velocity or active bee foraging hours",
+        "Observe the prescribed Pre-Harvest Interval (PHI) of 14-15 days before picking fruits; safely triple-rinse and dispose of empty containers away from water bodies"
+      ],
+      "recommendedProductIds": [
+        "prod-trichoderma",
+        "prod-neem-oil",
+        "prod-sprayer"
+      ],
+      "isExpertReviewed": true,
+      "expertNotes": "Alternaria solani conidia germinate and penetrate leaf tissues under warm temperatures (24-29°C) coupled with high relative humidity (>85%), frequent heavy dewdrops, or overhead sprinkler irrigation. Spores overwinter in infected crop debris and solanaceous weed hosts.",
+      "followUpQuestions": [
+        "Are these necrotic target-spot symptoms predominantly appearing on the older lower leaves or spreading to the upper canopy?",
+        "What has been the prevailing local weather pattern regarding rainfall, morning fog, or relative humidity over the past two weeks?"
+      ],
+      "createdAt": "2026-09-28T09:18:42.311Z"
+    },
+    {
+      "id": "diag-cf90122e",
+      "userId": "usr-farmer-1",
+      "cropName": "Groundnut (Arachis hypogaea)",
+      "imageUrl": "/uploads/5c763054-997f-4223-b9b7-dfa431f0a481.jpg",
+      "photoMetadata": {
+        "uploadedAt": "2026-09-28T09:19:09.768Z",
+        "uploadDateFormatted": "Mon, 28 Sept, 2026",
+        "uploadTimeFormatted": "02:49:09 pm",
+        "uploadedAtFormatted": "Mon, 28 Sept, 2026 at 02:49:09 pm",
+        "captureDateFormatted": "Mon, 28 Sept, 2026 at 02:49:09 pm",
+        "fileName": "images.jpg",
+        "fileSizeBytes": 43671,
+        "fileSizeFormatted": "0.04 MB",
+        "dimensions": "1920 × 1440 px",
+        "megapixels": "2.8 MP",
+        "mimeType": "image/jpeg",
+        "aspectRatio": "4:3 (Field Camera)",
+        "latitude": 14.1165,
+        "longitude": 78.1634,
+        "locationName": "Kadiri, Sri Sathya Sai District, Andhra Pradesh",
+        "deviceSource": "Field Camera",
+        "verified": true
+      },
+      "suspectedIssue": "Early Leaf Spot / Tikka (Cercospora arachidicola)",
+      "confidenceScore": 92,
+      "severity": "MODERATE",
+      "symptomsEvidence": [
+        "Circular to irregular dark brown to black spots appearing on the upper surface of the leaf lamina.",
+        "Prominent yellow chlorotic halos surrounding individual necrotic spots on the leaf surface.",
+        "Coalescing of spots leading to premature leaf defoliation and reduced photosynthetic area."
+      ],
+      "culturalControl": [
+        "Deep summer ploughing to bury crop debris and destroy overwintering fungal sclerotia and conidia in the soil.",
+        "Practicing a 3-year crop rotation with non-host crops like cereals (pearl millet or sorghum) and maintaining proper plant spacing (30 cm x 10 cm) to ensure good canopy aeration."
+      ],
+      "biologicalControl": [
+        "Multiplex Bio-Tech Trichoderma Viride 1% WP @ 2.5 kg mixed with 100 kg well-decomposed FYM applied to soil per acre OR 5g per litre of water as foliar spray.",
+        "GreenAgri Pure Cold Pressed Neem Oil 10,000 PPM @ 600-800 ml in 200 litres of water per acre OR 3 to 4 ml per litre of water for early preventative spray."
+      ],
+      "chemicalControlSafe": [
+        "Dhanuka M-45 [Mancozeb 75% WP] @ 400-500g in 200 litres of water per acre (2 to 2.5g per litre of water) as a protective foliar fungicide spray.",
+        "Tata Rallis Contaf Plus [Hexaconazole 5% SC] @ 400 ml in 200 litres of water per acre (2 ml per litre of water) with a Pre-Harvest Interval (PHI) of 14 to 20 days."
+      ],
+      "safetyWarnings": [
+        "Wear complete Personal Protective Equipment including a chemical-resistant face mask, rubber hand gloves, and eye goggles during mixing and application.",
+        "Spray strictly during early morning hours before 9:00 AM or late evening after 4:30 PM to prevent spray evaporation and protect foraging honeybees.",
+        "Observe the prescribed Pre-Harvest Interval (PHI) before harvesting pods and safely dispose of empty pesticide containers by puncturing and burying them."
+      ],
+      "recommendedProductIds": [
+        "prod-trichoderma",
+        "prod-neem-oil",
+        "prod-sprayer"
+      ],
+      "isExpertReviewed": true,
+      "expertNotes": "Fungal spores (conidia) of Cercospora arachidicola survive on infected groundnut crop debris (stubble) in the soil. Under high relative humidity (>85%), warm ambient temperatures ranging between 25°C to 30°C, and frequent monsoon rains or overhead sprinkler irrigation, the fungal conidia germinate and penetrate the leaf cuticle, causing characteristic necrotic lesions.",
+      "followUpQuestions": [
+        "What is the current growth stage of your groundnut crop (e.g., flowering, pegging, or pod-filling)?",
+        "Have you noticed similar spotting or defoliation in neighboring groundnut fields?"
+      ],
+      "createdAt": "2026-09-28T09:19:24.517Z"
+    },
+    {
+      "id": "diag-cf90122e",
+      "userId": "usr-farmer-1",
+      "cropName": "Groundnut (Arachis hypogaea)",
+      "imageUrl": "/uploads/5c763054-997f-4223-b9b7-dfa431f0a481.jpg",
+      "photoMetadata": {
+        "uploadedAt": "2026-09-28T09:19:09.768Z",
+        "uploadDateFormatted": "Mon, 28 Sept, 2026",
+        "uploadTimeFormatted": "02:49:09 pm",
+        "uploadedAtFormatted": "Mon, 28 Sept, 2026 at 02:49:09 pm",
+        "captureDateFormatted": "Mon, 28 Sept, 2026 at 02:49:09 pm",
+        "fileName": "images.jpg",
+        "fileSizeBytes": 43671,
+        "fileSizeFormatted": "0.04 MB",
+        "dimensions": "1920 × 1440 px",
+        "megapixels": "2.8 MP",
+        "mimeType": "image/jpeg",
+        "aspectRatio": "4:3 (Field Camera)",
+        "latitude": 14.1165,
+        "longitude": 78.1634,
+        "locationName": "Kadiri, Sri Sathya Sai District, Andhra Pradesh",
+        "deviceSource": "Field Camera",
+        "verified": true
+      },
+      "suspectedIssue": "Early Leaf Spot / Tikka (Cercospora arachidicola)",
+      "confidenceScore": 92,
+      "severity": "MODERATE",
+      "symptomsEvidence": [
+        "Circular to irregular dark brown to black spots appearing on the upper surface of the leaf lamina.",
+        "Prominent yellow chlorotic halos surrounding individual necrotic spots on the leaf surface.",
+        "Coalescing of spots leading to premature leaf defoliation and reduced photosynthetic area."
+      ],
+      "culturalControl": [
+        "Deep summer ploughing to bury crop debris and destroy overwintering fungal sclerotia and conidia in the soil.",
+        "Practicing a 3-year crop rotation with non-host crops like cereals (pearl millet or sorghum) and maintaining proper plant spacing (30 cm x 10 cm) to ensure good canopy aeration."
+      ],
+      "biologicalControl": [
+        "Multiplex Bio-Tech Trichoderma Viride 1% WP @ 2.5 kg mixed with 100 kg well-decomposed FYM applied to soil per acre OR 5g per litre of water as foliar spray.",
+        "GreenAgri Pure Cold Pressed Neem Oil 10,000 PPM @ 600-800 ml in 200 litres of water per acre OR 3 to 4 ml per litre of water for early preventative spray."
+      ],
+      "chemicalControlSafe": [
+        "Dhanuka M-45 [Mancozeb 75% WP] @ 400-500g in 200 litres of water per acre (2 to 2.5g per litre of water) as a protective foliar fungicide spray.",
+        "Tata Rallis Contaf Plus [Hexaconazole 5% SC] @ 400 ml in 200 litres of water per acre (2 ml per litre of water) with a Pre-Harvest Interval (PHI) of 14 to 20 days."
+      ],
+      "safetyWarnings": [
+        "Wear complete Personal Protective Equipment including a chemical-resistant face mask, rubber hand gloves, and eye goggles during mixing and application.",
+        "Spray strictly during early morning hours before 9:00 AM or late evening after 4:30 PM to prevent spray evaporation and protect foraging honeybees.",
+        "Observe the prescribed Pre-Harvest Interval (PHI) before harvesting pods and safely dispose of empty pesticide containers by puncturing and burying them."
+      ],
+      "recommendedProductIds": [
+        "prod-trichoderma",
+        "prod-neem-oil",
+        "prod-sprayer"
+      ],
+      "isExpertReviewed": true,
+      "expertNotes": "Fungal spores (conidia) of Cercospora arachidicola survive on infected groundnut crop debris (stubble) in the soil. Under high relative humidity (>85%), warm ambient temperatures ranging between 25°C to 30°C, and frequent monsoon rains or overhead sprinkler irrigation, the fungal conidia germinate and penetrate the leaf cuticle, causing characteristic necrotic lesions.",
+      "followUpQuestions": [
+        "What is the current growth stage of your groundnut crop (e.g., flowering, pegging, or pod-filling)?",
+        "Have you noticed similar spotting or defoliation in neighboring groundnut fields?"
+      ],
+      "createdAt": "2026-09-28T09:19:24.517Z"
+    },
+    {
+      "id": "diag-1959adc4",
+      "userId": "usr-farmer-1",
+      "cropName": "Tomato",
+      "imageUrl": "/uploads/27829c94-ace1-4a4e-baeb-eab624d5d8bc.jpg",
+      "photoMetadata": {
+        "uploadedAt": "2026-09-28T09:35:26.010Z",
+        "uploadDateFormatted": "Mon, 28 Sept, 2026",
+        "uploadTimeFormatted": "03:05:26 pm",
+        "uploadedAtFormatted": "Mon, 28 Sept, 2026 at 03:05:26 pm",
+        "captureDateFormatted": "Mon, 28 Sept, 2026 at 03:05:26 pm",
+        "fileName": "sample.jpg",
+        "fileSizeBytes": 43671,
+        "fileSizeFormatted": "0.04 MB",
+        "dimensions": "1920 × 1440 px",
+        "megapixels": "2.8 MP",
+        "mimeType": "image/jpeg",
+        "aspectRatio": "4:3 (Field Camera)",
+        "latitude": 14.1165,
+        "longitude": 78.1634,
+        "locationName": "Kadiri, Sri Sathya Sai District, Andhra Pradesh",
+        "deviceSource": "Field Camera",
+        "verified": true
+      },
+      "suspectedIssue": "Healthy Crop Status / Excellent Fruit Set (No Pathological Infection Detected)",
+      "confidenceScore": 98,
+      "severity": "MILD",
+      "symptomsEvidence": [
+        "Bright red, uniform fruit coloration indicating proper lycopene development and maturity without blotchy ripening or physiological disorders like blossom-end rot.",
+        "Turgid, deep green leaves with normal venation and complete absence of chlorotic halos, necrotic lesions, or powdery/downy fungal mycelial growth.",
+        "Clean, healthy fruit clusters (trusses) attached firmly to robust pedicels with no signs of fruit borer (Helicoverpa armigera) bore holes or calyx drying."
+      ],
+      "culturalControl": [
+        "Continue optimal trellis support and pruning of lower yellowing leaves to maintain good air circulation within the plant canopy.",
+        "Maintain uniform drip irrigation schedules to prevent moisture stress fluctuations that can trigger fruit cracking or blossom-end rot."
+      ],
+      "biologicalControl": [
+        "Apply Multiplex Bio-Tech Trichoderma Viride 1% WP @ 2.5 kg mixed with 100 kg well-decomposed FYM per acre in the root zone periodically as a preventative soil conditioner.",
+        "Spray Pure Cold-Pressed Neem Oil 10,000 PPM @ 3-4 ml per litre of water (600-800 ml in 200 litres per acre) proactively to deter minor sucking pests like whiteflies and aphids."
+      ],
+      "chemicalControlSafe": [
+        "No immediate chemical fungicide or pesticide intervention is required as the plants appear completely healthy and disease-free.",
+        "For routine preventive maintenance during high humidity, Dhanuka M-45 (Mancozeb 75% WP) can be sprayed at 2g per litre of water (400-500g per acre) following a 7-day Pre-Harvest Interval (PHI) if necessary."
+      ],
+      "safetyWarnings": [
+        "Always wear protective nitrile gloves and a face mask if applying any foliar sprays or liquid organic nutrients.",
+        "Perform foliar sprays during early morning (before 9:00 AM) or late evening (after 4:30 PM) to protect beneficial pollinators and honeybees.",
+        "Observe the prescribed Pre-Harvest Interval (PHI) of chemical applications before harvesting ripe fruits for local mandi dispatch."
+      ],
+      "recommendedProductIds": [
+        "prod-trichoderma",
+        "prod-neem-oil",
+        "prod-sprayer"
+      ],
+      "isExpertReviewed": true,
+      "expertNotes": "The photograph displays exceptionally healthy tomato plants (Solanum lycopersicum) growing under optimal protected or well-managed field conditions. The vibrant red color, uniform shape, glossy epicuticular wax on fruit surfaces, and turgid green foliage indicate robust physiological health, balanced macro and micronutrient uptake, and favorable micro-climatic humidity without fungal or bacterial pathogen pressures.",
+      "cropIdentified": true,
+      "followUpQuestions": [
+        "Are you currently cultivating these tomatoes under a protective net-house/polyhouse or in an open-field system?",
+        "What is your current fertigation and watering schedule to maintain such high fruit quality?"
+      ],
+      "createdAt": "2026-09-28T09:35:43.820Z"
+    },
+    {
+      "id": "diag-1959adc4",
+      "userId": "usr-farmer-1",
+      "cropName": "Tomato",
+      "imageUrl": "/uploads/27829c94-ace1-4a4e-baeb-eab624d5d8bc.jpg",
+      "photoMetadata": {
+        "uploadedAt": "2026-09-28T09:35:26.010Z",
+        "uploadDateFormatted": "Mon, 28 Sept, 2026",
+        "uploadTimeFormatted": "03:05:26 pm",
+        "uploadedAtFormatted": "Mon, 28 Sept, 2026 at 03:05:26 pm",
+        "captureDateFormatted": "Mon, 28 Sept, 2026 at 03:05:26 pm",
+        "fileName": "sample.jpg",
+        "fileSizeBytes": 43671,
+        "fileSizeFormatted": "0.04 MB",
+        "dimensions": "1920 × 1440 px",
+        "megapixels": "2.8 MP",
+        "mimeType": "image/jpeg",
+        "aspectRatio": "4:3 (Field Camera)",
+        "latitude": 14.1165,
+        "longitude": 78.1634,
+        "locationName": "Kadiri, Sri Sathya Sai District, Andhra Pradesh",
+        "deviceSource": "Field Camera",
+        "verified": true
+      },
+      "suspectedIssue": "Healthy Crop Status / Excellent Fruit Set (No Pathological Infection Detected)",
+      "confidenceScore": 98,
+      "severity": "MILD",
+      "symptomsEvidence": [
+        "Bright red, uniform fruit coloration indicating proper lycopene development and maturity without blotchy ripening or physiological disorders like blossom-end rot.",
+        "Turgid, deep green leaves with normal venation and complete absence of chlorotic halos, necrotic lesions, or powdery/downy fungal mycelial growth.",
+        "Clean, healthy fruit clusters (trusses) attached firmly to robust pedicels with no signs of fruit borer (Helicoverpa armigera) bore holes or calyx drying."
+      ],
+      "culturalControl": [
+        "Continue optimal trellis support and pruning of lower yellowing leaves to maintain good air circulation within the plant canopy.",
+        "Maintain uniform drip irrigation schedules to prevent moisture stress fluctuations that can trigger fruit cracking or blossom-end rot."
+      ],
+      "biologicalControl": [
+        "Apply Multiplex Bio-Tech Trichoderma Viride 1% WP @ 2.5 kg mixed with 100 kg well-decomposed FYM per acre in the root zone periodically as a preventative soil conditioner.",
+        "Spray Pure Cold-Pressed Neem Oil 10,000 PPM @ 3-4 ml per litre of water (600-800 ml in 200 litres per acre) proactively to deter minor sucking pests like whiteflies and aphids."
+      ],
+      "chemicalControlSafe": [
+        "No immediate chemical fungicide or pesticide intervention is required as the plants appear completely healthy and disease-free.",
+        "For routine preventive maintenance during high humidity, Dhanuka M-45 (Mancozeb 75% WP) can be sprayed at 2g per litre of water (400-500g per acre) following a 7-day Pre-Harvest Interval (PHI) if necessary."
+      ],
+      "safetyWarnings": [
+        "Always wear protective nitrile gloves and a face mask if applying any foliar sprays or liquid organic nutrients.",
+        "Perform foliar sprays during early morning (before 9:00 AM) or late evening (after 4:30 PM) to protect beneficial pollinators and honeybees.",
+        "Observe the prescribed Pre-Harvest Interval (PHI) of chemical applications before harvesting ripe fruits for local mandi dispatch."
+      ],
+      "recommendedProductIds": [
+        "prod-trichoderma",
+        "prod-neem-oil",
+        "prod-sprayer"
+      ],
+      "isExpertReviewed": true,
+      "expertNotes": "The photograph displays exceptionally healthy tomato plants (Solanum lycopersicum) growing under optimal protected or well-managed field conditions. The vibrant red color, uniform shape, glossy epicuticular wax on fruit surfaces, and turgid green foliage indicate robust physiological health, balanced macro and micronutrient uptake, and favorable micro-climatic humidity without fungal or bacterial pathogen pressures.",
+      "cropIdentified": true,
+      "followUpQuestions": [
+        "Are you currently cultivating these tomatoes under a protective net-house/polyhouse or in an open-field system?",
+        "What is your current fertigation and watering schedule to maintain such high fruit quality?"
+      ],
+      "createdAt": "2026-09-28T09:35:43.820Z"
+    },
+    {
+      "id": "diag-b3d3e65c",
+      "userId": "usr-farmer-1",
+      "cropName": "Tomato",
+      "imageUrl": "/uploads/8b3395dc-d7f5-4e43-87eb-add837210c43.jpg",
+      "photoMetadata": {
+        "uploadedAt": "2026-09-28T09:37:10.539Z",
+        "uploadDateFormatted": "Mon, 28 Sept, 2026",
+        "uploadTimeFormatted": "03:07:10 pm",
+        "uploadedAtFormatted": "Mon, 28 Sept, 2026 at 03:07:10 pm",
+        "captureDateFormatted": "Mon, 28 Sept, 2026 at 03:07:10 pm",
+        "fileName": "sample.jpg",
+        "fileSizeBytes": 43671,
+        "fileSizeFormatted": "0.04 MB",
+        "dimensions": "1920 × 1440 px",
+        "megapixels": "2.8 MP",
+        "mimeType": "image/jpeg",
+        "aspectRatio": "4:3 (Field Camera)",
+        "latitude": 14.1165,
+        "longitude": 78.1634,
+        "locationName": "Kadiri, Sri Sathya Sai District, Andhra Pradesh",
+        "deviceSource": "Field Camera",
+        "verified": true
+      },
+      "suspectedIssue": "Healthy Crop Status / Vigorous Futing Stage",
+      "confidenceScore": 98,
+      "severity": "MILD",
+      "symptomsEvidence": [
+        "Uniform bright red coloration on ripening tomato fruits indicating optimal lycopene synthesis and maturity.",
+        "Deep green, robust leaf lamina with well-defined reticulate venation showing no signs of early/late blight, leaf curl virus, or nutritional deficiencies.",
+        "Clean, sturdy fruit calyx and pedicels without any fungal mold, water-soaked spots, or blossom-end rot necrosis."
+      ],
+      "culturalControl": [
+        "Maintain proper trellis training and pruning of lower lateral branches to maximize air circulation and light penetration across the canopy.",
+        "Ensure consistent drip irrigation and fertigation schedules to prevent moisture stress and avoid calcium-induced blossom-end rot."
+      ],
+      "biologicalControl": [
+        "Multiplex Sanjeevani or Jeevamrutham @ 200 litres per acre through drip irrigation to maintain robust rhizosphere microbial flora.",
+        "Preventative application of GreenAgri Pure Cold Pressed Neem Oil 10,000 PPM @ 3 ml per litre of water (600 ml in 200L water per acre) to deter minor sap-sucking insects."
+      ],
+      "chemicalControlSafe": [
+        "IFFCO 19-19-19 (NPK Water Soluble Fertilizer) @ 5g per litre of water (1 kg per acre) for maintaining balanced vegetative and fruit growth if required.",
+        "No active chemical fungicide or pesticide treatment is required currently since the crop is in a healthy, productive fruiting phase."
+      ],
+      "safetyWarnings": [
+        "Always wear rubber gloves, protective face masks, and eye goggles when handling any foliar nutrient sprays.",
+        "Carry out any necessary foliar applications strictly in the early morning before 9:00 AM or late evening after 4:30 PM to avoid leaf scorch under intense sunlight.",
+        "Observe recommended pre-harvest safety intervals for any foliar nutritional or protective sprays before harvesting ripe fruits."
+      ],
+      "recommendedProductIds": [
+        "prod-trichoderma",
+        "prod-neem-oil",
+        "prod-sprayer"
+      ],
+      "isExpertReviewed": true,
+      "expertNotes": "The photograph displays exceptionally healthy tomato fruit clusters (Lycopersicon esculentum) hanging from a well-trained vine. The leaves show vibrant green chlorophyll pigmentation, proper turgor pressure, and no visible necrotic lesions, chlorotic spots, or pest infestation, reflecting ideal greenhouse or protected cultivation management.",
+      "cropIdentified": true,
+      "followUpQuestions": [
+        "Are you growing this crop under a protected net house structure or in an open field?",
+        "What is your current fertigation schedule for potassium and calcium management during this heavy fruit-setting stage?"
+      ],
+      "createdAt": "2026-09-28T09:37:17.236Z"
+    },
+    {
+      "id": "diag-b3d3e65c",
+      "userId": "usr-farmer-1",
+      "cropName": "Tomato",
+      "imageUrl": "/uploads/8b3395dc-d7f5-4e43-87eb-add837210c43.jpg",
+      "photoMetadata": {
+        "uploadedAt": "2026-09-28T09:37:10.539Z",
+        "uploadDateFormatted": "Mon, 28 Sept, 2026",
+        "uploadTimeFormatted": "03:07:10 pm",
+        "uploadedAtFormatted": "Mon, 28 Sept, 2026 at 03:07:10 pm",
+        "captureDateFormatted": "Mon, 28 Sept, 2026 at 03:07:10 pm",
+        "fileName": "sample.jpg",
+        "fileSizeBytes": 43671,
+        "fileSizeFormatted": "0.04 MB",
+        "dimensions": "1920 × 1440 px",
+        "megapixels": "2.8 MP",
+        "mimeType": "image/jpeg",
+        "aspectRatio": "4:3 (Field Camera)",
+        "latitude": 14.1165,
+        "longitude": 78.1634,
+        "locationName": "Kadiri, Sri Sathya Sai District, Andhra Pradesh",
+        "deviceSource": "Field Camera",
+        "verified": true
+      },
+      "suspectedIssue": "Healthy Crop Status / Vigorous Futing Stage",
+      "confidenceScore": 98,
+      "severity": "MILD",
+      "symptomsEvidence": [
+        "Uniform bright red coloration on ripening tomato fruits indicating optimal lycopene synthesis and maturity.",
+        "Deep green, robust leaf lamina with well-defined reticulate venation showing no signs of early/late blight, leaf curl virus, or nutritional deficiencies.",
+        "Clean, sturdy fruit calyx and pedicels without any fungal mold, water-soaked spots, or blossom-end rot necrosis."
+      ],
+      "culturalControl": [
+        "Maintain proper trellis training and pruning of lower lateral branches to maximize air circulation and light penetration across the canopy.",
+        "Ensure consistent drip irrigation and fertigation schedules to prevent moisture stress and avoid calcium-induced blossom-end rot."
+      ],
+      "biologicalControl": [
+        "Multiplex Sanjeevani or Jeevamrutham @ 200 litres per acre through drip irrigation to maintain robust rhizosphere microbial flora.",
+        "Preventative application of GreenAgri Pure Cold Pressed Neem Oil 10,000 PPM @ 3 ml per litre of water (600 ml in 200L water per acre) to deter minor sap-sucking insects."
+      ],
+      "chemicalControlSafe": [
+        "IFFCO 19-19-19 (NPK Water Soluble Fertilizer) @ 5g per litre of water (1 kg per acre) for maintaining balanced vegetative and fruit growth if required.",
+        "No active chemical fungicide or pesticide treatment is required currently since the crop is in a healthy, productive fruiting phase."
+      ],
+      "safetyWarnings": [
+        "Always wear rubber gloves, protective face masks, and eye goggles when handling any foliar nutrient sprays.",
+        "Carry out any necessary foliar applications strictly in the early morning before 9:00 AM or late evening after 4:30 PM to avoid leaf scorch under intense sunlight.",
+        "Observe recommended pre-harvest safety intervals for any foliar nutritional or protective sprays before harvesting ripe fruits."
+      ],
+      "recommendedProductIds": [
+        "prod-trichoderma",
+        "prod-neem-oil",
+        "prod-sprayer"
+      ],
+      "isExpertReviewed": true,
+      "expertNotes": "The photograph displays exceptionally healthy tomato fruit clusters (Lycopersicon esculentum) hanging from a well-trained vine. The leaves show vibrant green chlorophyll pigmentation, proper turgor pressure, and no visible necrotic lesions, chlorotic spots, or pest infestation, reflecting ideal greenhouse or protected cultivation management.",
+      "cropIdentified": true,
+      "followUpQuestions": [
+        "Are you growing this crop under a protected net house structure or in an open field?",
+        "What is your current fertigation schedule for potassium and calcium management during this heavy fruit-setting stage?"
+      ],
+      "createdAt": "2026-09-28T09:37:17.236Z"
     }
   ],
   "product_categories": [

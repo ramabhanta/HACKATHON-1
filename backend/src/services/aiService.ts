@@ -84,9 +84,8 @@ export class AiService {
     const ai = new GoogleGenAI({ apiKey });
     const modelsToTry = [
       'gemini-3.5-flash',
-      'gemini-3.8-flash',
-      'gemini-3.6-flash',
       'gemini-3.5-flash-lite',
+      'gemini-3.8-flash',
       'gemini-flash-latest',
       'gemini-flash-lite-latest'
     ];
@@ -100,7 +99,7 @@ export class AiService {
           config: {
             systemInstruction,
             temperature: options.temperature ?? 0.25,
-            maxOutputTokens: options.maxOutputTokens ?? 1500,
+            maxOutputTokens: options.maxOutputTokens ?? 800,
             ...(options.responseMimeType ? { responseMimeType: options.responseMimeType } : {})
           }
         });
@@ -193,15 +192,75 @@ ${context.soil ? `- Soil Health Data: pH ${context.soil.ph}, N: ${context.soil.n
 
     const text = await this.executeGemini(userQuery, contextualInstruction, {
       temperature: 0.25,
-      maxOutputTokens: 1500
+      maxOutputTokens: 750
     });
 
     return { reply: text };
   }
 
+  /**
+   * Stream Google Gemini with Indian Agronomy & Mandi Expert System Instruction
+   */
+  public static async *streamGeminiChat(
+    userQuery: string,
+    language: string,
+    context: { farm?: any; crop?: any; soil?: any }
+  ): AsyncGenerator<string> {
+    const apiKey = process.env.GEMINI_API_KEY || config.geminiApiKey;
+    if (apiKey && apiKey.length > 5) {
+      const ai = new GoogleGenAI({ apiKey });
+      const langName = LANGUAGE_NAMES[language] || 'English';
+
+      const contextualInstruction = `${INDIAN_AGRONOMY_SYSTEM_INSTRUCTION}
+
+Farmer & Regional Context:
+- Target Language: **${langName}** (Always reply fluently in this language).
+- Farm Location: ${context.farm?.district || 'Sri Sathya Sai / Kadiri'}, ${context.farm?.state || 'Andhra Pradesh'}
+- Soil Type: ${context.farm?.soilType || 'Red Sandy Loam'}
+- Standing Crops: ${context.crop?.cropName || 'Groundnut & Tomato'} (Acreage: ${context.farm?.totalArea || context.farm?.totalAcres || 5} acres)
+${context.soil ? `- Soil Health Data: pH ${context.soil.ph}, N: ${context.soil.nitrogenKgPerHa} kg/ha, P: ${context.soil.phosphorusKgPerHa} kg/ha, K: ${context.soil.potassiumKgPerHa} kg/ha, Organic Carbon: ${context.soil.organicCarbonPct}%` : ''}`;
+
+      const modelsToTry = [
+        'gemini-3.5-flash',
+        'gemini-3.5-flash-lite',
+        'gemini-3.8-flash',
+        'gemini-flash-latest'
+      ];
+
+      for (const model of modelsToTry) {
+        try {
+          const stream = await ai.models.generateContentStream({
+            model,
+            contents: userQuery,
+            config: {
+              systemInstruction: contextualInstruction,
+              temperature: 0.25,
+              maxOutputTokens: 750
+            }
+          });
+          for await (const chunk of stream) {
+            if (chunk.text) {
+              yield chunk.text;
+            }
+          }
+          return;
+        } catch (err: any) {
+          console.warn(`[AiService Stream] Model '${model}' stream failed: ${err?.message?.slice(0, 80)}. Trying fallback...`);
+          continue;
+        }
+      }
+    }
+
+    // Fallback: Stream instant agronomic knowledge engine
+    const fallbackRes = await this.fetchLiveAgriculturalKnowledge(userQuery, language, context.farm, context.crop);
+    const words = fallbackRes.reply.split(' ');
+    for (let i = 0; i < words.length; i += 3) {
+      yield words.slice(i, i + 3).join(' ') + ' ';
+    }
+  }
 
   /**
-   * Fetch Live Real Knowledge from Wikipedia and Agricultural Databases
+   * Ultra-Fast Internal Agricultural Knowledge Engine (Zero Network Overhead)
    */
   private static async fetchLiveAgriculturalKnowledge(
     query: string,
@@ -212,38 +271,7 @@ ${context.soil ? `- Soil Health Data: pH ${context.soil.ph}, N: ${context.soil.n
     const qLower = query.toLowerCase();
     const cropName = crop?.cropName || (qLower.includes('tomato') ? 'Tomato' : qLower.includes('cotton') ? 'Cotton' : qLower.includes('rice') ? 'Rice' : 'Groundnut');
 
-    let wikiExtract = '';
-    try {
-      // Search Wikipedia for agricultural topic
-      const searchTerm = `${cropName} ${query.replace(/[?.,!]/g, '')} agriculture`;
-      const searchRes = await fetch(
-        `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(searchTerm)}&format=json&origin=*`,
-        { signal: AbortSignal.timeout(4000) }
-      );
-
-      if (searchRes.ok) {
-        const searchData = (await searchRes.json()) as any;
-        const topResult = searchData?.query?.search?.[0];
-        if (topResult?.title) {
-          const extractRes = await fetch(
-            `https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro&explaintext&titles=${encodeURIComponent(topResult.title)}&format=json&origin=*`,
-            { signal: AbortSignal.timeout(4000) }
-          );
-          if (extractRes.ok) {
-            const extractData = (await extractRes.json()) as any;
-            const pages = extractData?.query?.pages;
-            const pageId = Object.keys(pages || {})[0];
-            if (pageId && pages[pageId]?.extract) {
-              wikiExtract = pages[pageId].extract.slice(0, 450);
-            }
-          }
-        }
-      }
-    } catch {
-      // Continue if Wikipedia call times out
-    }
-
-    // Compose authentic agronomic response with live data
+    // Fast in-memory agronomic response synthesis
     let baseAnswer = '';
     if (qLower.includes('yellow') || qLower.includes('leaves') || qLower.includes('turning yellow') || qLower.includes('పసుపు') || qLower.includes('पीली')) {
       baseAnswer = `**Diagnosis: Chlorosis (Foliage Yellowing) in ${cropName}**\n\n` +
@@ -275,16 +303,12 @@ ${context.soil ? `- Soil Health Data: pH ${context.soil.ph}, N: ${context.soil.n
         `You can list your lot directly in the **"Sell Produce"** tab to connect with verified wholesale buyers without middleman commissions.`;
     } else {
       baseAnswer = `**Agronomic Guidance for "${query}" (${cropName})**\n\n` +
-        (wikiExtract ? `*Scientific Botanical Context:* ${wikiExtract}\n\n` : '') +
         `• **Immediate Recommended Action:** Inspect 10 representative plants across your field in a zig-zag pattern.\n` +
         `• **Preventive Foliar Shield:** Spray Trichoderma viride or Pseudomonas fluorescens @ 5g/L water mixed with cold-pressed Neem Oil.\n` +
         `• **Field Diagnostics:** Snap a close-up leaf photo using the **"Scan Crop"** tool to verify fungal, bacterial, or pest etiology.`;
     }
 
-    // Add note for setting Gemini Key
-    const keyHint = `\n\n*(Note: For real-time conversational multi-turn deep neural AI, add your free Google Gemini API Key in "AI Settings".)*`;
-
-    return { reply: baseAnswer + keyHint };
+    return { reply: baseAnswer };
   }
 
   /**
@@ -365,16 +389,20 @@ ${context.soil ? `- Soil Health Data: pH ${context.soil.ph}, N: ${context.soil.n
         }
 
         if (imageBase64) {
-          const visionResult = await this.callGeminiVision(imageBase64, mimeType, cropHint);
+          const visionResult = await this.callGeminiVision(imageBase64, mimeType, cropNameHint || '');
           if (visionResult) {
+            const identifiedCrop = visionResult.cropName && !visionResult.cropName.includes('Unknown')
+              ? visionResult.cropName
+              : (cropNameHint || 'Unknown / Unclear');
+
             const diagnosis: AiDiagnosis = {
               id: `diag-${uuidv4().substring(0, 8)}`,
               userId,
               farmId,
-              cropName: visionResult.cropName || cropHint,
+              cropName: identifiedCrop,
               imageUrl,
               photoMetadata: resolvedPhotoMetadata,
-              suspectedIssue: visionResult.suspectedIssue,
+              suspectedIssue: visionResult.suspectedIssue || 'Foliar Plant Leaf Condition',
               confidenceScore: typeof visionResult.confidenceScore === 'number' ? visionResult.confidenceScore : 94.5,
               severity: visionResult.severity || 'MODERATE',
               symptomsEvidence: Array.isArray(visionResult.symptomsEvidence) ? visionResult.symptomsEvidence : [],
@@ -385,6 +413,8 @@ ${context.soil ? `- Soil Health Data: pH ${context.soil.ph}, N: ${context.soil.n
               recommendedProductIds: ['prod-trichoderma', 'prod-neem-oil', 'prod-sprayer'],
               isExpertReviewed: true,
               expertNotes: visionResult.rootCause || undefined,
+              clarificationPrompt: visionResult.clarificationPrompt || (visionResult.cropIdentified === false ? 'Please tell us which crop this is.' : undefined),
+              cropIdentified: visionResult.cropIdentified !== false,
               followUpQuestions: visionResult.followUpQuestions,
               createdAt: new Date().toISOString()
             };
@@ -535,20 +565,25 @@ ${context.soil ? `- Soil Health Data: pH ${context.soil.ph}, N: ${context.soil.n
     cropHint: string
   ): Promise<any> {
     const prompt = `You are a Senior Plant Pathologist & Chief Agronomist at the Indian Council of Agricultural Research (ICAR). Analyze this field photograph of an affected plant leaf or crop tissue with high precision deep vision.
-Crop context: ${cropHint}.
+${cropHint ? `Optional crop hint provided: "${cropHint}". ` : ''}
 
 Conduct a forensic agronomic diagnosis:
-1. Exact Disease: Diagnose the exact disease or disorder with common name and scientific pathogen Latin name (e.g. Early Leaf Spot / Tikka - Cercospora arachidicola, Late Blight - Phytophthora infestans, Yellow Vein Mosaic Virus - Begomovirus, etc.).
-2. Severity Level: Classify as 'MILD', 'MODERATE', or 'SEVERE' based on lesion percentage on lamina.
-3. Biological Root Cause: Detail the biological etiology and micro-climate triggers (e.g., fungal spores germinating under >85% relative humidity and 25-30°C temperature, bacterial entry through stomata/wounds during rains, sucking pest vectors like thrips/whiteflies transmitting viral particles, or soil-borne inoculum persisting on stubble).
-4. Verified Organic Solutions with Exact Indian Brands: State verified organic/bio-fungicide brand names in Indian market (e.g. Multiplex Bio-Tech Trichoderma Viride 1% WP, Multiplex Sanjeevani, GreenAgri Pure Cold Pressed Neem Oil 10,000 PPM, Pseudomonas fluorescens) with exact dosage per acre AND per litre of water.
-5. Verified Registered Chemical Solutions with Exact Indian Brands: State registered chemical fungicide/insecticide brand names widely sold across Indian APMC/dealers (e.g. Dhanuka M-45 [Mancozeb 75% WP], Tata Rallis Contaf Plus [Hexaconazole 5% SC], Bayer Nativo [Tebuconazole 50% + Trifloxystrobin 25% WG], Syngenta Amistar Top [Azoxystrobin + Difenoconazole], FMC Coragen, IFFCO 19-19-19) with exact dosage per acre AND per litre of water.
-6. Precautionary Measures: Precise spray timing (early morning or calm evening), personal protective equipment (mask, nitrile gloves), pre-harvest interval (PHI in days), and safety for bees.
+1. AUTO-IDENTIFY CROP: Examine leaf morphology, venation, leaf margin, stem, fruit/flower (if visible). Determine crop species (e.g., Tomato, Groundnut, Cotton, Chilli, Rice / Paddy, Wheat, Soybean, Potato, Maize, Brinjal, Onion, etc.).
+   - If the crop can be reliably determined: set "cropIdentified": true, "cropName": "<Detected Crop Name>", and "clarificationPrompt": "".
+   - If the crop CANNOT be reliably determined (e.g., generic closeup of an indistinguishable leaf lesion without leaf shape/margins): set "cropIdentified": false, "cropName": "Unknown / Unclear", and "clarificationPrompt": "Please tell us which crop this is."
+2. Exact Disease: Diagnose the exact disease or disorder with common name and scientific pathogen Latin name (e.g. Early Leaf Spot / Tikka - Cercospora arachidicola, Late Blight - Phytophthora infestans, Yellow Vein Mosaic Virus - Begomovirus, etc.).
+3. Severity Level: Classify as 'MILD', 'MODERATE', or 'SEVERE' based on lesion percentage on lamina.
+4. Biological Root Cause: Detail the biological etiology and micro-climate triggers (e.g., fungal spores germinating under >85% relative humidity and 25-30°C temperature, bacterial entry through stomata/wounds during rains, sucking pest vectors like thrips/whiteflies transmitting viral particles, or soil-borne inoculum persisting on stubble).
+5. Verified Organic Solutions with Exact Indian Brands: State verified organic/bio-fungicide brand names in Indian market (e.g. Multiplex Bio-Tech Trichoderma Viride 1% WP, Multiplex Sanjeevani, GreenAgri Pure Cold Pressed Neem Oil 10,000 PPM, Pseudomonas fluorescens) with exact dosage per acre AND per litre of water.
+6. Verified Registered Chemical Solutions with Exact Indian Brands: State registered chemical fungicide/insecticide brand names widely sold across Indian APMC/dealers (e.g. Dhanuka M-45 [Mancozeb 75% WP], Tata Rallis Contaf Plus [Hexaconazole 5% SC], Bayer Nativo [Tebuconazole 50% + Trifloxystrobin 25% WG], Syngenta Amistar Top [Azoxystrobin + Difenoconazole], FMC Coragen, IFFCO 19-19-19) with exact dosage per acre AND per litre of water.
+7. Precautionary Measures: Precise spray timing (early morning or calm evening), personal protective equipment (mask, nitrile gloves), pre-harvest interval (PHI in days), and safety for bees.
 Strictly NO generic advice, NO fake chemicals, and NO vague placeholders.
 
 Return your response in STRICT JSON format with EXACTLY these keys:
 {
-  "cropName": "Identified Crop Name",
+  "cropName": "Identified Crop Name or 'Unknown / Unclear'",
+  "cropIdentified": true,
+  "clarificationPrompt": "" or "Please tell us which crop this is.",
   "suspectedIssue": "Disease / Disorder Common Name (Scientific Pathogen Name)",
   "confidenceScore": 94.5,
   "severity": "MILD" | "MODERATE" | "SEVERE",
@@ -602,7 +637,7 @@ Ensure all advice adheres strictly to Indian agronomy and ICAR crop protection g
 
     const rawText = await this.executeGemini(contents, INDIAN_AGRONOMY_SYSTEM_INSTRUCTION, {
       temperature: 0.1,
-      maxOutputTokens: 1500
+      maxOutputTokens: 750
     });
 
     // Clean JSON formatting if enclosed in ```json

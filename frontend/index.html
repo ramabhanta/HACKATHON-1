@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌾</text></svg>" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#065f46" />
+    <meta name="description" content="AgriDex — AI for Every Farmer: Diagnose, Decide, Buy, Sell and Grow." />
+    <link rel="manifest" href="/manifest.json" />
+    <title>🌾 AgriDex — AI Farmer-to-Vendor Agriculture Platform</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <div id="google_translate_element" style="display:none"></div>
+    <script type="text/javascript">
+      function googleTranslateElementInit() {
+        try {
+          if (window.google && window.google.translate) {
+            new window.google.translate.TranslateElement({
+              pageLanguage: 'en',
+              includedLanguages: 'hi,te,ta,kn,ml,mr,bn,gu,pa,or',
+              autoDisplay: false
+            }, 'google_translate_element');
+          }
+        } catch (e) {
+          // Fallback handled by internal AgriDex 11-language engine
+        }
+      }
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" async defer></script>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

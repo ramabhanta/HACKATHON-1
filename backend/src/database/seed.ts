@@ -1,0 +1,955 @@
+import bcrypt from 'bcryptjs';
+import { db } from './db.js';
+import {
+  User,
+  FarmerProfile,
+  VendorProfile,
+  ExpertProfile,
+  Farm,
+  Crop,
+  SoilTestRecord,
+  ProductCategory,
+  Product,
+  Order,
+  ProduceListing,
+  BuyerRequest,
+  ProcurementVendor,
+  VendorDealRequest,
+  FarmTask,
+  FarmExpense,
+  AppNotification
+} from '../models/types.js';
+
+export async function seedDatabase() {
+  console.log('🌱 Seeding AgriConnect AI database with realistic agricultural data...');
+  
+  const passwordHash = await bcrypt.hash('password123', 10);
+  const adminPasswordHash = await bcrypt.hash('admin123', 10);
+
+  // 1. Users
+  const users: User[] = [
+    {
+      id: 'usr-farmer-1',
+      name: 'Ramesh Patel',
+      phone: '+91 98480 12345',
+      email: 'farmer@agriconnect.com',
+      passwordHash,
+      role: 'FARMER',
+      language: 'en',
+      village: 'Kadiri Rural',
+      district: 'Sri Sathya Sai',
+      state: 'Andhra Pradesh',
+      pincode: '515591',
+      latitude: 14.1165,
+      longitude: 78.1634,
+      avatarUrl: 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=150',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: 'usr-vendor-1',
+      name: 'Sri Lakshmi Agri Traders',
+      phone: '+91 98490 54321',
+      email: 'vendor@agriconnect.com',
+      passwordHash,
+      role: 'VENDOR',
+      language: 'en',
+      village: 'Kadiri Town',
+      district: 'Sri Sathya Sai',
+      state: 'Andhra Pradesh',
+      pincode: '515591',
+      latitude: 14.1120,
+      longitude: 78.1601,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: 'usr-buyer-1',
+      name: 'Kisan Mandi Wholesalers',
+      phone: '+91 94400 98765',
+      email: 'buyer@agriconnect.com',
+      passwordHash,
+      role: 'BUYER',
+      language: 'en',
+      district: 'Bengaluru Urban',
+      state: 'Karnataka',
+      pincode: '560001',
+      latitude: 12.9716,
+      longitude: 77.5946,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: 'usr-expert-1',
+      name: 'Dr. K. Swaminathan (Agronomist)',
+      phone: '+91 93900 11223',
+      email: 'expert@agriconnect.com',
+      passwordHash,
+      role: 'EXPERT',
+      language: 'en',
+      district: 'Tirupati',
+      state: 'Andhra Pradesh',
+      pincode: '517502',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: 'usr-admin-1',
+      name: 'AgriConnect Administrator',
+      phone: '+91 99999 00000',
+      email: 'admin@agriconnect.com',
+      passwordHash: adminPasswordHash,
+      role: 'ADMIN',
+      language: 'en',
+      district: 'Hyderabad',
+      state: 'Telangana',
+      pincode: '500081',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    }
+  ];
+
+  // 2. Profiles
+  const farmerProfiles: FarmerProfile[] = [
+    {
+      id: 'prof-farmer-1',
+      userId: 'usr-farmer-1',
+      totalAcreage: 5.5,
+      primaryCrops: ['Groundnut', 'Tomato', 'Paddy'],
+      farmingExperienceYears: 16,
+      farmingType: 'INTEGRATED',
+      soilTypeDefault: 'RED_LOAM',
+      hasSoilCard: true,
+      irrigationType: 'BOREWELL'
+    }
+  ];
+
+  const vendorProfiles: VendorProfile[] = [
+    {
+      id: 'prof-vendor-1',
+      userId: 'usr-vendor-1',
+      shopName: 'Sri Lakshmi Agri Inputs & Seeds Depot',
+      licenseNumber: 'AP/SSS/FERT/2023/8891',
+      gstNumber: '37AABCS1429B1Z8',
+      verificationStatus: 'VERIFIED',
+      address: 'Shop #14, Main Bazaar, Near Old Bus Stand, Kadiri',
+      district: 'Sri Sathya Sai',
+      state: 'Andhra Pradesh',
+      pincode: '515591',
+      latitude: 14.1120,
+      longitude: 78.1601,
+      rating: 4.8,
+      reviewCount: 142,
+      deliveryRadiusKm: 25,
+      contactPhone: '+91 98490 54321',
+      openingHours: '07:30 AM - 08:30 PM (Mon-Sat)'
+    }
+  ];
+
+  const expertProfiles: ExpertProfile[] = [
+    {
+      id: 'prof-expert-1',
+      userId: 'usr-expert-1',
+      qualification: 'Ph.D. in Agronomy & Plant Pathology',
+      institution: 'Acharya N.G. Ranga Agricultural University (ANGRAU)',
+      specialization: ['Groundnut Diseases', 'Nutrient Deficiency in Red Soils', 'Integrated Pest Management'],
+      isVerified: true,
+      experienceYears: 22,
+      bio: 'Agricultural scientist with over two decades of field extension experience across Rayalaseema and South Indian cropping zones.'
+    }
+  ];
+
+  // 3. Farms & Crops
+  const farms: Farm[] = [
+    {
+      id: 'farm-1',
+      userId: 'usr-farmer-1',
+      name: 'Sri Venkateswara Farm',
+      location: 'Survey #142/A, Kadiri Rural Road',
+      district: 'Sri Sathya Sai',
+      state: 'Andhra Pradesh',
+      totalArea: 5.5,
+      areaUnit: 'ACRE',
+      soilType: 'RED_LOAM',
+      irrigationSource: 'BOREWELL',
+      waterAvailability: 'MODERATE',
+      createdAt: '2026-06-15T00:00:00.000Z'
+    }
+  ];
+
+  const crops: Crop[] = [
+    {
+      id: 'crop-1',
+      farmId: 'farm-1',
+      cropName: 'Groundnut (Peanut)',
+      variety: 'Kadiri-6 (K-6)',
+      sowingDate: '2026-07-10T00:00:00.000Z',
+      expectedHarvestDate: '2026-10-25T00:00:00.000Z',
+      growthStage: 'FLOWERING',
+      areaPlanted: 4.0,
+      previousCrop: 'Fallow / Green Manure',
+      currentProblems: 'Mild leaf spot (Tikka) spotted on lower foliage after monsoon rains',
+      healthStatus: 'NEEDS_ATTENTION',
+      createdAt: '2026-07-10T00:00:00.000Z'
+    },
+    {
+      id: 'crop-2',
+      farmId: 'farm-1',
+      cropName: 'Tomato',
+      variety: 'Arka Rakshak (Triple Disease Resistant)',
+      sowingDate: '2026-08-01T00:00:00.000Z',
+      expectedHarvestDate: '2026-11-15T00:00:00.000Z',
+      growthStage: 'VEGETATIVE',
+      areaPlanted: 1.5,
+      previousCrop: 'Groundnut',
+      currentProblems: 'None. Good vegetative vigor.',
+      healthStatus: 'HEALTHY',
+      createdAt: '2026-08-01T00:00:00.000Z'
+    }
+  ];
+
+  // 4. Soil Test
+  const soilTests: SoilTestRecord[] = [
+    {
+      id: 'soil-1',
+      farmId: 'farm-1',
+      userId: 'usr-farmer-1',
+      testDate: '2026-06-20',
+      isLabCertified: true,
+      sourceType: 'LAB_REPORT',
+      ph: 6.8,
+      nitrogenKgPerHa: 185,
+      phosphorusKgPerHa: 19.5,
+      potassiumKgPerHa: 290,
+      organicCarbonPct: 0.44,
+      electricalConductivity: 0.38,
+      soilMoisturePct: 18,
+      summary: 'Slightly low Nitrogen & Organic Carbon; Medium Phosphorus; Adequate Potassium. pH 6.8 is optimal for legume nodulation and groundnut pegging.',
+      recommendations: [
+        'Apply Farm Yard Manure (FYM) or Vermicompost @ 4-5 tonnes/acre to replenish organic carbon.',
+        'Split application of Urea: 50% basal with DAP, and 50% top-dressing at 30 days after sowing.',
+        'Apply Gypsum @ 200 kg/acre at 40-45 DAS (flowering/pegging) for Pod filling and Calcium/Sulfur enrichment.'
+      ],
+      createdAt: '2026-06-20T10:00:00.000Z'
+    }
+  ];
+
+  // 5. Product Categories
+  const productCategories: ProductCategory[] = [
+    {
+      id: 'cat-fertilizers',
+      slug: 'fertilizers',
+      nameEn: 'Fertilizers & Nutrients',
+      nameHi: 'उर्वरक एवं पोषक तत्व',
+      nameTe: 'ఎరువులు & పోషకాలు',
+      icon: 'Sprout'
+    },
+    {
+      id: 'cat-seeds',
+      slug: 'seeds',
+      nameEn: 'Certified Seeds',
+      nameHi: 'प्रमाणित बीज',
+      nameTe: 'ధృవీకరించబడిన విత్తనాలు',
+      icon: 'Wheat'
+    },
+    {
+      id: 'cat-protection',
+      slug: 'crop-protection',
+      nameEn: 'Crop Protection & Bio-Inputs',
+      nameHi: 'फसल सुरक्षा एवं कीटनाशक',
+      nameTe: 'పంట సంరక్షణ & జీవ రసాయనాలు',
+      icon: 'ShieldCheck'
+    },
+    {
+      id: 'cat-equipment',
+      slug: 'equipment',
+      nameEn: 'Farming Tools & Machinery',
+      nameHi: 'कृषि उपकरण एवं मशीनरी',
+      nameTe: 'వ్యవసాయ పరికరాలు',
+      icon: 'Wrench'
+    }
+  ];
+
+  // 6. Products
+  const products: Product[] = [
+    {
+      id: 'prod-urea',
+      vendorId: 'usr-vendor-1',
+      categoryId: 'cat-fertilizers',
+      name: 'Urea 46% N (Neem Coated)',
+      brand: 'IFFCO',
+      category: 'FERTILIZERS',
+      images: ['https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?w=400'],
+      description: 'Government subsidized Neem Coated Urea providing 46% slow-release Ammoniacal Nitrogen for vigorous vegetative growth and chlorophyll synthesis.',
+      agriculturalUse: 'Primary Nitrogen source for all cereals, legumes, and vegetable crops. Top-dress during active vegetative stages.',
+      applicableCrops: ['Paddy', 'Groundnut', 'Wheat', 'Maize', 'Cotton', 'Tomato', 'Chilli'],
+      packSize: '45 kg Bag',
+      price: 266.50,
+      mrp: 266.50,
+      stockQuantity: 180,
+      isOrganic: false,
+      chemicalComposition: 'Nitrogen (N) 46.0% minimum, Neem Oil extract coating 0.035%',
+      dosageGuidance: 'Follow soil-test recommendations. For Groundnut: 15-20 kg/acre as basal dose. Do not over-apply to avoid excessive vegetative growth and pest incidence.',
+      safetyPrecautions: [
+        'Store in a cool, dry place away from rain and moisture.',
+        'Keep away from children, livestock feed, and drinking water sources.',
+        'Wear gloves during manual broadcasting.'
+      ],
+      labelInstructions: 'Manufactured per Fertilizer (Control) Order 1985 guidelines. Maximum retail price regulated by Government of India.',
+      status: 'APPROVED',
+      createdAt: '2026-06-01T00:00:00.000Z'
+    },
+    {
+      id: 'prod-dap',
+      vendorId: 'usr-vendor-1',
+      categoryId: 'cat-fertilizers',
+      name: 'DAP (Di-Ammonium Phosphate 18:46:0)',
+      brand: 'Coromandel / IFFCO',
+      category: 'FERTILIZERS',
+      images: ['https://images.unsplash.com/photo-1628352081506-83c43123ed6d?w=400'],
+      description: 'High-analysis phosphatic fertilizer providing 18% Nitrogen and 46% water-soluble Phosphate to establish robust root systems and early seedling vigor.',
+      agriculturalUse: 'Ideal basal fertilizer applied at sowing or transplanting time beneath the seed row.',
+      applicableCrops: ['Groundnut', 'Paddy', 'Cotton', 'Tomato', 'Maize', 'Pulses'],
+      packSize: '50 kg Bag',
+      price: 1350.00,
+      mrp: 1400.00,
+      stockQuantity: 95,
+      isOrganic: false,
+      chemicalComposition: 'Total Nitrogen 18.0%, Available P2O5 46.0%',
+      dosageGuidance: 'Basal application: 40-50 kg/acre for Groundnut and Tomato based on soil analysis.',
+      safetyPrecautions: [
+        'Place 5 cm away from seeds to avoid germination burn.',
+        'Store on raised wooden pallets in waterproof godown.'
+      ],
+      labelInstructions: 'Conforms to FCO specifications. Ensure bag is sealed with official manufacturer tamper-evident stitch.',
+      status: 'APPROVED',
+      createdAt: '2026-06-01T00:00:00.000Z'
+    },
+    {
+      id: 'prod-gromor-28',
+      vendorId: 'usr-vendor-1',
+      categoryId: 'cat-fertilizers',
+      name: 'Coromandel Gromor 28-28-0 Complex',
+      brand: 'Coromandel International',
+      category: 'FERTILIZERS',
+      images: ['https://images.unsplash.com/photo-1592417817098-8f3d6910985b?w=400'],
+      description: 'Balanced high-grade complex fertilizer with equal proportions of Ammoniacal & Nitrate Nitrogen (28%) and Water-soluble Phosphorus (28%).',
+      agriculturalUse: 'Excellent for top-dressing and vegetative boost in intensive vegetable and commercial crops.',
+      applicableCrops: ['Groundnut', 'Tomato', 'Chilli', 'Sugarcane', 'Cotton', 'Maize'],
+      packSize: '50 kg Bag',
+      price: 1450.00,
+      mrp: 1520.00,
+      stockQuantity: 60,
+      isOrganic: false,
+      chemicalComposition: 'Total Nitrogen (N) 28%, Available Phosphorus (P2O5) 28%',
+      dosageGuidance: 'Apply 35-45 kg per acre during mid-vegetative stage, incorporated 3-5 cm into moist soil.',
+      safetyPrecautions: ['Wash hands thoroughly with soap after handling.', 'Do not mix with alkaline substances or unslaked lime.'],
+      labelInstructions: 'Official Coromandel genuine agrochemical product.',
+      status: 'APPROVED',
+      createdAt: '2026-06-05T00:00:00.000Z'
+    },
+    {
+      id: 'prod-npk-19',
+      vendorId: 'usr-vendor-1',
+      categoryId: 'cat-fertilizers',
+      name: 'NPK 19-19-19 100% Water Soluble Foliar Fertilizer',
+      brand: 'Mahadhan',
+      category: 'FERTILIZERS',
+      images: ['https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=400'],
+      description: 'Premium fully water-soluble balanced NPK formulation designed for drip fertigation and foliar spray to rapidly correct multiple nutrient deficiencies.',
+      agriculturalUse: 'Foliar spray at vegetative and flowering transitions for instant uptake and flower drop prevention.',
+      applicableCrops: ['Groundnut', 'Tomato', 'Chilli', 'Paddy', 'Banana', 'Mango'],
+      packSize: '1 kg Pouch',
+      price: 180.00,
+      mrp: 210.00,
+      stockQuantity: 150,
+      isOrganic: false,
+      chemicalComposition: 'Total N 19%, Total P2O5 19%, Total K2O 19%',
+      dosageGuidance: 'Foliar: 5 grams per litre of clean water (75-100g per 15L knapsack sprayer). Spray during early morning or late afternoon.',
+      safetyPrecautions: ['Do not spray during peak midday sunlight or when heavy rain is expected within 3 hours.'],
+      labelInstructions: 'Keep airtight in original container.',
+      status: 'APPROVED',
+      createdAt: '2026-06-05T00:00:00.000Z'
+    },
+    {
+      id: 'prod-trichoderma',
+      vendorId: 'usr-vendor-1',
+      categoryId: 'cat-protection',
+      name: 'Trichoderma Viride 1% WP (Bio-Fungicide)',
+      brand: 'Multiplex Bio-Tech',
+      category: 'CROP_PROTECTION',
+      images: ['https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=400'],
+      description: 'Antagonistic beneficial fungus for eco-friendly biological control of soil-borne and fungal diseases such as Root Rot, Collar Rot, Wilt, and Damping-off.',
+      agriculturalUse: 'Seed treatment, nursery soil drenching, and soil enrichment mixed with compost/FYM.',
+      applicableCrops: ['Groundnut', 'Tomato', 'Chilli', 'Cotton', 'Pulses', 'Ginger'],
+      packSize: '1 kg Pack',
+      price: 220.00,
+      mrp: 260.00,
+      stockQuantity: 85,
+      isOrganic: true,
+      chemicalComposition: 'Trichoderma viride 1.0% W.P. (minimum 2x10^6 CFU/g)',
+      dosageGuidance: 'Seed treatment: 10g per kg seed. Soil application: Mix 2 kg with 100 kg well-decomposed FYM, incubate under shade for 7 days, then apply to 1 acre.',
+      safetyPrecautions: ['Do not mix or apply simultaneously with synthetic chemical fungicides. Maintain a 10-day gap.'],
+      labelInstructions: 'CIB&RC registered biological crop protection agent. Safe for bees and beneficial soil fauna.',
+      status: 'APPROVED',
+      createdAt: '2026-06-10T00:00:00.000Z'
+    },
+    {
+      id: 'prod-neem-oil',
+      vendorId: 'usr-vendor-1',
+      categoryId: 'cat-protection',
+      name: 'Cold Pressed Pure Neem Oil 10,000 PPM (Azadirachtin)',
+      brand: 'GreenAgri Bio',
+      category: 'CROP_PROTECTION',
+      images: ['https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?w=400'],
+      description: 'Natural broad-spectrum botanical bio-pesticide with antifeedant, repellent, and oviposition deterrent properties against sucking pests, aphids, thrips, and caterpillars.',
+      agriculturalUse: 'Preventive and early-stage pest management in organic and integrated pest management systems.',
+      applicableCrops: ['Groundnut', 'Tomato', 'Chilli', 'Cotton', 'Brinjal', 'Paddy'],
+      packSize: '1 Litre Bottle',
+      price: 420.00,
+      mrp: 490.00,
+      stockQuantity: 45,
+      isOrganic: true,
+      chemicalComposition: 'Azadirachtin 1% (10,000 PPM) with natural emulsifiers',
+      dosageGuidance: '3-4 ml per litre of water (45-60 ml per 15L knapsack tank). Shake well before mixing.',
+      safetyPrecautions: ['Wear standard eye protection while measuring.', 'Non-toxic to humans but avoid inhalation of concentrated spray mist.'],
+      labelInstructions: 'Eco-certified for organic agriculture. Leaves zero toxic chemical residues on produce.',
+      status: 'APPROVED',
+      createdAt: '2026-06-10T00:00:00.000Z'
+    },
+    {
+      id: 'prod-seeds-groundnut',
+      vendorId: 'usr-vendor-1',
+      categoryId: 'cat-seeds',
+      name: 'Certified Kadiri-6 (K-6) Groundnut Seeds',
+      brand: 'AP State Seeds Development Corp',
+      category: 'SEEDS',
+      images: ['https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?w=400'],
+      description: 'High-yielding Spanish bunch type groundnut variety bred specifically for semi-arid rainfed and borewell tracts. Resistant to drought stress and moderate resistance to leaf spots.',
+      agriculturalUse: 'Commercial oilseed and kernel production. Sowing rate: 40-45 kg per acre depending on spacing.',
+      applicableCrops: ['Groundnut'],
+      packSize: '30 kg Bag',
+      price: 2850.00,
+      mrp: 3000.00,
+      stockQuantity: 40,
+      isOrganic: false,
+      dosageGuidance: 'Treat with Trichoderma viride or Thiram prior to sowing. Recommended row spacing 30 cm x 10 cm.',
+      safetyPrecautions: ['Treated seed. Not for human consumption or animal feed.'],
+      labelInstructions: 'Government certified blue label seed. Purity 98%, Minimum Germination 75%.',
+      status: 'APPROVED',
+      createdAt: '2026-06-12T00:00:00.000Z'
+    },
+    {
+      id: 'prod-seeds-tomato',
+      vendorId: 'usr-vendor-1',
+      categoryId: 'cat-seeds',
+      name: 'Hybrid Tomato Seeds - Arka Rakshak (Triple Resistant)',
+      brand: 'ICAR-IIHR Certified',
+      category: 'SEEDS',
+      images: ['https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=400'],
+      description: 'Landmark F1 hybrid resistant to Tomato Leaf Curl Virus (ToLCV), Bacterial Wilt, and Early Blight. High firm deep red fruits (90-100g) ideal for distant transport.',
+      agriculturalUse: 'Fresh vegetable market and processing. High yield potential of 30-35 tonnes/acre.',
+      applicableCrops: ['Tomato'],
+      packSize: '10 Gram Pack',
+      price: 350.00,
+      mrp: 395.00,
+      stockQuantity: 110,
+      isOrganic: false,
+      dosageGuidance: 'Nursery seed rate: 50-60g per acre. Transplant 25-day old healthy seedlings.',
+      safetyPrecautions: ['Keep in airtight refrigerated storage until planting.'],
+      labelInstructions: 'Tested for high genetic purity and vigor per National Seed Standards.',
+      status: 'APPROVED',
+      createdAt: '2026-06-12T00:00:00.000Z'
+    },
+    {
+      id: 'prod-sprayer',
+      vendorId: 'usr-vendor-1',
+      categoryId: 'cat-equipment',
+      name: 'Balwaan 16-Litre 12V Battery Knapsack Sprayer',
+      brand: 'Balwaan Agri Tools',
+      category: 'EQUIPMENT',
+      images: ['https://images.unsplash.com/photo-1589923188900-85dae523342b?w=400'],
+      description: 'Heavy duty rechargeable battery-powered agricultural sprayer with pressure regulator, stainless steel telescopic lance, and 4 multipurpose nozzles for effortless spraying.',
+      agriculturalUse: 'Uniform application of bio-pesticides, foliar micronutrients, and crop protection formulations.',
+      applicableCrops: ['All Crops'],
+      packSize: '1 Unit (Complete Box)',
+      price: 2400.00,
+      mrp: 2999.00,
+      stockQuantity: 25,
+      isOrganic: true,
+      dosageGuidance: 'Full charge delivers 6-8 hours of continuous operation (20-25 tank sprays).',
+      safetyPrecautions: ['Rinse tank thoroughly with fresh water after every chemical application.'],
+      labelInstructions: 'Includes 1-Year manufacturer warranty card and battery charger.',
+      status: 'APPROVED',
+      createdAt: '2026-06-15T00:00:00.000Z'
+    }
+  ];
+
+  // 7. Orders
+  const orders: Order[] = [
+    {
+      id: 'ord-1001',
+      orderNumber: 'AGRI-2026-9812',
+      farmerId: 'usr-farmer-1',
+      vendorId: 'usr-vendor-1',
+      vendorName: 'Sri Lakshmi Agri Inputs',
+      items: [
+        {
+          id: 'item-1',
+          orderId: 'ord-1001',
+          productId: 'prod-urea',
+          productName: 'Urea 46% N (Neem Coated)',
+          brand: 'IFFCO',
+          price: 266.50,
+          quantity: 2,
+          packSize: '45 kg Bag'
+        },
+        {
+          id: 'item-2',
+          orderId: 'ord-1001',
+          productId: 'prod-neem-oil',
+          productName: 'Cold Pressed Pure Neem Oil 10,000 PPM',
+          brand: 'GreenAgri Bio',
+          price: 420.00,
+          quantity: 1,
+          packSize: '1 Litre Bottle'
+        }
+      ],
+      subtotal: 953.00,
+      deliveryFee: 50.00,
+      totalAmount: 1003.00,
+      deliveryAddress: {
+        name: 'Ramesh Patel',
+        phone: '+91 98480 12345',
+        village: 'Kadiri Rural',
+        district: 'Sri Sathya Sai',
+        state: 'Andhra Pradesh',
+        pincode: '515591',
+        landmark: 'Near Gram Panchayat Water Tank'
+      },
+      paymentMethod: 'UPI',
+      paymentStatus: 'PAID',
+      status: 'PROCESSING',
+      estimatedDeliveryDate: '2026-09-29',
+      trackingUpdates: [
+        {
+          status: 'ORDER_PLACED',
+          message: 'Order received and payment confirmed via UPI.',
+          timestamp: '2026-09-27T09:15:00.000Z'
+        },
+        {
+          status: 'CONFIRMED',
+          message: 'Vendor Sri Lakshmi Agri Inputs accepted the order and packed items.',
+          timestamp: '2026-09-27T11:30:00.000Z'
+        },
+        {
+          status: 'PROCESSING',
+          message: 'Items staged at Kadiri hub for delivery partner dispatch.',
+          timestamp: '2026-09-27T15:00:00.000Z'
+        }
+      ],
+      createdAt: '2026-09-27T09:15:00.000Z',
+      updatedAt: '2026-09-27T15:00:00.000Z'
+    }
+  ];
+
+  // 8. Farmer Produce Listings
+  const produceListings: ProduceListing[] = [
+    {
+      id: 'prod-list-1',
+      farmerId: 'usr-farmer-1',
+      farmerName: 'Ramesh Patel',
+      farmerPhone: '+91 98480 12345',
+      cropName: 'Groundnut (Pod)',
+      variety: 'Kadiri-6 (High Oil Content)',
+      quantity: 30,
+      unit: 'QUINTAL',
+      expectedPricePerUnit: 7400,
+      harvestDate: '2026-10-25',
+      village: 'Kadiri Rural',
+      district: 'Sri Sathya Sai',
+      state: 'Andhra Pradesh',
+      qualityGrade: 'GRADE_A',
+      images: ['https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?w=400'],
+      description: 'First quality Kadiri-6 groundnut pods with 2-seeded uniform kernels, clean sun-dried pods (moisture < 8%). Pre-booking accepted for October harvest.',
+      status: 'AVAILABLE',
+      createdAt: '2026-09-20T10:00:00.000Z'
+    },
+    {
+      id: 'prod-list-2',
+      farmerId: 'usr-farmer-1',
+      farmerName: 'Ramesh Patel',
+      farmerPhone: '+91 98480 12345',
+      cropName: 'Tomato',
+      variety: 'Arka Rakshak F1',
+      quantity: 50,
+      unit: 'CRATE',
+      expectedPricePerUnit: 480,
+      harvestDate: '2026-11-10',
+      village: 'Kadiri Rural',
+      district: 'Sri Sathya Sai',
+      state: 'Andhra Pradesh',
+      qualityGrade: 'GRADE_A',
+      images: ['https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=400'],
+      description: 'Firm, uniform red-ripe hybrid tomatoes (approx. 25 kg per crate). Ideal for retail supermarket supply and Bangalore mandi dispatch.',
+      status: 'AVAILABLE',
+      createdAt: '2026-09-22T14:30:00.000Z'
+    }
+  ];
+
+  // 9. Buyer Requests
+  const buyerRequests: BuyerRequest[] = [
+    {
+      id: 'req-1',
+      produceListingId: 'prod-list-1',
+      buyerId: 'usr-buyer-1',
+      buyerName: 'Kisan Mandi Wholesalers',
+      buyerPhone: '+91 94400 98765',
+      offeredPricePerUnit: 7250,
+      requestedQuantity: 25,
+      message: 'We are interested in 25 quintals of Kadiri-6 groundnuts for Bengaluru processing plant. Can arrange direct pickup at farm gate on harvest day.',
+      status: 'SUBMITTED',
+      createdAt: '2026-09-25T11:00:00.000Z'
+    }
+  ];
+
+  // 10. Farm Tasks
+  const farmTasks: FarmTask[] = [
+    {
+      id: 'task-1',
+      farmId: 'farm-1',
+      cropId: 'crop-1',
+      userId: 'usr-farmer-1',
+      title: 'Foliar Spray of 19-19-19 (5g/L)',
+      description: 'Nutrient spray during flower initiation to support peg penetration and reduce flower drop.',
+      dueDate: '2026-09-28',
+      priority: 'HIGH',
+      category: 'FERTILIZER',
+      isCompleted: false
+    },
+    {
+      id: 'task-2',
+      farmId: 'farm-1',
+      cropId: 'crop-1',
+      userId: 'usr-farmer-1',
+      title: 'Check Soil Moisture Before 3rd Irrigation',
+      description: 'Moisture is critical during groundnut pegging stage. Irrigate if soil ball crumbles easily.',
+      dueDate: '2026-09-29',
+      priority: 'MEDIUM',
+      category: 'IRRIGATION',
+      isCompleted: false
+    },
+    {
+      id: 'task-3',
+      farmId: 'farm-1',
+      cropId: 'crop-1',
+      userId: 'usr-farmer-1',
+      title: 'Scout Lower Leaves for Early Leaf Spot (Tikka)',
+      description: 'Examine 20 random plants across the 4-acre field for circular dark brown lesions.',
+      dueDate: '2026-09-30',
+      priority: 'HIGH',
+      category: 'PEST_INSPECTION',
+      isCompleted: false
+    }
+  ];
+
+  // 11. Farm Expenses
+  const expenses: FarmExpense[] = [
+    {
+      id: 'exp-1',
+      farmId: 'farm-1',
+      cropId: 'crop-1',
+      userId: 'usr-farmer-1',
+      category: 'MACHINERY',
+      amount: 4500,
+      date: '2026-07-05',
+      notes: 'Tractor deep plowing & rotavator field preparation (3 passes)'
+    },
+    {
+      id: 'exp-2',
+      farmId: 'farm-1',
+      cropId: 'crop-1',
+      userId: 'usr-farmer-1',
+      category: 'SEEDS',
+      amount: 5700,
+      date: '2026-07-08',
+      notes: '2 bags (60 kg) Certified Kadiri-6 groundnut seed'
+    },
+    {
+      id: 'exp-3',
+      farmId: 'farm-1',
+      cropId: 'crop-1',
+      userId: 'usr-farmer-1',
+      category: 'FERTILIZER',
+      amount: 3200,
+      date: '2026-07-10',
+      notes: 'Basal application: 2 bags DAP and 1 bag Gypsum'
+    },
+    {
+      id: 'exp-4',
+      farmId: 'farm-1',
+      cropId: 'crop-1',
+      userId: 'usr-farmer-1',
+      category: 'LABOUR',
+      amount: 4800,
+      date: '2026-08-05',
+      notes: 'Manual weeding and intercultural hoeing (8 workers)'
+    }
+  ];
+
+  // 12. Procurement Vendors (Vendors & Mandi Buyers who purchase crops directly from farmers)
+  const procurementVendors: ProcurementVendor[] = [
+    {
+      id: 'proc-ven-1',
+      vendorId: 'usr-vendor-1',
+      vendorName: 'Sri Lakshmi Agri Traders & Oil Mills',
+      businessName: 'Sri Lakshmi Agri Procurement Yard & Oil Expellers',
+      phone: '+91 98490 54321',
+      avatarUrl: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=150',
+      cropsBought: ['Groundnut', 'Groundnut (Pod)', 'Paddy', 'Maize', 'Sunflower', 'Cotton'],
+      buyingRates: [
+        { crop: 'Groundnut', rate: 7450, unit: 'QUINTAL', note: 'Sun-dried pods, moisture < 8%' },
+        { crop: 'Paddy', rate: 2380, unit: 'QUINTAL', note: 'Grade A Sona Masoori' },
+        { crop: 'Maize', rate: 2180, unit: 'QUINTAL', note: 'Clean yellow corn' },
+        { crop: 'Sunflower', rate: 5600, unit: 'QUINTAL', note: 'Oil content > 38%' }
+      ],
+      minQuantity: 10,
+      maxQuantity: 500,
+      unit: 'QUINTAL',
+      village: 'Kadiri Town',
+      district: 'Sri Sathya Sai',
+      state: 'Andhra Pradesh',
+      paymentTerms: 'Spot Cash / Instant UPI at Farm Gate',
+      pickupAvailable: true,
+      qualityPreference: 'Grade A pods, clean sun-dried, foreign matter < 1%',
+      rating: 4.9,
+      verified: true
+    },
+    {
+      id: 'proc-ven-2',
+      vendorId: 'usr-buyer-1',
+      vendorName: 'Kisan Mandi Wholesalers & Cold Chain',
+      businessName: 'Kisan Mandi Multi-Commodity Procure Hub',
+      phone: '+91 94400 98765',
+      avatarUrl: 'https://images.unsplash.com/photo-1578575437130-527eed3abbec?w=150',
+      cropsBought: ['Tomato', 'Chilli', 'Onion', 'Mango', 'Watermelon', 'Vegetables'],
+      buyingRates: [
+        { crop: 'Tomato', rate: 520, unit: 'CRATE', note: '25kg firm red-ripe hybrid' },
+        { crop: 'Chilli', rate: 19500, unit: 'QUINTAL', note: 'Guntur Teja dry red' },
+        { crop: 'Onion', rate: 2850, unit: 'QUINTAL', note: 'Medium-Large Nashik Red' },
+        { crop: 'Mango', rate: 48000, unit: 'TONNE', note: 'Banganapalli grade 1' }
+      ],
+      minQuantity: 20,
+      maxQuantity: 1000,
+      unit: 'CRATE',
+      district: 'Bengaluru Urban',
+      state: 'Karnataka',
+      paymentTerms: 'Same-day Bank Transfer (NEFT/RTGS) post weighment',
+      pickupAvailable: true,
+      qualityPreference: 'Uniform ripeness, export carton grade, zero fruit borer',
+      rating: 4.8,
+      verified: true
+    },
+    {
+      id: 'proc-ven-3',
+      vendorId: 'usr-vendor-rayalaseema',
+      vendorName: 'Rayalaseema Cotton Ginning & Grain Depot',
+      businessName: 'Rayalaseema Agro Processing Industries',
+      phone: '+91 98765 43210',
+      avatarUrl: 'https://images.unsplash.com/photo-1595246140625-573b715d11dc?w=150',
+      cropsBought: ['Cotton', 'Red Gram (Toor)', 'Bengal Gram (Chana)', 'Castor', 'Groundnut'],
+      buyingRates: [
+        { crop: 'Cotton', rate: 7950, unit: 'QUINTAL', note: 'Long staple 29mm+, low trash' },
+        { crop: 'Red Gram (Toor)', rate: 10400, unit: 'QUINTAL', note: 'White/Red toor whole' },
+        { crop: 'Bengal Gram (Chana)', rate: 6200, unit: 'QUINTAL', note: 'Desi chana bold' }
+      ],
+      minQuantity: 15,
+      maxQuantity: 800,
+      unit: 'QUINTAL',
+      district: 'Anantapur',
+      state: 'Andhra Pradesh',
+      paymentTerms: 'Instant weighbridge voucher + Immediate NEFT',
+      pickupAvailable: true,
+      qualityPreference: 'Clean lint, low trash content, no rain damage',
+      rating: 4.7,
+      verified: true
+    },
+    {
+      id: 'proc-ven-4',
+      vendorId: 'usr-vendor-phool',
+      vendorName: 'South India Floriculture & Phool Mandi Direct',
+      businessName: 'Gudimalkapur & Bangalore Phool Syndicate',
+      phone: '+91 97654 32109',
+      avatarUrl: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?w=150',
+      cropsBought: ['Jasmine (Mallipoo)', 'Marigold (Banti)', 'Cut Dutch Rose', 'Crossandra (Kanakambaram)', 'Flowers'],
+      buyingRates: [
+        { crop: 'Jasmine (Mallipoo)', rate: 440, unit: 'KG', note: 'Morning fresh tight bud stage' },
+        { crop: 'Marigold (Banti)', rate: 70, unit: 'KG', note: 'Deep orange/yellow garland grade' },
+        { crop: 'Cut Dutch Rose', rate: 190, unit: 'BUNDLE', note: '20 stems, 50cm+ straight stems' },
+        { crop: 'Crossandra (Kanakambaram)', rate: 520, unit: 'KG', note: 'Vibrant orange whole flowers' }
+      ],
+      minQuantity: 5,
+      maxQuantity: 200,
+      unit: 'KG',
+      district: 'Hyderabad',
+      state: 'Telangana',
+      paymentTerms: 'Daily morning UPI settlement',
+      pickupAvailable: true,
+      qualityPreference: 'Fresh morning harvest without petal browning or pest blemish',
+      rating: 4.9,
+      verified: true
+    },
+    {
+      id: 'proc-ven-5',
+      vendorId: 'usr-vendor-coromandel',
+      vendorName: 'Coromandel Grain & Pulse Millers',
+      businessName: 'Coromandel Food Grains Agro Corp',
+      phone: '+91 99887 76655',
+      avatarUrl: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=150',
+      cropsBought: ['Paddy', 'Groundnut', 'Black Gram', 'Green Gram', 'Maize'],
+      buyingRates: [
+        { crop: 'Paddy', rate: 2420, unit: 'QUINTAL', note: 'BPT 5204 Samba Mahsuri' },
+        { crop: 'Groundnut', rate: 7500, unit: 'QUINTAL', note: 'Kernel yield > 70%' },
+        { crop: 'Black Gram', rate: 8900, unit: 'QUINTAL', note: 'Machine cleaned' }
+      ],
+      minQuantity: 25,
+      maxQuantity: 1500,
+      unit: 'QUINTAL',
+      district: 'Guntur',
+      state: 'Andhra Pradesh',
+      paymentTerms: 'Direct bank transfer within 2 hours of gate entry',
+      pickupAvailable: false,
+      qualityPreference: 'Fair Average Quality (FAQ), Moisture < 12%',
+      rating: 4.8,
+      verified: true
+    }
+  ];
+
+  // 13. Vendor Deal Requests (Direct Farmer -> Vendor Sell Requests)
+  const vendorDealRequests: VendorDealRequest[] = [
+    {
+      id: 'deal-101',
+      farmerId: 'usr-farmer-1',
+      farmerName: 'Ramesh Patel',
+      farmerPhone: '+91 98480 12345',
+      farmerVillage: 'Kadiri Rural',
+      farmerDistrict: 'Sri Sathya Sai',
+      farmerState: 'Andhra Pradesh',
+      vendorId: 'usr-vendor-1',
+      vendorName: 'Sri Lakshmi Agri Traders & Oil Mills',
+      shopName: 'Sri Lakshmi Agri Procurement Yard & Oil Expellers',
+      cropName: 'Groundnut (Pod)',
+      variety: 'Kadiri-6 High Oil',
+      quantity: 25,
+      unit: 'QUINTAL',
+      offeredPricePerUnit: 7450,
+      totalAmount: 186250,
+      proposedHarvestDate: '2026-10-25',
+      deliveryPreference: 'FARM_GATE_PICKUP',
+      qualityGrade: 'GRADE_A',
+      notes: 'Borewell irrigated 4-acre field. Sun-dried on polythene tarps, moisture 7.5%. Ready for truck loading.',
+      status: 'CONFIRMED',
+      vendorResponseNotes: 'Deal confirmed! We have dispatched our logistics partner Srinivas Rao with truck AP 02 TE 4821 for Oct 26 morning farm gate pickup with electronic weigh scale.',
+      pickupScheduledDate: '2026-10-26',
+      confirmedAt: '2026-09-27T14:20:00.000Z',
+      createdAt: '2026-09-27T10:30:00.000Z'
+    },
+    {
+      id: 'deal-102',
+      farmerId: 'usr-farmer-1',
+      farmerName: 'Ramesh Patel',
+      farmerPhone: '+91 98480 12345',
+      farmerVillage: 'Kadiri Rural',
+      farmerDistrict: 'Sri Sathya Sai',
+      farmerState: 'Andhra Pradesh',
+      vendorId: 'usr-buyer-1',
+      vendorName: 'Kisan Mandi Wholesalers & Cold Chain',
+      shopName: 'Kisan Mandi Multi-Commodity Procure Hub',
+      cropName: 'Tomato',
+      variety: 'Arka Rakshak F1',
+      quantity: 40,
+      unit: 'CRATE',
+      offeredPricePerUnit: 500,
+      totalAmount: 20000,
+      proposedHarvestDate: '2026-11-12',
+      deliveryPreference: 'FARM_GATE_PICKUP',
+      qualityGrade: 'GRADE_A',
+      notes: 'Harvesting triple disease resistant hybrid tomatoes. Can supply 40 crates per picking every 4 days.',
+      status: 'PENDING',
+      createdAt: '2026-09-28T07:15:00.000Z'
+    }
+  ];
+
+  // 14. App Notifications
+  const notifications: AppNotification[] = [
+    {
+      id: 'notif-1',
+      userId: 'usr-farmer-1',
+      title: 'Weather Alert: Light to Moderate Rain Expected',
+      body: 'Regional forecast predicts 15-20 mm rainfall over Kadiri region in the next 36 hours. Delay irrigation and wait for clear skies before foliar spraying.',
+      category: 'WEATHER_ALERT',
+      isRead: false,
+      createdAt: new Date().toISOString()
+    },
+    {
+      id: 'notif-deal-conf',
+      userId: 'usr-farmer-1',
+      title: '🎉 Deal Confirmed: Groundnut Lot Accepted!',
+      body: 'Sri Lakshmi Agri Traders confirmed your 25 Quintals Groundnut offer at ₹7,450/Qtl (Total: ₹1,86,250). Farm gate pickup scheduled for Oct 26.',
+      category: 'PRODUCE_REQUEST',
+      linkUrl: '/produce',
+      isRead: false,
+      createdAt: new Date(Date.now() - 1800000).toISOString()
+    },
+    {
+      id: 'notif-ven-offer',
+      userId: 'usr-vendor-1',
+      title: '🌾 New Harvest Offer from Farmer Ramesh Patel',
+      body: 'Farmer Ramesh Patel offered 25 Quintals Groundnut (Pod) at ₹7,450/Qtl. View and confirm the procurement deal.',
+      category: 'PRODUCE_REQUEST',
+      linkUrl: '/vendor-portal',
+      isRead: false,
+      createdAt: new Date(Date.now() - 3600000).toISOString()
+    },
+    {
+      id: 'notif-buyer-offer',
+      userId: 'usr-buyer-1',
+      title: '🌾 New Tomato Offer from Farmer Ramesh Patel',
+      body: 'Farmer Ramesh Patel offered 40 Crates Tomato (Arka Rakshak F1) at ₹500/Crate. View and confirm lot.',
+      category: 'PRODUCE_REQUEST',
+      linkUrl: '/buyer-portal',
+      isRead: false,
+      createdAt: new Date(Date.now() - 900000).toISOString()
+    }
+  ];
+
+  db.reset({
+    users,
+    farmer_profiles: farmerProfiles,
+    vendor_profiles: vendorProfiles,
+    expert_profiles: expertProfiles,
+    farms,
+    crops,
+    soil_tests: soilTests,
+    ai_diagnoses: [],
+    product_categories: productCategories,
+    products,
+    orders,
+    produce_listings: produceListings,
+    buyer_requests: buyerRequests,
+    procurement_vendors: procurementVendors,
+    vendor_deal_requests: vendorDealRequests,
+    farm_tasks: farmTasks,
+    expenses,
+    messages: [],
+    notifications,
+    market_prices: []
+  });
+
+  console.log('✅ Database seeded successfully with all tables and realistic data.');
+}
+
+if (process.argv[1] && process.argv[1].includes('seed')) {
+  seedDatabase().then(() => process.exit(0));
+}
+

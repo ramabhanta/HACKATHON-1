@@ -351,3 +351,11 @@ BEGIN
     END IF;
 END $$;
 
+-- 19. COMPATIBILITY VIEWS (profiles, marketplace_products, disease_scans, soil_health_records)
+CREATE OR REPLACE VIEW profiles AS SELECT * FROM users;
+CREATE OR REPLACE VIEW marketplace_products AS SELECT * FROM products;
+CREATE OR REPLACE VIEW disease_scans AS SELECT * FROM ai_diagnoses;
+CREATE OR REPLACE VIEW soil_health_records AS SELECT * FROM soil_tests;
+
+
+

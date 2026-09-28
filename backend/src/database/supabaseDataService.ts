@@ -30,8 +30,18 @@ export class SupabaseDataService {
       try {
         let query = client.from('users').select('*');
         if (role) query = query.eq('role', role);
-        const { data, error } = await query;
-        if (!error && data && data.length > 0) {
+        let { data, error } = await query;
+
+        if (error || !data || data.length === 0) {
+          let pQuery = client.from('profiles').select('*');
+          if (role) pQuery = pQuery.eq('role', role);
+          const pRes = await pQuery;
+          if (!pRes.error && pRes.data && pRes.data.length > 0) {
+            data = pRes.data;
+          }
+        }
+
+        if (data && data.length > 0) {
           return data.map(this.mapUserFromSupabase);
         }
       } catch (e) {
@@ -45,8 +55,12 @@ export class SupabaseDataService {
     const client = getSupabase();
     if (client) {
       try {
-        const { data, error } = await client.from('users').select('*').eq('id', id).single();
-        if (!error && data) return this.mapUserFromSupabase(data);
+        let { data, error } = await client.from('users').select('*').eq('id', id).single();
+        if (error || !data) {
+          const p = await client.from('profiles').select('*').eq('id', id).single();
+          if (!p.error && p.data) data = p.data;
+        }
+        if (data) return this.mapUserFromSupabase(data);
       } catch (e) {
         console.warn('Supabase getUserById fallback to local db:', (e as any)?.message);
       }
@@ -59,12 +73,20 @@ export class SupabaseDataService {
     if (client) {
       try {
         const lower = identifier.toLowerCase();
-        const { data, error } = await client
+        let { data, error } = await client
           .from('users')
           .select('*')
           .or(`email.ilike.${lower},phone.eq.${identifier}`)
           .limit(1);
-        if (!error && data && data[0]) return this.mapUserFromSupabase(data[0]);
+        if (error || !data || data.length === 0) {
+          const p = await client
+            .from('profiles')
+            .select('*')
+            .or(`email.ilike.${lower},phone.eq.${identifier}`)
+            .limit(1);
+          if (!p.error && p.data && p.data[0]) data = p.data;
+        }
+        if (data && data[0]) return this.mapUserFromSupabase(data[0]);
       } catch (e) {
         console.warn('Supabase getUserByEmailOrPhone fallback to local db:', (e as any)?.message);
       }
@@ -76,24 +98,28 @@ export class SupabaseDataService {
     db.insert('users', user);
     const client = getSupabase();
     if (client) {
+      const userPayload = {
+        id: user.id,
+        name: user.name,
+        phone: user.phone,
+        email: user.email,
+        password_hash: user.passwordHash,
+        role: user.role,
+        language: user.language || 'en',
+        village: user.village || '',
+        district: user.district || '',
+        state: user.state || '',
+        pincode: user.pincode || '515591',
+        latitude: user.latitude,
+        longitude: user.longitude,
+        avatar_url: user.avatarUrl,
+        created_at: user.createdAt
+      };
       try {
-        await client.from('users').upsert({
-          id: user.id,
-          name: user.name,
-          phone: user.phone,
-          email: user.email,
-          password_hash: user.passwordHash,
-          role: user.role,
-          language: user.language || 'en',
-          village: user.village || '',
-          district: user.district || '',
-          state: user.state || '',
-          pincode: user.pincode || '515591',
-          latitude: user.latitude,
-          longitude: user.longitude,
-          avatar_url: user.avatarUrl,
-          created_at: user.createdAt
-        });
+        await Promise.allSettled([
+          client.from('users').upsert(userPayload),
+          client.from('profiles').upsert(userPayload)
+        ]);
       } catch (e) {
         console.warn('Supabase createUser async mirror warning:', (e as any)?.message);
       }
@@ -370,12 +396,24 @@ export class SupabaseDataService {
   // 3. DISEASE SCANS (AI DIAGNOSES)
   // ============================================================================
 
-  public static async getDiagnoses(userId: string): Promise<AiDiagnosis[]> {
+  public static async getDiagnoses(userId?: string): Promise<AiDiagnosis[]> {
     const client = getSupabase();
     if (client) {
       try {
-        const { data, error } = await client.from('ai_diagnoses').select('*').eq('user_id', userId);
-        if (!error && data && data.length > 0) {
+        let q = client.from('disease_scans').select('*');
+        if (userId) q = q.eq('user_id', userId);
+        let { data, error } = await q.order('created_at', { ascending: false });
+
+        if (error || !data || data.length === 0) {
+          let aiQ = client.from('ai_diagnoses').select('*');
+          if (userId) aiQ = aiQ.eq('user_id', userId);
+          const aiRes = await aiQ.order('created_at', { ascending: false });
+          if (!aiRes.error && aiRes.data && aiRes.data.length > 0) {
+            data = aiRes.data;
+          }
+        }
+
+        if (data && data.length > 0) {
           return data.map(d => ({
             id: d.id,
             userId: d.user_id,
@@ -401,36 +439,40 @@ export class SupabaseDataService {
         console.warn('Supabase getDiagnoses fallback to local db:', (e as any)?.message);
       }
     }
-    return db.find('ai_diagnoses', d => d.userId === userId);
+    return userId ? db.find('ai_diagnoses', d => d.userId === userId) : db.getTable('ai_diagnoses');
   }
 
   public static async saveDiagnosis(diagnosis: AiDiagnosis): Promise<AiDiagnosis> {
     db.insert('ai_diagnoses', diagnosis);
     const client = getSupabase();
     if (client) {
+      const scanPayload = {
+        id: diagnosis.id,
+        user_id: diagnosis.userId,
+        farm_id: diagnosis.farmId,
+        crop_name: diagnosis.cropName,
+        image_url: diagnosis.imageUrl,
+        photo_metadata: diagnosis.photoMetadata,
+        suspected_issue: diagnosis.suspectedIssue,
+        confidence_score: diagnosis.confidenceScore,
+        severity: diagnosis.severity,
+        symptoms_evidence: diagnosis.symptomsEvidence,
+        cultural_control: diagnosis.culturalControl,
+        biological_control: diagnosis.biologicalControl,
+        chemical_control_safe: diagnosis.chemicalControlSafe,
+        safety_warnings: diagnosis.safetyWarnings,
+        recommended_product_ids: diagnosis.recommendedProductIds,
+        follow_up_questions: diagnosis.followUpQuestions,
+        is_expert_reviewed: diagnosis.isExpertReviewed,
+        created_at: diagnosis.createdAt
+      };
       try {
-        await client.from('ai_diagnoses').upsert({
-          id: diagnosis.id,
-          user_id: diagnosis.userId,
-          farm_id: diagnosis.farmId,
-          crop_name: diagnosis.cropName,
-          image_url: diagnosis.imageUrl,
-          photo_metadata: diagnosis.photoMetadata,
-          suspected_issue: diagnosis.suspectedIssue,
-          confidence_score: diagnosis.confidenceScore,
-          severity: diagnosis.severity,
-          symptoms_evidence: diagnosis.symptomsEvidence,
-          cultural_control: diagnosis.culturalControl,
-          biological_control: diagnosis.biologicalControl,
-          chemical_control_safe: diagnosis.chemicalControlSafe,
-          safety_warnings: diagnosis.safetyWarnings,
-          recommended_product_ids: diagnosis.recommendedProductIds,
-          follow_up_questions: diagnosis.followUpQuestions,
-          is_expert_reviewed: diagnosis.isExpertReviewed,
-          created_at: diagnosis.createdAt
-        });
-      } catch (e) {
-        console.warn('Supabase saveDiagnosis mirror warning:', (e as any)?.message);
+        await Promise.allSettled([
+          client.from('disease_scans').upsert(scanPayload),
+          client.from('ai_diagnoses').upsert(scanPayload)
+        ]);
+      } catch (e: any) {
+        console.warn('Supabase saveDiagnosis mirror warning:', e?.message || e);
       }
     }
     return diagnosis;
@@ -446,8 +488,18 @@ export class SupabaseDataService {
       try {
         let q = client.from('soil_tests').select('*');
         if (farmId) q = q.eq('farm_id', farmId);
-        const { data, error } = await q;
-        if (!error && data && data.length > 0) {
+        let { data, error } = await q;
+
+        if (error || !data || data.length === 0) {
+          let shQ = client.from('soil_health_records').select('*');
+          if (farmId) shQ = shQ.eq('farm_id', farmId);
+          const shRes = await shQ;
+          if (!shRes.error && shRes.data && shRes.data.length > 0) {
+            data = shRes.data;
+          }
+        }
+
+        if (data && data.length > 0) {
           return data.map(d => ({
             id: d.id,
             farmId: d.farm_id,
@@ -478,25 +530,29 @@ export class SupabaseDataService {
     db.insert('soil_tests', test);
     const client = getSupabase();
     if (client) {
+      const soilPayload = {
+        id: test.id,
+        farm_id: test.farmId,
+        user_id: test.userId,
+        test_date: test.testDate,
+        is_lab_certified: test.isLabCertified,
+        source_type: test.sourceType,
+        ph: test.ph,
+        nitrogen_kg_per_ha: test.nitrogenKgPerHa,
+        phosphorus_kg_per_ha: test.phosphorusKgPerHa,
+        potassium_kg_per_ha: test.potassiumKgPerHa,
+        organic_carbon_pct: test.organicCarbonPct,
+        electrical_conductivity: test.electricalConductivity,
+        soil_moisture_pct: test.soilMoisturePct,
+        summary: test.summary,
+        recommendations: test.recommendations,
+        created_at: test.createdAt
+      };
       try {
-        await client.from('soil_tests').upsert({
-          id: test.id,
-          farm_id: test.farmId,
-          user_id: test.userId,
-          test_date: test.testDate,
-          is_lab_certified: test.isLabCertified,
-          source_type: test.sourceType,
-          ph: test.ph,
-          nitrogen_kg_per_ha: test.nitrogenKgPerHa,
-          phosphorus_kg_per_ha: test.phosphorusKgPerHa,
-          potassium_kg_per_ha: test.potassiumKgPerHa,
-          organic_carbon_pct: test.organicCarbonPct,
-          electrical_conductivity: test.electricalConductivity,
-          soil_moisture_pct: test.soilMoisturePct,
-          summary: test.summary,
-          recommendations: test.recommendations,
-          created_at: test.createdAt
-        });
+        await Promise.allSettled([
+          client.from('soil_tests').upsert(soilPayload),
+          client.from('soil_health_records').upsert(soilPayload)
+        ]);
       } catch (e) {
         console.warn('Supabase saveSoilTest mirror warning:', (e as any)?.message);
       }
@@ -514,8 +570,18 @@ export class SupabaseDataService {
       try {
         let q = client.from('products').select('*');
         if (category && category !== 'ALL') q = q.eq('category', category);
-        const { data, error } = await q;
-        if (!error && data && data.length > 0) {
+        let { data, error } = await q;
+
+        if (error || !data || data.length === 0) {
+          let mpQ = client.from('marketplace_products').select('*');
+          if (category && category !== 'ALL') mpQ = mpQ.eq('category', category);
+          const mpRes = await mpQ;
+          if (!mpRes.error && mpRes.data && mpRes.data.length > 0) {
+            data = mpRes.data;
+          }
+        }
+
+        if (data && data.length > 0) {
           return data.map(d => ({
             id: d.id,
             vendorId: d.vendor_id,
@@ -552,8 +618,12 @@ export class SupabaseDataService {
     const client = getSupabase();
     if (client) {
       try {
-        const { data, error } = await client.from('products').select('*').eq('id', id).single();
-        if (!error && data) {
+        let { data, error } = await client.from('products').select('*').eq('id', id).single();
+        if (error || !data) {
+          const mp = await client.from('marketplace_products').select('*').eq('id', id).single();
+          if (!mp.error && mp.data) data = mp.data;
+        }
+        if (data) {
           return {
             id: data.id,
             vendorId: data.vendor_id,
@@ -588,27 +658,31 @@ export class SupabaseDataService {
     db.insert('products', product);
     const client = getSupabase();
     if (client) {
+      const prodPayload = {
+        id: product.id,
+        vendor_id: product.vendorId,
+        category_id: product.categoryId,
+        name: product.name,
+        brand: product.brand,
+        category: product.category,
+        price: product.price,
+        original_price: product.mrp,
+        pack_size: product.packSize,
+        in_stock: product.stockQuantity > 0,
+        stock_quantity: product.stockQuantity,
+        images: product.images,
+        description: product.description,
+        agricultural_use: product.agriculturalUse,
+        dosage_guidance: product.dosageGuidance,
+        label_instructions: product.labelInstructions,
+        safety_warnings: product.safetyPrecautions,
+        created_at: product.createdAt
+      };
       try {
-        await client.from('products').upsert({
-          id: product.id,
-          vendor_id: product.vendorId,
-          category_id: product.categoryId,
-          name: product.name,
-          brand: product.brand,
-          category: product.category,
-          price: product.price,
-          original_price: product.mrp,
-          pack_size: product.packSize,
-          in_stock: product.stockQuantity > 0,
-          stock_quantity: product.stockQuantity,
-          images: product.images,
-          description: product.description,
-          agricultural_use: product.agriculturalUse,
-          dosage_guidance: product.dosageGuidance,
-          label_instructions: product.labelInstructions,
-          safety_warnings: product.safetyPrecautions,
-          created_at: product.createdAt
-        });
+        await Promise.allSettled([
+          client.from('products').upsert(prodPayload),
+          client.from('marketplace_products').upsert(prodPayload)
+        ]);
       } catch (e) {
         console.warn('Supabase createProduct mirror warning:', (e as any)?.message);
       }

@@ -92,9 +92,13 @@ app.use((err: any, _req: express.Request, res: express.Response, _next: express.
   });
 });
 
-// Auto-seed if database is empty
-if (db.getTable('users').length === 0) {
-  console.log('Database empty on startup. Triggering initial seed...');
+// Auto-seed initial demo/production data and trigger Supabase sync
+const shouldSeed = db.getTable('users').length === 0 ||
+  db.getTable('crops').length < 3 ||
+  db.getTable('ai_diagnoses').length === 0;
+
+if (shouldSeed) {
+  console.log('🌱 Populating initial database tables (profiles, farms, crops, marketplace_products, disease_scans)...');
   seedDatabase().catch(console.error);
 }
 

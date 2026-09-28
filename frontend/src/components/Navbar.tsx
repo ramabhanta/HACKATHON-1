@@ -23,10 +23,8 @@ import {
   Layers,
   Sparkles,
   Eye,
-  Search,
-  Database
+  Search
 } from 'lucide-react';
-import { SupabaseModal } from './SupabaseModal';
 
 interface NavbarProps {
   activeTab: string;
@@ -47,7 +45,6 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenV
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showModeMenu, setShowModeMenu] = useState(false);
   const [showNotifMenu, setShowNotifMenu] = useState(false);
-  const [showSupabaseModal, setShowSupabaseModal] = useState(false);
   const [notifications, setNotifications] = useState<any[]>([]);
 
 
@@ -322,16 +319,6 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenV
               className="p-2 rounded-full bg-emerald-700/80 hover:bg-emerald-600 text-amber-300 border border-emerald-500/50 shadow-sm transition active:scale-95"
             >
               <Volume2 className="w-5 h-5" />
-            </button>
-
-            {/* Cloud Database (Supabase) Button */}
-            <button
-              onClick={() => setShowSupabaseModal(true)}
-              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-bold rounded-lg bg-emerald-700/70 hover:bg-emerald-600 border border-emerald-500/60 transition shadow-sm text-emerald-100"
-              title="Connect Supabase Cloud Database"
-            >
-              <Database className="w-3.5 h-3.5 text-emerald-300" />
-              <span className="hidden md:inline">Supabase</span>
             </button>
 
             {/* Display Mode Switcher (Clean Pro / Simple Field / Dark Night) */}
@@ -694,12 +681,6 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenV
           </div>
         </div>
       </div>
-
-      {/* Supabase Cloud Connection Modal */}
-      <SupabaseModal
-        isOpen={showSupabaseModal}
-        onClose={() => setShowSupabaseModal(false)}
-      />
     </header>
   );
 };

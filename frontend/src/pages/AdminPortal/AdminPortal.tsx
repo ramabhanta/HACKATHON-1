@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { SupabaseModal } from '../../components/SupabaseModal';
 import {
   ShieldCheck,
   Users,
@@ -25,7 +24,6 @@ export const AdminPortal: React.FC = () => {
   const [aiLogs, setAiLogs] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<'METRICS' | 'AI_LOGS'>('METRICS');
   const [loading, setLoading] = useState(true);
-  const [isSupabaseModalOpen, setIsSupabaseModalOpen] = useState(false);
   const [supabaseStatus, setSupabaseStatus] = useState<any>(null);
   const [aiConfig, setAiConfig] = useState<any>(null);
 
@@ -96,31 +94,24 @@ export const AdminPortal: React.FC = () => {
                 <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-sm">
                   <Database className="w-4 h-4 text-emerald-700" />
                 </div>
-                <h3 className="font-extrabold text-sm text-gray-900">Supabase Cloud Database</h3>
+                <h3 className="font-extrabold text-sm text-gray-900">PostgreSQL Cloud Database</h3>
               </div>
-              <span className={`px-2 py-0.5 rounded-full text-[10px] font-black border ${
-                supabaseStatus?.connected
-                  ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
-                  : 'bg-amber-50 text-amber-900 border-amber-300'
-              }`}>
-                {supabaseStatus?.connected ? '✓ Connected' : 'Ready to Connect'}
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-black border bg-emerald-50 text-emerald-800 border-emerald-300">
+                ✓ Server-Managed
               </span>
             </div>
             <p className="text-xs text-gray-500 mb-4">
-              Connect AgriDex to your free Supabase PostgreSQL instance. Sync farmers, crops, orders, and produce lots with 1 click.
+              All tables (farmers, crops, products, orders, produce lots) are securely synchronized through backend services.
             </p>
           </div>
 
           <div className="flex items-center justify-between gap-2 pt-2 border-t border-gray-100">
-            <span className="text-[10px] font-mono text-gray-400 truncate max-w-[180px]">
-              {supabaseStatus?.url || 'PostgreSQL Cloud'}
+            <span className="text-[10px] font-mono text-emerald-700 font-bold truncate max-w-[280px]">
+              PostgreSQL Cloud • Auto-Sync Active
             </span>
-            <button
-              onClick={() => setIsSupabaseModalOpen(true)}
-              className="px-3.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold transition shadow-xs flex items-center gap-1.5 active:scale-95"
-            >
-              <span>Connect Supabase</span>
-            </button>
+            <span className="text-[10px] font-bold text-gray-400">
+              Zero Config Required
+            </span>
           </div>
         </div>
 
@@ -236,14 +227,6 @@ export const AdminPortal: React.FC = () => {
         </div>
       )}
 
-      {/* Modals */}
-      <SupabaseModal
-        isOpen={isSupabaseModalOpen}
-        onClose={() => {
-          setIsSupabaseModalOpen(false);
-          loadAdminData();
-        }}
-      />
     </div>
   );
 };

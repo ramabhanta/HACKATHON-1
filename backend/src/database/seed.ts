@@ -17,8 +17,11 @@ import {
   VendorDealRequest,
   FarmTask,
   FarmExpense,
-  AppNotification
+  AppNotification,
+  AiDiagnosis,
+  MarketPrice
 } from '../models/types.js';
+import { syncLocalDataToSupabase } from './supabaseClient.js';
 
 export async function seedDatabase() {
   console.log('🌱 Seeding AgriConnect AI database with realistic agricultural data...');
@@ -168,7 +171,7 @@ export async function seedDatabase() {
       location: 'Survey #142/A, Kadiri Rural Road',
       district: 'Sri Sathya Sai',
       state: 'Andhra Pradesh',
-      totalArea: 5.5,
+      totalArea: 6.5,
       areaUnit: 'ACRE',
       soilType: 'RED_LOAM',
       irrigationSource: 'BOREWELL',
@@ -202,9 +205,23 @@ export async function seedDatabase() {
       growthStage: 'VEGETATIVE',
       areaPlanted: 1.5,
       previousCrop: 'Groundnut',
-      currentProblems: 'None. Good vegetative vigor.',
+      currentProblems: 'None. Good vegetative vigor with drip fertigation.',
       healthStatus: 'HEALTHY',
       createdAt: '2026-08-01T00:00:00.000Z'
+    },
+    {
+      id: 'crop-3',
+      farmId: 'farm-1',
+      cropName: 'Chilli (Mirchi)',
+      variety: 'Guntur Hope / Byadagi Dry Red',
+      sowingDate: '2026-08-10T00:00:00.000Z',
+      expectedHarvestDate: '2026-12-05T00:00:00.000Z',
+      growthStage: 'VEGETATIVE',
+      areaPlanted: 1.0,
+      previousCrop: 'Legume Green Manure',
+      currentProblems: 'None observed. Vigorous canopy with drip fertigation.',
+      healthStatus: 'HEALTHY',
+      createdAt: '2026-08-10T00:00:00.000Z'
     }
   ];
 
@@ -480,6 +497,28 @@ export async function seedDatabase() {
       dosageGuidance: 'Full charge delivers 6-8 hours of continuous operation (20-25 tank sprays).',
       safetyPrecautions: ['Rinse tank thoroughly with fresh water after every chemical application.'],
       labelInstructions: 'Includes 1-Year manufacturer warranty card and battery charger.',
+      status: 'APPROVED',
+      createdAt: '2026-06-15T00:00:00.000Z'
+    },
+    {
+      id: 'prod-seeds-chilli',
+      vendorId: 'usr-vendor-1',
+      categoryId: 'cat-seeds',
+      name: 'High-Yield Guntur Teja Chilli Seeds',
+      brand: 'Andhra Hybrid Seeds',
+      category: 'SEEDS',
+      images: ['https://images.unsplash.com/photo-1588252303782-cb80119abd6d?w=400'],
+      description: 'High pungency dry red chilli hybrid with prolific bearing and resistance to powdery mildew. High capsaicin content and lustrous red color.',
+      agriculturalUse: 'Commercial spice cultivation. High yield potential of 25-30 quintals/acre dry pods.',
+      applicableCrops: ['Chilli'],
+      packSize: '50 Gram Pouch',
+      price: 480.00,
+      mrp: 550.00,
+      stockQuantity: 75,
+      isOrganic: false,
+      dosageGuidance: 'Seed rate: 100g/acre for nursery bed sowing. Transplant at 35-40 days.',
+      safetyPrecautions: ['Wash hands after handling chilli seed treatments.'],
+      labelInstructions: 'Certified hybrid seed. Minimum germination 80%.',
       status: 'APPROVED',
       createdAt: '2026-06-15T00:00:00.000Z'
     }
@@ -923,6 +962,186 @@ export async function seedDatabase() {
     }
   ];
 
+  // 15. Real AI Diagnoses & Leaf Scans (So disease_scans is never empty)
+  const aiDiagnoses: AiDiagnosis[] = [
+    {
+      id: 'diag-scan-1',
+      userId: 'usr-farmer-1',
+      farmId: 'farm-1',
+      cropName: 'Groundnut (Peanut)',
+      imageUrl: 'https://images.unsplash.com/photo-1592417817098-8f3d6910985b?w=600',
+      suspectedIssue: 'Early Leaf Spot (Tikka Disease - Cercospora arachidicola)',
+      confidenceScore: 94.5,
+      severity: 'MODERATE',
+      cropIdentified: true,
+      clarificationPrompt: '',
+      symptomsEvidence: [
+        'Circular reddish-brown to dark necrotic spots (2-8 mm) on leaf lamina.',
+        'Distinct chlorotic yellow halo surrounding necrotic margins.',
+        'Early signs of defoliation starting from lower canopy.'
+      ],
+      culturalControl: [
+        'Collect and destroy infected crop residues to disrupt fungal inoculum.',
+        'Maintain optimum plant spacing for adequate air circulation.',
+        'Avoid late-evening overhead sprinkler irrigation.'
+      ],
+      biologicalControl: [
+        'Foliar spray of cold-pressed Neem Oil 10,000 PPM @ 3-4 ml per litre of water.',
+        'Apply Multiplex Trichoderma Viride 1% WP @ 5g per litre of water.'
+      ],
+      chemicalControlSafe: [
+        'Dhanuka M-45 (Mancozeb 75% WP) @ 400-500g in 200L water per acre (2-2.5g/L).',
+        'Tata Rallis Contaf Plus (Hexaconazole 5% SC) @ 400 ml in 200L water per acre (2 ml/L).'
+      ],
+      safetyWarnings: [
+        'Wear protective face mask and gloves during mixing and spray application.',
+        'Spray during calm morning (before 9 AM) or evening (after 4:30 PM).',
+        'Observe minimum pre-harvest interval (PHI) of 15 days.'
+      ],
+      recommendedProductIds: ['prod-trichoderma', 'prod-neem-oil', 'prod-sprayer'],
+      isExpertReviewed: true,
+      expertNotes: 'Fungal spores germinating under >85% relative humidity and 25-30°C temperature with conidial dispersal by rain-splash.',
+      followUpQuestions: [
+        'How many days ago did you first observe these lesions?',
+        'Was there continuous heavy rainfall or dense dew recently?'
+      ],
+      createdAt: '2026-09-27T10:00:00.000Z'
+    },
+    {
+      id: 'diag-scan-2',
+      userId: 'usr-farmer-1',
+      farmId: 'farm-1',
+      cropName: 'Tomato',
+      imageUrl: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600',
+      suspectedIssue: 'Healthy Crop Status / Vigorous Fruiting Stage',
+      confidenceScore: 96.0,
+      severity: 'MILD',
+      cropIdentified: true,
+      clarificationPrompt: '',
+      symptomsEvidence: [
+        'Deep green, turgid leaves with normal venation and zero chlorosis.',
+        'Sturdy stems and healthy cluster flowering without flower drop.'
+      ],
+      culturalControl: [
+        'Maintain regular drip irrigation scheduling at 2-day intervals.',
+        'Stake and trellis plants to prevent soil contact with fruits.'
+      ],
+      biologicalControl: [
+        'Soil application of Pseudomonas fluorescens @ 2.5 kg/acre with FYM for root vigor.'
+      ],
+      chemicalControlSafe: [
+        'No synthetic chemical intervention required for healthy crop.',
+        'Foliar spray of NPK 19-19-19 @ 5g/L for balanced fruit expansion.'
+      ],
+      safetyWarnings: [
+        'Avoid excessive Nitrogen application which can attract sucking pests.'
+      ],
+      recommendedProductIds: ['prod-npk-19', 'prod-neem-oil'],
+      isExpertReviewed: true,
+      expertNotes: 'Optimal nutritional balance observed. Keep monitoring for early whitefly vectors.',
+      createdAt: '2026-09-28T08:30:00.000Z'
+    }
+  ];
+
+  // 16. Live Mandi Market Prices
+  const marketPrices: MarketPrice[] = [
+    {
+      id: 'price-1',
+      state: 'Andhra Pradesh',
+      district: 'Sri Sathya Sai',
+      market: 'Kadiri APMC Mandi',
+      commodity: 'Groundnut (Pod)',
+      commodityType: 'OILSEED',
+      variety: 'Kadiri-6 Bold',
+      unit: 'QUINTAL',
+      minPrice: 7100,
+      maxPrice: 7650,
+      modalPrice: 7450,
+      priceDate: '2026-09-28',
+      trend: 'UP',
+      changeAmount: 120,
+      reportedBy: 'APMC Market Secretary',
+      reportedByName: 'Kadiri APMC Yard',
+      createdAt: new Date().toISOString()
+    },
+    {
+      id: 'price-2',
+      state: 'Karnataka',
+      district: 'Bengaluru Urban',
+      market: 'Yeshwanthpur APMC Mandi',
+      commodity: 'Tomato',
+      commodityType: 'VEGETABLE',
+      variety: 'Hybrid Red (Arka)',
+      unit: 'CRATE',
+      minPrice: 420,
+      maxPrice: 530,
+      modalPrice: 480,
+      priceDate: '2026-09-28',
+      trend: 'STABLE',
+      changeAmount: 0,
+      reportedBy: 'Mandi Trade Board',
+      reportedByName: 'Bangalore Mandi Desk',
+      createdAt: new Date().toISOString()
+    },
+    {
+      id: 'price-3',
+      state: 'Andhra Pradesh',
+      district: 'Guntur',
+      market: 'Guntur Mirchi Yard',
+      commodity: 'Chilli (Dry Red)',
+      commodityType: 'SPICE',
+      variety: 'Teja S17 / Byadagi',
+      unit: 'QUINTAL',
+      minPrice: 18500,
+      maxPrice: 20800,
+      modalPrice: 19500,
+      priceDate: '2026-09-28',
+      trend: 'UP',
+      changeAmount: 350,
+      reportedBy: 'Spices Board Field Officer',
+      reportedByName: 'Guntur Mirchi Yard',
+      createdAt: new Date().toISOString()
+    },
+    {
+      id: 'price-4',
+      state: 'Andhra Pradesh',
+      district: 'Anantapur',
+      market: 'Anantapur Cotton Market',
+      commodity: 'Cotton',
+      commodityType: 'CROP',
+      variety: 'Medium-Long Staple',
+      unit: 'QUINTAL',
+      minPrice: 7600,
+      maxPrice: 8200,
+      modalPrice: 7950,
+      priceDate: '2026-09-28',
+      trend: 'UP',
+      changeAmount: 80,
+      reportedBy: 'Cotton Corporation of India',
+      reportedByName: 'Anantapur Yard',
+      createdAt: new Date().toISOString()
+    },
+    {
+      id: 'price-5',
+      state: 'Andhra Pradesh',
+      district: 'Sri Sathya Sai',
+      market: 'Kadiri APMC Mandi',
+      commodity: 'Paddy (Dhan)',
+      commodityType: 'CROP',
+      variety: 'Common / Sona Masoori',
+      unit: 'QUINTAL',
+      minPrice: 2280,
+      maxPrice: 2450,
+      modalPrice: 2380,
+      priceDate: '2026-09-28',
+      trend: 'STABLE',
+      changeAmount: 0,
+      reportedBy: 'APMC Market Secretary',
+      reportedByName: 'Kadiri APMC Yard',
+      createdAt: new Date().toISOString()
+    }
+  ];
+
   db.reset({
     users,
     farmer_profiles: farmerProfiles,
@@ -931,7 +1150,7 @@ export async function seedDatabase() {
     farms,
     crops,
     soil_tests: soilTests,
-    ai_diagnoses: [],
+    ai_diagnoses: aiDiagnoses,
     product_categories: productCategories,
     products,
     orders,
@@ -943,10 +1162,21 @@ export async function seedDatabase() {
     expenses,
     messages: [],
     notifications,
-    market_prices: []
+    market_prices: marketPrices
   });
 
   console.log('✅ Database seeded successfully with all tables and realistic data.');
+
+  // Asynchronously trigger sync to Supabase Cloud tables
+  syncLocalDataToSupabase().then(res => {
+    if (res.success) {
+      console.log('☁️ Supabase Cloud Tables successfully seeded and synchronized:', res.syncedCounts);
+    } else {
+      console.warn('⚠️ Supabase Cloud Tables sync notice (local database is fully active):', res.errors.join('; '));
+    }
+  }).catch(e => {
+    console.warn('⚠️ Supabase Cloud sync exception:', e?.message || e);
+  });
 }
 
 if (process.argv[1] && process.argv[1].includes('seed')) {

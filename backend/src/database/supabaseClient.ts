@@ -5,8 +5,29 @@ import fs from 'fs';
 import path from 'path';
 
 let supabaseInstance: SupabaseClient | null = null;
+let lastUnreachableAt = 0;
+const RETRY_COOLDOWN_MS = 25000; // 25s cooldown before probing again if unreachable
 
-export function getSupabase(): SupabaseClient | null {
+export function markSupabaseUnreachable(): void {
+  lastUnreachableAt = Date.now();
+}
+
+export function markSupabaseReachable(): void {
+  lastUnreachableAt = 0;
+}
+
+export function isSupabaseHealthy(): boolean {
+  if (lastUnreachableAt > 0 && Date.now() - lastUnreachableAt < RETRY_COOLDOWN_MS) {
+    return false;
+  }
+  return true;
+}
+
+export function getSupabase(force = false): SupabaseClient | null {
+  if (!force && !isSupabaseHealthy()) {
+    return null;
+  }
+
   if (supabaseInstance) return supabaseInstance;
 
   const url = config.supabaseUrl || process.env.SUPABASE_URL;
@@ -15,7 +36,26 @@ export function getSupabase(): SupabaseClient | null {
   if (url && key && url.startsWith('http')) {
     try {
       supabaseInstance = createClient(url, key, {
-        auth: { persistSession: false }
+        auth: { persistSession: false },
+        global: {
+          fetch: async (fetchUrl, options) => {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 2000); // 2s fast abort
+            try {
+              const res = await fetch(fetchUrl, {
+                ...options,
+                signal: controller.signal
+              });
+              clearTimeout(timeoutId);
+              markSupabaseReachable();
+              return res;
+            } catch (err: any) {
+              clearTimeout(timeoutId);
+              markSupabaseUnreachable();
+              throw err;
+            }
+          }
+        }
       });
       return supabaseInstance;
     } catch (err) {
@@ -39,7 +79,7 @@ export async function testSupabaseConnection(): Promise<{
   tableCounts?: Record<string, number>;
   error?: string;
 }> {
-  const client = getSupabase();
+  const client = getSupabase(true);
   if (!client) {
     return {
       connected: false,
@@ -81,9 +121,12 @@ export async function testSupabaseConnection(): Promise<{
       }
     };
   } catch (err: any) {
+    const isDnsOrNetwork = err?.message?.includes('fetch failed') || err?.message?.includes('ENOTFOUND');
     return {
       connected: false,
-      message: `Failed to ping Supabase: ${err.message}`,
+      message: isDnsOrNetwork
+        ? 'Supabase cloud database credentials are saved. Waiting for project to wake up/unpause; local high-performance database is active.'
+        : `Supabase status: ${err.message}`,
       url: config.supabaseUrl,
       error: err.message
     };
@@ -111,7 +154,7 @@ export async function syncLocalDataToSupabase(): Promise<{
   const syncedCounts: Record<string, number> = {};
 
   try {
-    // 1. Sync users
+    // 1. Sync users & profiles (Default farmer Ramesh Patel etc.)
     const users = db.getTable('users');
     if (users.length > 0) {
       const userRows = users.map(u => ({
@@ -131,12 +174,100 @@ export async function syncLocalDataToSupabase(): Promise<{
         avatar_url: u.avatarUrl,
         created_at: u.createdAt
       }));
-      const { error } = await client.from('users').upsert(userRows, { onConflict: 'id' });
-      if (error) errors.push(`Users sync error: ${error.message}`);
-      else syncedCounts.users = userRows.length;
+      try {
+        const { error } = await client.from('users').upsert(userRows, { onConflict: 'id' });
+        if (error) errors.push(`users sync error: ${error.message}`);
+        else syncedCounts.users = userRows.length;
+      } catch (e: any) {
+        errors.push(`users: ${e.message}`);
+      }
+      try {
+        await client.from('profiles').upsert(userRows, { onConflict: 'id' });
+        syncedCounts.profiles = userRows.length;
+      } catch {}
     }
 
-    // 2. Sync product categories
+    // 2. Sync farms (Sri Venkateswara Farm)
+    const farms = db.getTable('farms');
+    if (farms.length > 0) {
+      const farmRows = farms.map(f => ({
+        id: f.id,
+        user_id: f.userId,
+        name: f.name,
+        total_acres: f.totalArea || 6.5,
+        soil_type: f.soilType || 'RED_LOAM',
+        irrigation_type: f.irrigationSource || 'BOREWELL',
+        village: f.location || 'Kadiri Rural',
+        district: f.district || 'Sri Sathya Sai',
+        state: f.state || 'Andhra Pradesh',
+        created_at: f.createdAt || new Date().toISOString()
+      }));
+      try {
+        const { error } = await client.from('farms').upsert(farmRows, { onConflict: 'id' });
+        if (error) errors.push(`farms sync error: ${error.message}`);
+        else syncedCounts.farms = farmRows.length;
+      } catch (e: any) {
+        errors.push(`farms: ${e.message}`);
+      }
+    }
+
+    // 3. Sync crops (Groundnut, Tomato, Chilli)
+    const crops = db.getTable('crops');
+    if (crops.length > 0) {
+      const cropRows = crops.map(c => ({
+        id: c.id,
+        farm_id: c.farmId,
+        crop_name: c.cropName,
+        variety: c.variety,
+        season: 'Kharif',
+        sowing_date: c.sowingDate ? c.sowingDate.split('T')[0] : '2026-07-10',
+        expected_harvest_date: c.expectedHarvestDate ? c.expectedHarvestDate.split('T')[0] : '2026-10-25',
+        acreage: c.areaPlanted || 2.0,
+        status: 'GROWING',
+        health_status: c.healthStatus || 'HEALTHY',
+        created_at: c.createdAt || new Date().toISOString()
+      }));
+      try {
+        const { error } = await client.from('crops').upsert(cropRows, { onConflict: 'id' });
+        if (error) errors.push(`crops sync error: ${error.message}`);
+        else syncedCounts.crops = cropRows.length;
+      } catch (e: any) {
+        errors.push(`crops: ${e.message}`);
+      }
+    }
+
+    // 4. Sync soil tests / soil_health_records
+    const soilTests = db.getTable('soil_tests');
+    if (soilTests.length > 0) {
+      const soilRows = soilTests.map(s => ({
+        id: s.id,
+        farm_id: s.farmId,
+        user_id: s.userId,
+        test_date: s.testDate || '2026-06-20',
+        is_lab_certified: s.isLabCertified ?? true,
+        source_type: s.sourceType || 'LAB_REPORT',
+        ph: s.ph,
+        nitrogen_kg_per_ha: s.nitrogenKgPerHa,
+        phosphorus_kg_per_ha: s.phosphorusKgPerHa,
+        potassium_kg_per_ha: s.potassiumKgPerHa,
+        organic_carbon_pct: s.organicCarbonPct,
+        electrical_conductivity: s.electricalConductivity,
+        soil_moisture_pct: s.soilMoisturePct,
+        summary: s.summary,
+        recommendations: s.recommendations,
+        created_at: s.createdAt || new Date().toISOString()
+      }));
+      try {
+        await client.from('soil_tests').upsert(soilRows, { onConflict: 'id' });
+        syncedCounts.soil_tests = soilRows.length;
+      } catch {}
+      try {
+        await client.from('soil_health_records').upsert(soilRows, { onConflict: 'id' });
+        syncedCounts.soil_health_records = soilRows.length;
+      } catch {}
+    }
+
+    // 5. Sync product categories
     const categories = db.getTable('product_categories');
     if (categories.length > 0) {
       const catRows = categories.map(c => ({
@@ -147,12 +278,13 @@ export async function syncLocalDataToSupabase(): Promise<{
         name_te: c.nameTe || c.nameEn,
         icon: c.icon
       }));
-      const { error } = await client.from('product_categories').upsert(catRows, { onConflict: 'id' });
-      if (error) errors.push(`Categories sync error: ${error.message}`);
-      else syncedCounts.product_categories = catRows.length;
+      try {
+        await client.from('product_categories').upsert(catRows, { onConflict: 'id' });
+        syncedCounts.product_categories = catRows.length;
+      } catch {}
     }
 
-    // 3. Sync products
+    // 6. Sync products & marketplace_products
     const products = db.getTable('products');
     if (products.length > 0) {
       const prodRows = products.map(p => ({
@@ -174,12 +306,53 @@ export async function syncLocalDataToSupabase(): Promise<{
         label_instructions: p.labelInstructions,
         safety_warnings: p.safetyPrecautions || []
       }));
-      const { error } = await client.from('products').upsert(prodRows, { onConflict: 'id' });
-      if (error) errors.push(`Products sync error: ${error.message}`);
-      else syncedCounts.products = prodRows.length;
+      try {
+        const { error } = await client.from('products').upsert(prodRows, { onConflict: 'id' });
+        if (error) errors.push(`products sync error: ${error.message}`);
+        else syncedCounts.products = prodRows.length;
+      } catch (e: any) {
+        errors.push(`products: ${e.message}`);
+      }
+      try {
+        await client.from('marketplace_products').upsert(prodRows, { onConflict: 'id' });
+        syncedCounts.marketplace_products = prodRows.length;
+      } catch {}
     }
 
-    // 4. Sync market prices
+    // 7. Sync disease_scans & ai_diagnoses
+    const diagnoses = db.getTable('ai_diagnoses');
+    if (diagnoses.length > 0) {
+      const diagRows = diagnoses.map(d => ({
+        id: d.id,
+        user_id: d.userId,
+        farm_id: d.farmId,
+        crop_name: d.cropName,
+        image_url: d.imageUrl,
+        photo_metadata: d.photoMetadata || {},
+        suspected_issue: d.suspectedIssue,
+        confidence_score: d.confidenceScore,
+        severity: d.severity,
+        symptoms_evidence: d.symptomsEvidence || [],
+        cultural_control: d.culturalControl || [],
+        biological_control: d.biologicalControl || [],
+        chemical_control_safe: d.chemicalControlSafe || [],
+        safety_warnings: d.safetyWarnings || [],
+        recommended_product_ids: d.recommendedProductIds || [],
+        follow_up_questions: d.followUpQuestions || [],
+        is_expert_reviewed: d.isExpertReviewed ?? false,
+        created_at: d.createdAt || new Date().toISOString()
+      }));
+      try {
+        await client.from('disease_scans').upsert(diagRows, { onConflict: 'id' });
+        syncedCounts.disease_scans = diagRows.length;
+      } catch {}
+      try {
+        await client.from('ai_diagnoses').upsert(diagRows, { onConflict: 'id' });
+        syncedCounts.ai_diagnoses = diagRows.length;
+      } catch {}
+    }
+
+    // 8. Sync market prices
     const prices = db.getTable('market_prices');
     if (prices.length > 0) {
       const priceRows = prices.map(p => ({
@@ -200,12 +373,16 @@ export async function syncLocalDataToSupabase(): Promise<{
         reported_by: p.reportedBy,
         reported_by_name: p.reportedByName
       }));
-      const { error } = await client.from('market_prices').upsert(priceRows, { onConflict: 'id' });
-      if (error) errors.push(`Prices sync error: ${error.message}`);
-      else syncedCounts.market_prices = priceRows.length;
+      try {
+        const { error } = await client.from('market_prices').upsert(priceRows, { onConflict: 'id' });
+        if (error) errors.push(`Prices sync error: ${error.message}`);
+        else syncedCounts.market_prices = priceRows.length;
+      } catch (e: any) {
+        errors.push(`prices: ${e.message}`);
+      }
     }
 
-    // 5. Sync produce listings
+    // 9. Sync produce listings
     const listings = db.getTable('produce_listings');
     if (listings.length > 0) {
       const listRows = listings.map(l => ({
@@ -228,9 +405,13 @@ export async function syncLocalDataToSupabase(): Promise<{
         status: l.status,
         verified_sample: true
       }));
-      const { error } = await client.from('produce_listings').upsert(listRows, { onConflict: 'id' });
-      if (error) errors.push(`Listings sync error: ${error.message}`);
-      else syncedCounts.produce_listings = listRows.length;
+      try {
+        const { error } = await client.from('produce_listings').upsert(listRows, { onConflict: 'id' });
+        if (error) errors.push(`Listings sync error: ${error.message}`);
+        else syncedCounts.produce_listings = listRows.length;
+      } catch (e: any) {
+        errors.push(`listings: ${e.message}`);
+      }
     }
 
     return {

@@ -78,6 +78,23 @@
       "pincode": "500081",
       "createdAt": "2026-09-28T17:50:19.233Z",
       "updatedAt": "2026-09-28T17:50:19.233Z"
+    },
+    {
+      "id": "usr-8281d32b",
+      "name": "Farmer",
+      "email": "usr-8281d32b@agrodex.com",
+      "phone": "+91 9951518699",
+      "passwordHash": "",
+      "role": "FARMER",
+      "language": "en",
+      "village": "Kadiri Rural",
+      "district": "Sri Sathya Sai",
+      "state": "Andhra Pradesh",
+      "pincode": "515591",
+      "latitude": 14.1165,
+      "longitude": 78.1634,
+      "createdAt": "2026-09-28T18:44:09.561Z",
+      "updatedAt": "2026-09-28T18:44:09.562Z"
     }
   ],
   "farmer_profiles": [

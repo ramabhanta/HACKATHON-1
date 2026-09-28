@@ -35,7 +35,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Login form state
-  const [loginIdentifier, setLoginIdentifier] = useState('farmer@agridex.com');
+  const [loginIdentifier, setLoginIdentifier] = useState('farmer@agrodex.com');
   const [loginPassword, setLoginPassword] = useState('password123');
   const [rememberMe, setRememberMe] = useState(true);
 
@@ -163,7 +163,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
           🌾
         </div>
         <h1 className="text-2xl font-black text-gray-900 tracking-tight">
-          {mode === 'LOGIN' ? 'Sign In to AgriDex' : 'Join AgriDex Platform'}
+          {mode === 'LOGIN' ? 'Sign In to AgroDex' : 'Join AgroDex Platform'}
         </h1>
         <p className="text-xs sm:text-sm text-gray-500 mt-1 max-w-sm mx-auto">
           {mode === 'LOGIN'
@@ -240,7 +240,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                   type="text"
                   value={loginIdentifier}
                   onChange={e => setLoginIdentifier(e.target.value)}
-                  placeholder="farmer@agridex.com or 9848012345"
+                  placeholder="farmer@agrodex.com or 9848012345"
                   className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none text-xs"
                   required
                 />
@@ -298,7 +298,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                 </>
               ) : (
                 <>
-                  <span>Sign In to AgriDex</span>
+                  <span>Sign In to AgroDex</span>
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
@@ -428,7 +428,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                   type="email"
                   value={regEmail}
                   onChange={e => setRegEmail(e.target.value)}
-                  placeholder="name@agridex.com"
+                  placeholder="name@agrodex.com"
                   className="w-full p-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none"
                   required
                 />

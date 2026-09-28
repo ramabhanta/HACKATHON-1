@@ -310,8 +310,8 @@ export const CartCheckout: React.FC<CartCheckoutProps> = ({ setActiveTab }) => {
 
             {paymentMethod === 'UPI' && (
               <div className="p-3 bg-emerald-50 rounded-2xl border border-emerald-200 text-center">
-                <span className="text-[10px] text-emerald-800 font-bold block uppercase">AgriDex Secure UPI</span>
-                <span className="text-xs font-mono font-bold text-emerald-950">agridex@icici</span>
+                <span className="text-[10px] text-emerald-800 font-bold block uppercase">AgroDex Secure UPI</span>
+                <span className="text-xs font-mono font-bold text-emerald-950">agrodex@icici</span>
               </div>
             )}
           </div>

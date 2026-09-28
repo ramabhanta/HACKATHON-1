@@ -24,7 +24,7 @@ export const indianLanguages: LanguageMeta[] = [
 
 export const translations: Record<Language, Record<string, string>> = {
   en: {
-    appName: 'AgriDex',
+    appName: 'AgroDex',
     tagline: 'AI for Every Farmer — Diagnose, Decide, Buy, Sell and Grow',
     home: 'My Farm',
     aiAssistant: 'AI Assistant',
@@ -42,7 +42,7 @@ export const translations: Record<Language, Record<string, string>> = {
     
     // Dashboard
     greeting: 'Good morning, Ramesh Patel 👋',
-    subGreeting: 'How can AgriDex assist your fields today?',
+    subGreeting: 'How can AgroDex assist your fields today?',
     askAiBtn: 'Ask AI Farmer Assistant',
     scanCropBtn: 'Scan My Crop',
     checkSoilBtn: 'Soil Intelligence',
@@ -78,7 +78,7 @@ export const translations: Record<Language, Record<string, string>> = {
     safeChemicalControl: '3. Regulated Chemical Options (If Severe)',
     safetyNotice: 'Important Safety Notice',
     matchedProductsTitle: 'Certified Inputs Available from Local Verified Vendors',
-    consultExpertBtn: 'Ask AgriDex AI Assistant',
+    consultExpertBtn: 'Ask AgroDex AI Assistant',
     
     // Store & Cart
     searchPlaceholder: 'Search "urea", "groundnut seeds", "gromor", "fungicide"...',
@@ -142,7 +142,7 @@ export const translations: Record<Language, Record<string, string>> = {
   },
   
   hi: {
-    appName: 'एग्रीडेक्स (AgriDex)',
+    appName: 'एग्रोडेक्स (AgroDex)',
     tagline: 'हर किसान के लिए AI — पहचानें, निर्णय लें, खरीदें, बेचें और आगे बढ़ें',
     home: 'मेरा खेत',
     aiAssistant: 'एआई सहायक',
@@ -260,7 +260,7 @@ export const translations: Record<Language, Record<string, string>> = {
   },
   
   te: {
-    appName: 'అగ్రిడెక్స్ (AgriDex)',
+    appName: 'అగ్రోడెక్స్ (AgroDex)',
     tagline: 'ప్రతి రైతుకు AI — గుర్తించండి, నిర్ణయించండి, కొనండి, అమ్మండి మరియు ఎదగండి',
     home: 'నా పొలం',
     aiAssistant: 'AI సహాయకుడు',
@@ -378,7 +378,7 @@ export const translations: Record<Language, Record<string, string>> = {
   },
 
   ta: {
-    appName: 'அக்ரிடெக்ஸ் (AgriDex)',
+    appName: 'அக்ரோடெக்ஸ் (AgroDex)',
     tagline: 'ஒவ்வொரு விவசாயிக்கும் AI — கண்டறியவும், தீர்மானிக்கவும், வாங்கவும், விற்கவும், வளரவும்',
     home: 'எனது பண்ணை',
     aiAssistant: 'AI உதவியாளர்',
@@ -480,7 +480,7 @@ export const translations: Record<Language, Record<string, string>> = {
   },
 
   kn: {
-    appName: 'ಅಗ್ರಿಡೆಕ್ಸ್ (AgriDex)',
+    appName: 'ಅಗ್ರೋಡೆಕ್ಸ್ (AgroDex)',
     tagline: 'ಪ್ರತಿ ರೈತನಿಗಾಗಿ AI — ಪತ್ತೆಹಚ್ಚಿ, ನಿರ್ಧರಿಸಿ, ಖರೀದಿಸಿ, ಮಾರಿ ಮತ್ತು ಬೆಳೆಯಿರಿ',
     home: 'ನನ್ನ ಜಮೀನು',
     aiAssistant: 'AI ಸಹಾಯಕ',
@@ -582,7 +582,7 @@ export const translations: Record<Language, Record<string, string>> = {
   },
 
   ml: {
-    appName: 'അഗ്രിഡെക്സ് (AgriDex)',
+    appName: 'അഗ്രോഡെക്സ് (AgroDex)',
     tagline: 'ഓരോ കർഷകനും AI — രോഗങ്ങൾ കണ്ടെത്തുക, തീരുമാനിക്കുക, വാങ്ങുക, വിൽക്കുക, വളരുക',
     home: 'എന്റെ കൃഷിയിടം',
     aiAssistant: 'AI സഹായി',
@@ -684,7 +684,7 @@ export const translations: Record<Language, Record<string, string>> = {
   },
 
   mr: {
-    appName: 'ॲग्रीडेक्स (AgriDex)',
+    appName: 'ॲग्रोडेक्स (AgroDex)',
     tagline: 'प्रत्येक शेतकऱ्यासाठी AI — ओळखा, निर्णय घ्या, खरेदी करा, विका आणि प्रगती करा',
     home: 'माझे शेत',
     aiAssistant: 'एआय सहाय्यक',
@@ -786,7 +786,7 @@ export const translations: Record<Language, Record<string, string>> = {
   },
 
   bn: {
-    appName: 'এগ্রিডেক্স (AgriDex)',
+    appName: 'এগ্রোডেক্স (AgroDex)',
     tagline: 'প্রতিটি কৃষকের জন্য AI — রোগ নির্ণয় করুন, সিদ্ধান্ত নিন, কিনুন, বিক্রি করুন এবং এগিয়ে যান',
     home: 'আমার খামার',
     aiAssistant: 'এআই সহকারী',
@@ -888,7 +888,7 @@ export const translations: Record<Language, Record<string, string>> = {
   },
 
   gu: {
-    appName: 'એગ્રીડેક્સ (AgriDex)',
+    appName: 'એગ્રોડેક્સ (AgroDex)',
     tagline: 'દરેક ખેડૂત માટે AI — રોગ ઓળખો, નિર્ણય લો, ખરીદો, વેચો અને પ્રગતિ કરો',
     home: 'મારું ખેતર',
     aiAssistant: 'એઆઈ સહાયક',
@@ -990,7 +990,7 @@ export const translations: Record<Language, Record<string, string>> = {
   },
 
   pa: {
-    appName: 'ਐਗਰੀਡੈਕਸ (AgriDex)',
+    appName: 'ਐਗਰੋਡੈਕਸ (AgroDex)',
     tagline: 'ਹਰ ਕਿਸਾਨ ਲਈ AI — ਬਿਮਾਰੀ ਪਛਾਣੋ, ਫੈਸਲਾ ਲਓ, ਖਰੀਦੋ, ਵੇਚੋ ਅਤੇ ਤਰੱਕੀ ਕਰੋ',
     home: 'ਮੇਰਾ ਖੇਤ',
     aiAssistant: 'AI ਸਹਾਇਕ',
@@ -1092,7 +1092,7 @@ export const translations: Record<Language, Record<string, string>> = {
   },
 
   or: {
-    appName: 'ଏଗ୍ରିଡେକ୍ସ (AgriDex)',
+    appName: 'ଏଗ୍ରୋଡେକ୍ସ (AgroDex)',
     tagline: 'ପ୍ରତ୍ୟେକ ଚାଷୀଙ୍କ ପାଇଁ AI — ଚିହ୍ନଟ କରନ୍ତୁ, ନିଷ୍ପତ୍ତି ନିଅନ୍ତୁ, କିଣନ୍ତୁ, ବିକ୍ରୟ କରନ୍ତୁ ଏବଂ ଉନ୍ନତି କରନ୍ତୁ',
     home: 'ମୋର କ୍ଷେତ',
     aiAssistant: 'AI ସହାୟକ',

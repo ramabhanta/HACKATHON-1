@@ -21,7 +21,7 @@ interface AiConfigModalProps {
 export const AiConfigModal: React.FC<AiConfigModalProps> = ({ isOpen, onClose, onKeySaved }) => {
   const [apiKey, setApiKey] = useState('');
   const [serverHasKey, setServerHasKey] = useState(false);
-  const [activeModel, setActiveModel] = useState('AgriDex Live Knowledge Engine');
+  const [activeModel, setActiveModel] = useState('AgroDex Live Knowledge Engine');
   const [testing, setTesting] = useState(false);
   const [testStatus, setTestStatus] = useState<'IDLE' | 'SUCCESS' | 'ERROR'>('IDLE');
   const [statusMessage, setStatusMessage] = useState('');
@@ -180,7 +180,7 @@ export const AiConfigModal: React.FC<AiConfigModalProps> = ({ isOpen, onClose, o
                   Active Intelligence Mode
                 </span>
                 <span className="font-extrabold text-xs text-gray-900">
-                  {hasAnyKey ? 'Google Gemini 3.5 Flash (Deep Neural AI)' : 'AgriDex Live Knowledge Engine (Live Wikipedia & Mandi Data)'}
+                  {hasAnyKey ? 'Google Gemini 3.5 Flash (Deep Neural AI)' : 'AgroDex Live Knowledge Engine (Live Wikipedia & Mandi Data)'}
                 </span>
               </div>
             </div>

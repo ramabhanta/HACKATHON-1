@@ -526,7 +526,7 @@ export const DiseaseScan: React.FC<DiseaseScanProps> = ({ setActiveTab }) => {
               <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
               <div>
                 <p className="font-bold">Low AI Confidence Advisory:</p>
-                <p>The AI is not confident enough to identify this problem with certainty. Please upload a clearer photo or consult your local Krishi Vigyan Kendra (KVK) / AgriDex AI Assistant before spraying chemicals.</p>
+                <p>The AI is not confident enough to identify this problem with certainty. Please upload a clearer photo or consult your local Krishi Vigyan Kendra (KVK) / AgroDex AI Assistant before spraying chemicals.</p>
               </div>
             </div>
           )}
@@ -657,7 +657,7 @@ export const DiseaseScan: React.FC<DiseaseScanProps> = ({ setActiveTab }) => {
             </div>
           )}
 
-          {/* Ask AgriDex AI Assistant CTA */}
+          {/* Ask AgroDex AI Assistant CTA */}
           <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 bg-emerald-900 text-white p-4 rounded-2xl">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-amber-400 text-amber-950 flex items-center justify-center font-bold text-lg">
@@ -665,7 +665,7 @@ export const DiseaseScan: React.FC<DiseaseScanProps> = ({ setActiveTab }) => {
               </div>
               <div>
                 <p className="text-xs font-bold text-amber-300">Need an Instant AI Agronomic Diagnosis?</p>
-                <p className="text-xs text-emerald-100">Ask AgriDex AI Assistant for organic dosages, spray schedules & local stores</p>
+                <p className="text-xs text-emerald-100">Ask AgroDex AI Assistant for organic dosages, spray schedules & local stores</p>
               </div>
             </div>
 

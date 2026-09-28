@@ -41,7 +41,7 @@ app.use('/uploads', express.static(config.uploadDir));
 app.get('/api/health', (_req, res) => {
   res.json({
     status: 'ONLINE',
-    app: 'AgriDex Backend API',
+    app: 'AgroDex Backend API',
     tagline: 'AI for Every Farmer — Diagnose, Decide, Buy, Sell and Grow.',
     version: '1.0.0',
     timestamp: new Date().toISOString()
@@ -72,7 +72,7 @@ const frontendDistPaths = [
 const foundFrontendDist = frontendDistPaths.find(p => fs.existsSync(p));
 
 if (foundFrontendDist) {
-  console.log(`📦 Serving compiled AgriDex frontend from: ${foundFrontendDist}`);
+  console.log(`📦 Serving compiled AgroDex frontend from: ${foundFrontendDist}`);
   app.use(express.static(foundFrontendDist));
   app.get('*', (req: express.Request, res: express.Response, next: express.NextFunction) => {
     if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) {
@@ -103,6 +103,6 @@ if (shouldSeed) {
 }
 
 app.listen(config.port, () => {
-  console.log(`🌾 AgriDex Backend Server is live on http://localhost:${config.port}`);
+  console.log(`🌾 AgroDex Backend Server is live on http://localhost:${config.port}`);
   console.log(`🚀 Agricultural REST endpoints ready at http://localhost:${config.port}/api`);
 });

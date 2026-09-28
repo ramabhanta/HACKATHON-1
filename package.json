@@ -1,7 +1,7 @@
 {
-  "name": "agridex",
+  "name": "agrodex",
   "version": "1.0.0",
-  "description": "AgriDex — AI for Every Farmer: Diagnose, Decide, Buy, Sell and Grow",
+  "description": "AgroDex — AI for Every Farmer: Diagnose, Decide, Buy, Sell and Grow",
   "private": true,
   "type": "module",
   "scripts": {

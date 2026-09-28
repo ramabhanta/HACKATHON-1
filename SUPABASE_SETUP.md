@@ -1,6 +1,6 @@
-# ☁️ How to Connect Supabase to AgriDex
+# ☁️ How to Connect Supabase to AgroDex
 
-AgriDex is built with native cloud support for **Supabase (PostgreSQL)**. With Supabase connected, your platform gets cloud persistence, real-time database synchronization, and scalable cloud storage for farmer listings and crop images.
+AgroDex is built with native cloud support for **Supabase (PostgreSQL)**. With Supabase connected, your platform gets cloud persistence, real-time database synchronization, and scalable cloud storage for farmer listings and crop images.
 
 ---
 

@@ -48,10 +48,10 @@ export const AiAssistant: React.FC<AiAssistantProps> = ({ onOpenVoice, setActive
       sender: 'ai',
       source: 'GEMINI_AI',
       text: language === 'te'
-        ? 'నమస్కారం రమేష్ గారు! నేను మీ అగ్రిడెక్స్ AI వ్యవసాయ సహాయకుడిని. మీ కదిరి పొలంలోని వేరుశనగ మరియు టమాటా పంటల రక్షణ, ఎరువుల నిర్వహణ, నీటి తడులు లేదా విత్తనాల గురించి మీకు ఎలాంటి సందేహం ఉన్నా అడగండి.'
+        ? 'నమస్కారం రమేష్ గారు! నేను మీ అగ్రోడెక్స్ AI వ్యవసాయ సహాయకుడిని. మీ కదిరి పొలంలోని వేరుశనగ మరియు టమాటా పంటల రక్షణ, ఎరువుల నిర్వహణ, నీటి తడులు లేదా విత్తనాల గురించి మీకు ఎలాంటి సందేహం ఉన్నా అడగండి.'
         : language === 'hi'
-        ? 'नमस्ते रमेश जी! मैं आपका एग्रीडेक्स एआई कृषि सहायक हूँ। आपके खेत में लगी मूंगफली और टमाटर की फसल, खाद, दवाओं या सिंचाई से संबंधित कोई भी सवाल पूछें।'
-        : 'Hello Ramesh Patel! I am your AgriDex AI farming copilot. I am tuned to your farm in Kadiri, your standing Groundnut (K-6) and Tomato crops, and local Red Loamy soil fertility. How can I assist you today?',
+        ? 'नमस्ते रमेश जी! मैं आपका एग्रोडेक्स एआई कृषि सहायक हूँ। आपके खेत में लगी मूंगफली और टमाटर की फसल, खाद, दवाओं या सिंचाई से संबंधित कोई भी सवाल पूछें।'
+        : 'Hello Ramesh Patel! I am your AgroDex AI farming copilot. I am tuned to your farm in Kadiri, your standing Groundnut (K-6) and Tomato crops, and local Red Loamy soil fertility. How can I assist you today?',
       timestamp: 'Just now',
       suggestedActions: [
         'What fertilizer should I use for groundnut?',

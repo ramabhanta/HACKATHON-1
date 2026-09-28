@@ -137,7 +137,7 @@ aiRouter.get('/config', (_req, res) => {
   const hasServerKey = Boolean(config.geminiApiKey && config.geminiApiKey.length > 5);
   return res.json({
     hasServerKey,
-    activeModel: hasServerKey ? 'Google Gemini 3.5 Flash' : 'AgriDex Live Knowledge Engine',
+    activeModel: hasServerKey ? 'Google Gemini 3.5 Flash' : 'AgroDex Live Knowledge Engine',
     visionCapable: true,
     supportedLanguages: ['en', 'hi', 'te', 'ta', 'kn', 'ml', 'mr', 'bn', 'gu', 'pa', 'or']
   });

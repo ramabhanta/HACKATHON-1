@@ -126,7 +126,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialTa
             🌾
           </div>
           <h2 className="text-xl font-black text-gray-900 tracking-tight">
-            {tab === 'LOGIN' ? 'Welcome Back to AgriDex' : 'Create Your Agriculture Account'}
+            {tab === 'LOGIN' ? 'Welcome Back to AgroDex' : 'Create Your Agriculture Account'}
           </h2>
           <p className="text-xs text-gray-500 mt-0.5">
             {tab === 'LOGIN' ? 'Sign in to access your farm, marketplace & AI assistant' : 'Connect with farmers, shops, and agricultural experts'}
@@ -168,7 +168,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialTa
                   type="text"
                   value={loginIdentifier}
                   onChange={e => setLoginIdentifier(e.target.value)}
-                  placeholder="farmer@agridex.com or 9848012345"
+                  placeholder="farmer@agrodex.com or 9848012345"
                   className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none"
                   required
                 />

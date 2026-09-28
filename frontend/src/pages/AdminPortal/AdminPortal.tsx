@@ -61,7 +61,7 @@ export const AdminPortal: React.FC = () => {
             <span>🛡️ Platform Governance & Supervision</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-black tracking-tight">
-            AgriDex Administration Hub
+            AgroDex Administration Hub
           </h1>
           <p className="text-gray-400 text-xs sm:text-sm mt-0.5">
             Cloud database sync, Google Gemini AI configuration, and platform management

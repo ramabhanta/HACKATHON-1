@@ -142,7 +142,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenV
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="font-extrabold text-xl tracking-tight text-white">Agri<span className="text-amber-400">Dex</span></span>
+                <span className="font-extrabold text-xl tracking-tight text-white">Agro<span className="text-amber-400">Dex</span></span>
                 <span className="text-[10px] bg-amber-400 text-amber-950 font-black px-1.5 py-0.5 rounded shadow-sm uppercase">AI</span>
                 {isSimpleMode && (
                   <span className="text-[10px] bg-emerald-500/40 text-emerald-200 border border-emerald-400/50 font-black px-1.5 py-0.5 rounded uppercase">

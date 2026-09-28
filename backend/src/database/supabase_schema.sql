@@ -1,5 +1,5 @@
 -- ==============================================================================
--- AgriDex - Cloud PostgreSQL Schema for Supabase
+-- AgroDex - Cloud PostgreSQL Schema for Supabase
 -- One-Click Run in Supabase SQL Editor (https://supabase.com/dashboard/project/_/sql)
 -- ==============================================================================
 

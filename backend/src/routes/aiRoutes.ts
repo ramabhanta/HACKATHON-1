@@ -4,25 +4,33 @@ import { upload } from '../middleware/upload.js';
 import { AiService } from '../services/aiService.js';
 import { fetchWeather } from '../services/weatherService.js';
 import { db } from '../database/db.js';
+import { config } from '../config/index.js';
+import fs from 'fs';
+import path from 'path';
 
 export const aiRouter = Router();
 
-// Natural language conversational assistant
+// 1. Natural language conversational assistant
 aiRouter.post('/chat', optionalAuthenticate, async (req: AuthenticatedRequest, res: Response) => {
   try {
     const userId = req.user?.id || 'usr-farmer-1';
-    const { message, language, farmId, cropId } = req.body;
+    const { message, language, farmId, cropId, apiKey } = req.body;
+    const clientApiKey = (req.headers['x-gemini-key'] as string) || apiKey;
 
     if (!message) {
       return res.status(400).json({ error: 'Message content is required' });
     }
 
-    const response = await AiService.processChat(userId, {
-      message,
-      language: language || req.user?.language || 'en',
-      farmId,
-      cropId
-    });
+    const response = await AiService.processChat(
+      userId,
+      {
+        message,
+        language: language || req.user?.language || 'en',
+        farmId,
+        cropId
+      },
+      clientApiKey
+    );
 
     return res.json(response);
   } catch (err: any) {
@@ -30,11 +38,12 @@ aiRouter.post('/chat', optionalAuthenticate, async (req: AuthenticatedRequest, r
   }
 });
 
-// Deep Learning Crop Disease Scan
+// 2. Deep Learning Crop Disease Scan
 aiRouter.post('/crop-disease', optionalAuthenticate, upload.single('image'), async (req: AuthenticatedRequest, res: Response) => {
   try {
     const userId = req.user?.id || 'usr-farmer-1';
-    const { cropName, farmId, photoMetadata } = req.body;
+    const { cropName, farmId, photoMetadata, apiKey } = req.body;
+    const clientApiKey = (req.headers['x-gemini-key'] as string) || apiKey;
 
     let parsedMetadata = undefined;
     if (photoMetadata) {
@@ -45,7 +54,14 @@ aiRouter.post('/crop-disease', optionalAuthenticate, upload.single('image'), asy
       }
     }
 
-    const diagnosis = await AiService.diagnoseDisease(userId, req.file, cropName, farmId, parsedMetadata);
+    const diagnosis = await AiService.diagnoseDisease(
+      userId,
+      req.file,
+      cropName,
+      farmId,
+      parsedMetadata,
+      clientApiKey
+    );
 
     // Fetch details of matched products
     const matchedProducts = db.find('products', p => diagnosis.recommendedProductIds.includes(p.id));
@@ -59,7 +75,48 @@ aiRouter.post('/crop-disease', optionalAuthenticate, upload.single('image'), asy
   }
 });
 
-// Soil Analysis Engine
+// 3. AI Engine Configuration status & settings
+aiRouter.get('/config', (_req, res) => {
+  const hasServerKey = Boolean(config.geminiApiKey && config.geminiApiKey.length > 5);
+  return res.json({
+    hasServerKey,
+    activeModel: hasServerKey ? 'Google Gemini 1.5 Flash' : 'AgriDex Live Knowledge Engine',
+    visionCapable: true,
+    supportedLanguages: ['en', 'hi', 'te', 'ta', 'kn', 'ml', 'mr', 'bn', 'gu', 'pa', 'or']
+  });
+});
+
+aiRouter.post('/config', optionalAuthenticate, (req, res) => {
+  const { geminiApiKey } = req.body;
+  if (!geminiApiKey) {
+    return res.status(400).json({ error: 'API key is required' });
+  }
+
+  config.geminiApiKey = geminiApiKey.trim();
+  process.env.GEMINI_API_KEY = geminiApiKey.trim();
+
+  // Save to .env on disk
+  try {
+    const envPath = path.resolve(process.cwd(), '.env');
+    let envContent = fs.existsSync(envPath) ? fs.readFileSync(envPath, 'utf8') : '';
+    if (envContent.includes('GEMINI_API_KEY=')) {
+      envContent = envContent.replace(/GEMINI_API_KEY=.*/g, `GEMINI_API_KEY=${geminiApiKey.trim()}`);
+    } else {
+      envContent += `\nGEMINI_API_KEY=${geminiApiKey.trim()}`;
+    }
+    fs.writeFileSync(envPath, envContent.trim() + '\n', 'utf8');
+  } catch (e) {
+    console.error('Failed to write .env file:', e);
+  }
+
+  return res.json({
+    success: true,
+    message: 'Google Gemini API key saved successfully',
+    activeModel: 'Google Gemini 1.5 Flash'
+  });
+});
+
+// 4. Soil Analysis Engine
 aiRouter.post('/soil-analysis', optionalAuthenticate, upload.single('report'), async (req: AuthenticatedRequest, res: Response) => {
   try {
     const userId = req.user?.id || 'usr-farmer-1';
@@ -84,7 +141,7 @@ aiRouter.post('/soil-analysis', optionalAuthenticate, upload.single('report'), a
   }
 });
 
-// Weather API integration
+// 5. Weather API integration
 aiRouter.get('/weather', async (req, res) => {
   try {
     const lat = req.query.lat ? parseFloat(req.query.lat as string) : 14.1165;
@@ -98,7 +155,7 @@ aiRouter.get('/weather', async (req, res) => {
   }
 });
 
-// History of diagnoses for user
+// 6. History of diagnoses for user
 aiRouter.get('/diagnoses', authenticate, (req: AuthenticatedRequest, res: Response) => {
   const diagnoses = db.find('ai_diagnoses', d => d.userId === req.user!.id);
   return res.json(diagnoses);

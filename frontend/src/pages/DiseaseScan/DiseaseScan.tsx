@@ -18,8 +18,11 @@ import {
   Calendar,
   Clock,
   HardDrive,
-  Info
+  Info,
+  Zap,
+  Key
 } from 'lucide-react';
+import { AiConfigModal } from '../../components/AiConfigModal';
 import {
   extractPhotoTelemetry,
   createSampleTelemetry,
@@ -43,6 +46,8 @@ export const DiseaseScan: React.FC<DiseaseScanProps> = ({ setActiveTab }) => {
   const [scanStep, setScanStep] = useState(0);
   const [diagnosis, setDiagnosis] = useState<any>(null);
   const [scanError, setScanError] = useState<string | null>(null);
+  const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
+  const [geminiKey, setGeminiKey] = useState<string>(() => localStorage.getItem('agri_gemini_api_key') || '');
 
   // Demo sample photos for quick 1-click test
   const sampleLeaves = [
@@ -110,15 +115,21 @@ export const DiseaseScan: React.FC<DiseaseScanProps> = ({ setActiveTab }) => {
         formData.append('image', imageFile);
       }
       formData.append('cropName', selectedCrop);
-      if (photoTelemetry) {
-        formData.append('photoMetadata', JSON.stringify(photoTelemetry));
+      const activeKey = localStorage.getItem('agri_gemini_api_key') || geminiKey;
+      if (activeKey) {
+        formData.append('apiKey', activeKey);
+      }
+
+      const headers: Record<string, string> = {
+        Authorization: `Bearer ${localStorage.getItem('agri_token') || ''}`
+      };
+      if (activeKey) {
+        headers['X-Gemini-Key'] = activeKey;
       }
 
       const res = await fetch('/api/ai/crop-disease', {
         method: 'POST',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('agri_token')}`
-        },
+        headers,
         body: formData
       });
 
@@ -150,8 +161,20 @@ export const DiseaseScan: React.FC<DiseaseScanProps> = ({ setActiveTab }) => {
       {/* Title */}
       <div className="bg-white rounded-3xl p-6 shadow-sm border border-emerald-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-bold border border-emerald-200 mb-2">
-            <span>🔬 MobileNetV3 / EfficientNet Engine</span>
+          <div className="flex items-center gap-2 mb-2">
+            <button
+              onClick={() => setIsConfigModalOpen(true)}
+              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border transition ${
+                geminiKey
+                  ? 'bg-amber-50 text-amber-900 border-amber-300 hover:bg-amber-100'
+                  : 'bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100'
+              }`}
+              title="Click to configure Real Gemini Vision API Key"
+            >
+              {geminiKey ? <Zap className="w-3.5 h-3.5 fill-amber-500 text-amber-600" /> : <span>🔬</span>}
+              <span>{geminiKey ? 'Gemini 1.5 Flash Vision Multimodal' : 'MobileNetV3 / EfficientNet Engine'}</span>
+              <span className="text-[10px] underline ml-1 text-emerald-700 font-extrabold">Settings ⚙️</span>
+            </button>
           </div>
           <h1 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">
             {t('scanTitle')}
@@ -608,6 +631,12 @@ export const DiseaseScan: React.FC<DiseaseScanProps> = ({ setActiveTab }) => {
           </div>
         </div>
       )}
+      {/* AI Key & Settings Modal */}
+      <AiConfigModal
+        isOpen={isConfigModalOpen}
+        onClose={() => setIsConfigModalOpen(false)}
+        onKeySaved={key => setGeminiKey(key)}
+      />
     </div>
   );
 };

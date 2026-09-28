@@ -15,6 +15,7 @@ import { chatRouter } from './routes/chatRoutes.js';
 import { adminRouter } from './routes/adminRoutes.js';
 import { notificationRouter } from './routes/notificationRoutes.js';
 import { priceRouter } from './routes/priceRoutes.js';
+import { supabaseRouter } from './routes/supabaseRoutes.js';
 import { seedDatabase } from './database/seed.js';
 import { db } from './database/db.js';
 
@@ -60,6 +61,7 @@ app.use('/api/messages', chatRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/notifications', notificationRouter);
 app.use('/api/prices', priceRouter);
+app.use('/api/supabase', supabaseRouter);
 
 // Production: Serve compiled frontend if frontend/dist exists
 const frontendDistPaths = [

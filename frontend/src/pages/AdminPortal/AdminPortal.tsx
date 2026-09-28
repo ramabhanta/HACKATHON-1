@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { SupabaseModal } from '../../components/SupabaseModal';
+import { AiConfigModal } from '../../components/AiConfigModal';
 import {
   ShieldCheck,
   Users,
@@ -9,7 +11,12 @@ import {
   AlertCircle,
   CheckCircle2,
   XCircle,
-  FileText
+  FileText,
+  Database,
+  Zap,
+  Key,
+  ExternalLink,
+  RefreshCw
 } from 'lucide-react';
 
 export const AdminPortal: React.FC = () => {
@@ -17,19 +24,27 @@ export const AdminPortal: React.FC = () => {
   const [overview, setOverview] = useState<any>(null);
   const [users, setUsers] = useState<any[]>([]);
   const [aiLogs, setAiLogs] = useState<any[]>([]);
-  const [activeTab, setActiveTab] = useState<'METRICS' | 'VENDORS' | 'AI_LOGS'>('METRICS');
+  const [activeTab, setActiveTab] = useState<'METRICS' | 'AI_LOGS'>('METRICS');
   const [loading, setLoading] = useState(true);
+  const [isSupabaseModalOpen, setIsSupabaseModalOpen] = useState(false);
+  const [isAiConfigModalOpen, setIsAiConfigModalOpen] = useState(false);
+  const [supabaseStatus, setSupabaseStatus] = useState<any>(null);
+  const [aiConfig, setAiConfig] = useState<any>(null);
 
   const loadAdminData = async () => {
     try {
-      const [oRes, uRes, aRes] = await Promise.all([
+      const [oRes, uRes, aRes, sRes, aiRes] = await Promise.all([
         fetch('/api/admin/overview', { headers: { Authorization: `Bearer ${localStorage.getItem('agri_token')}` } }),
         fetch('/api/admin/users', { headers: { Authorization: `Bearer ${localStorage.getItem('agri_token')}` } }),
-        fetch('/api/admin/ai-logs', { headers: { Authorization: `Bearer ${localStorage.getItem('agri_token')}` } })
+        fetch('/api/admin/ai-logs', { headers: { Authorization: `Bearer ${localStorage.getItem('agri_token')}` } }),
+        fetch('/api/supabase/status'),
+        fetch('/api/ai/config')
       ]);
       if (oRes.ok) setOverview(await oRes.json());
       if (uRes.ok) setUsers(await uRes.json());
       if (aRes.ok) setAiLogs(await aRes.json());
+      if (sRes.ok) setSupabaseStatus(await sRes.json());
+      if (aiRes.ok) setAiConfig(await aiRes.json());
     } catch (err) {
       console.error(err);
     } finally {
@@ -40,24 +55,6 @@ export const AdminPortal: React.FC = () => {
   useEffect(() => {
     loadAdminData();
   }, []);
-
-  const handleVerifyVendor = async (vendorId: string, status: string) => {
-    try {
-      const res = await fetch(`/api/admin/vendors/${vendorId}/verify`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('agri_token')}`
-        },
-        body: JSON.stringify({ status })
-      });
-      if (res.ok) {
-        loadAdminData();
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
 
   return (
     <div className="max-w-5xl mx-auto space-y-6 pb-20 md:pb-8">
@@ -71,7 +68,7 @@ export const AdminPortal: React.FC = () => {
             AgriDex Administration Hub
           </h1>
           <p className="text-gray-400 text-xs sm:text-sm mt-0.5">
-            Supervise vendor licensing, moderate regulated agrochemicals, and monitor AI telemetry
+            Cloud database sync, Google Gemini AI configuration, and platform management
           </p>
         </div>
 
@@ -88,6 +85,82 @@ export const AdminPortal: React.FC = () => {
           >
             AI Audit Logs
           </button>
+        </div>
+      </div>
+
+      {/* Cloud DB & AI Management Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* Supabase Cloud Database Card */}
+        <div className="bg-white rounded-3xl p-5 shadow-sm border border-emerald-100 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-sm">
+                  <Database className="w-4 h-4 text-emerald-700" />
+                </div>
+                <h3 className="font-extrabold text-sm text-gray-900">Supabase Cloud Database</h3>
+              </div>
+              <span className={`px-2 py-0.5 rounded-full text-[10px] font-black border ${
+                supabaseStatus?.connected
+                  ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                  : 'bg-amber-50 text-amber-900 border-amber-300'
+              }`}>
+                {supabaseStatus?.connected ? '✓ Connected' : 'Ready to Connect'}
+              </span>
+            </div>
+            <p className="text-xs text-gray-500 mb-4">
+              Connect AgriDex to your free Supabase PostgreSQL instance. Sync farmers, crops, orders, and produce lots with 1 click.
+            </p>
+          </div>
+
+          <div className="flex items-center justify-between gap-2 pt-2 border-t border-gray-100">
+            <span className="text-[10px] font-mono text-gray-400 truncate max-w-[180px]">
+              {supabaseStatus?.url || 'PostgreSQL Cloud'}
+            </span>
+            <button
+              onClick={() => setIsSupabaseModalOpen(true)}
+              className="px-3.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold transition shadow-xs flex items-center gap-1.5 active:scale-95"
+            >
+              <span>Connect Supabase</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Real AI Engine Card */}
+        <div className="bg-white rounded-3xl p-5 shadow-sm border border-emerald-100 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-sm">
+                  <Zap className="w-4 h-4 text-amber-600" />
+                </div>
+                <h3 className="font-extrabold text-sm text-gray-900">Google Gemini AI Engine</h3>
+              </div>
+              <span className={`px-2 py-0.5 rounded-full text-[10px] font-black border ${
+                aiConfig?.hasServerKey || localStorage.getItem('agri_gemini_api_key')
+                  ? 'bg-amber-50 text-amber-900 border-amber-300'
+                  : 'bg-blue-50 text-blue-800 border-blue-200'
+              }`}>
+                {aiConfig?.hasServerKey || localStorage.getItem('agri_gemini_api_key') ? '⚡ Gemini 1.5 Flash' : '🌐 Live Knowledge'}
+              </span>
+            </div>
+            <p className="text-xs text-gray-500 mb-4">
+              Real multimodal AI Q&A and leaf photo disease diagnosis across all 11 Indian languages.
+            </p>
+          </div>
+
+          <div className="flex items-center justify-between gap-2 pt-2 border-t border-gray-100">
+            <span className="text-[10px] font-mono text-gray-400">
+              Free Tier: 15 RPM
+            </span>
+            <button
+              onClick={() => setIsAiConfigModalOpen(true)}
+              className="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 rounded-xl text-xs font-bold transition shadow-xs flex items-center gap-1.5 active:scale-95"
+            >
+              <Key className="w-3.5 h-3.5" />
+              <span>Configure AI Key</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -129,15 +202,19 @@ export const AdminPortal: React.FC = () => {
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {users.map(u => (
-                  <tr key={u.id} className="hover:bg-gray-50/50">
+                  <tr key={u.id} className="hover:bg-gray-50/80">
                     <td className="py-3 font-bold text-gray-900">{u.name}</td>
                     <td className="py-3">
-                      <span className="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-50 text-emerald-800">
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
+                        u.role === 'FARMER' ? 'bg-amber-100 text-amber-800' :
+                        u.role === 'VENDOR' ? 'bg-emerald-100 text-emerald-800' :
+                        u.role === 'BUYER' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'
+                      }`}>
                         {u.role}
                       </span>
                     </td>
-                    <td className="py-3 text-gray-500">{u.email}</td>
-                    <td className="py-3 text-gray-600">{u.district}, {u.state}</td>
+                    <td className="py-3 text-gray-600">{u.phone}</td>
+                    <td className="py-3 text-gray-500">{u.district}, {u.state}</td>
                   </tr>
                 ))}
               </tbody>
@@ -146,37 +223,44 @@ export const AdminPortal: React.FC = () => {
         </div>
       )}
 
-      {/* AI Diagnostic Logs Tab */}
       {activeTab === 'AI_LOGS' && (
         <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 space-y-4">
-          <h3 className="font-extrabold text-sm text-gray-900">
-            AI Crop Disease Inference Audit Logs ({aiLogs.length})
-          </h3>
-
-          <div className="space-y-3">
-            {aiLogs.length === 0 ? (
-              <p className="text-xs text-gray-400 py-6 text-center">No AI scans logged yet.</p>
-            ) : (
-              aiLogs.map(log => (
-                <div
-                  key={log.id}
-                  className="p-4 rounded-2xl border border-gray-100 bg-gray-50/50 flex items-center justify-between text-xs"
-                >
-                  <div>
-                    <span className="font-extrabold text-gray-900 block">{log.suspectedIssue}</span>
-                    <p className="text-[11px] text-gray-500 mt-0.5">Crop: {log.cropName} • Severity: {log.severity}</p>
-                    <span className="text-[10px] text-gray-400">{new Date(log.createdAt).toLocaleString()}</span>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-sm font-black text-emerald-700">{log.confidenceScore}%</span>
-                    <span className="text-[10px] text-gray-400 block font-semibold">Confidence</span>
-                  </div>
+          <h3 className="font-extrabold text-sm text-gray-900">Recent AI Diagnostic Queries</h3>
+          <div className="divide-y divide-gray-100">
+            {aiLogs.map(l => (
+              <div key={l.id} className="py-3 flex items-center justify-between gap-4 text-xs">
+                <div>
+                  <p className="font-bold text-gray-900">{l.cropName} — {l.suspectedIssue}</p>
+                  <p className="text-[10px] text-gray-500">
+                    {l.photoMetadata?.uploadDateFormatted || new Date(l.createdAt).toLocaleDateString()} • {l.photoMetadata?.locationName || 'Field'}
+                  </p>
                 </div>
-              ))
-            )}
+                <div className="text-right">
+                  <span className="font-bold text-emerald-700">{l.confidenceScore}% Confidence</span>
+                  <span className="block text-[10px] text-gray-400">{l.severity} Severity</span>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}
+
+      {/* Modals */}
+      <SupabaseModal
+        isOpen={isSupabaseModalOpen}
+        onClose={() => {
+          setIsSupabaseModalOpen(false);
+          loadAdminData();
+        }}
+      />
+
+      <AiConfigModal
+        isOpen={isAiConfigModalOpen}
+        onClose={() => {
+          setIsAiConfigModalOpen(false);
+          loadAdminData();
+        }}
+      />
     </div>
   );
 };

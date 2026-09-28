@@ -184,29 +184,9 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return (localStorage.getItem('agri_lang') as Language) || 'en';
   });
 
-  // Track original text of text nodes to ensure clean bidirectional switching
-  const originalTextMap = useRef<WeakMap<Node, string>>(new WeakMap());
-
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
     localStorage.setItem('agri_lang', lang);
-
-    // Sync with Google Translate cookie if available
-    try {
-      const hostname = window.location.hostname;
-      const cookieValue = `/en/${lang}`;
-      document.cookie = `googtrans=${cookieValue}; path=/; domain=${hostname};`;
-      document.cookie = `googtrans=${cookieValue}; path=/;`;
-
-      // Trigger Google Translate dropdown change if present
-      const select = document.querySelector('.goog-te-combo') as HTMLSelectElement | null;
-      if (select) {
-        select.value = lang;
-        select.dispatchEvent(new Event('change'));
-      }
-    } catch {
-      // Ignored in non-browser environments
-    }
   };
 
   // Universal translation helper function
@@ -239,94 +219,6 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
     return keyOrText;
   };
-
-  // Automated DOM Text Tree Translator: ensures each and every line converts dynamically
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    let timeoutId: number;
-
-    const translateDomTree = () => {
-      const root = document.getElementById('root');
-      if (!root) return;
-
-      const walker = document.createTreeWalker(
-        root,
-        NodeFilter.SHOW_TEXT,
-        {
-          acceptNode: (node) => {
-            const parent = node.parentElement;
-            if (!parent) return NodeFilter.FILTER_REJECT;
-            const tagName = parent.tagName.toLowerCase();
-            if (['script', 'style', 'input', 'textarea', 'pre', 'code'].includes(tagName)) {
-              return NodeFilter.FILTER_REJECT;
-            }
-            if (parent.closest('.notranslate') || parent.getAttribute('data-no-translate')) {
-              return NodeFilter.FILTER_REJECT;
-            }
-            const val = node.nodeValue?.trim();
-            if (!val || val.length === 0 || /^[\d\s.,:;!?₹$%()/\-]+$/.test(val)) {
-              return NodeFilter.FILTER_SKIP;
-            }
-            return NodeFilter.FILTER_ACCEPT;
-          }
-        }
-      );
-
-      let currentNode = walker.nextNode();
-      while (currentNode) {
-        let original = originalTextMap.current.get(currentNode);
-        if (!original) {
-          original = currentNode.nodeValue || '';
-          originalTextMap.current.set(currentNode, original);
-        }
-
-        if (language === 'en') {
-          // Restore English
-          if (currentNode.nodeValue !== original) {
-            currentNode.nodeValue = original;
-          }
-        } else {
-          // Translate text node value
-          const trimmed = original.trim();
-          let translated = t(trimmed);
-
-          if (translated !== trimmed) {
-            // Preserve surrounding whitespace
-            const leadingSpace = original.match(/^\s*/)?.[0] || '';
-            const trailingSpace = original.match(/\s*$/)?.[0] || '';
-            currentNode.nodeValue = `${leadingSpace}${translated}${trailingSpace}`;
-          }
-        }
-
-        currentNode = walker.nextNode();
-      }
-    };
-
-    const scheduleTranslation = () => {
-      cancelAnimationFrame(timeoutId);
-      timeoutId = requestAnimationFrame(translateDomTree);
-    };
-
-    // Run initial scan
-    scheduleTranslation();
-
-    // Observe dynamic changes
-    const observer = new MutationObserver(() => {
-      scheduleTranslation();
-    });
-
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-      characterData: false
-    });
-
-    return () => {
-      cancelAnimationFrame(timeoutId);
-      observer.disconnect();
-    };
-  }, [language]);
 
   const currentLangMeta = indianLanguages.find(l => l.code === language) || indianLanguages[0];
 

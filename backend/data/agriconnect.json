@@ -5,7 +5,7 @@
       "name": "Ramesh Patel",
       "phone": "+91 98480 12345",
       "email": "farmer@agriconnect.com",
-      "passwordHash": "$2a$10$TvzV1.kR8/20tWGQASxaiOCvDz2ff0npQ.UpIB7xK6TKhu1u6kRDS",
+      "passwordHash": "$2a$10$.aL0uZ/dbvb/f0ip..pEgu1qqc/axBmSIsUQ1khOaRq7NdKNTYruW",
       "role": "FARMER",
       "language": "en",
       "village": "Kadiri Rural",
@@ -15,15 +15,15 @@
       "latitude": 14.1165,
       "longitude": 78.1634,
       "avatarUrl": "https://images.unsplash.com/photo-1544717305-2782549b5136?w=150",
-      "createdAt": "2026-09-28T17:50:19.232Z",
-      "updatedAt": "2026-09-28T17:50:19.233Z"
+      "createdAt": "2026-09-28T19:50:34.558Z",
+      "updatedAt": "2026-09-28T19:50:34.559Z"
     },
     {
       "id": "usr-vendor-1",
       "name": "Sri Lakshmi Agri Traders",
       "phone": "+91 98490 54321",
       "email": "vendor@agriconnect.com",
-      "passwordHash": "$2a$10$TvzV1.kR8/20tWGQASxaiOCvDz2ff0npQ.UpIB7xK6TKhu1u6kRDS",
+      "passwordHash": "$2a$10$.aL0uZ/dbvb/f0ip..pEgu1qqc/axBmSIsUQ1khOaRq7NdKNTYruW",
       "role": "VENDOR",
       "language": "en",
       "village": "Kadiri Town",
@@ -32,15 +32,15 @@
       "pincode": "515591",
       "latitude": 14.112,
       "longitude": 78.1601,
-      "createdAt": "2026-09-28T17:50:19.233Z",
-      "updatedAt": "2026-09-28T17:50:19.233Z"
+      "createdAt": "2026-09-28T19:50:34.559Z",
+      "updatedAt": "2026-09-28T19:50:34.559Z"
     },
     {
       "id": "usr-buyer-1",
       "name": "Kisan Mandi Wholesalers",
       "phone": "+91 94400 98765",
       "email": "buyer@agriconnect.com",
-      "passwordHash": "$2a$10$TvzV1.kR8/20tWGQASxaiOCvDz2ff0npQ.UpIB7xK6TKhu1u6kRDS",
+      "passwordHash": "$2a$10$.aL0uZ/dbvb/f0ip..pEgu1qqc/axBmSIsUQ1khOaRq7NdKNTYruW",
       "role": "BUYER",
       "language": "en",
       "district": "Bengaluru Urban",
@@ -48,53 +48,36 @@
       "pincode": "560001",
       "latitude": 12.9716,
       "longitude": 77.5946,
-      "createdAt": "2026-09-28T17:50:19.233Z",
-      "updatedAt": "2026-09-28T17:50:19.233Z"
+      "createdAt": "2026-09-28T19:50:34.559Z",
+      "updatedAt": "2026-09-28T19:50:34.560Z"
     },
     {
       "id": "usr-expert-1",
       "name": "Dr. K. Swaminathan (Agronomist)",
       "phone": "+91 93900 11223",
       "email": "expert@agriconnect.com",
-      "passwordHash": "$2a$10$TvzV1.kR8/20tWGQASxaiOCvDz2ff0npQ.UpIB7xK6TKhu1u6kRDS",
+      "passwordHash": "$2a$10$.aL0uZ/dbvb/f0ip..pEgu1qqc/axBmSIsUQ1khOaRq7NdKNTYruW",
       "role": "EXPERT",
       "language": "en",
       "district": "Tirupati",
       "state": "Andhra Pradesh",
       "pincode": "517502",
-      "createdAt": "2026-09-28T17:50:19.233Z",
-      "updatedAt": "2026-09-28T17:50:19.233Z"
+      "createdAt": "2026-09-28T19:50:34.560Z",
+      "updatedAt": "2026-09-28T19:50:34.560Z"
     },
     {
       "id": "usr-admin-1",
       "name": "AgriConnect Administrator",
       "phone": "+91 99999 00000",
       "email": "admin@agriconnect.com",
-      "passwordHash": "$2a$10$5KC2iUQXKExRbgm4im43/e5cdcOqAyAICg/JY4SRAxl29qPqDOlE.",
+      "passwordHash": "$2a$10$G4JLkZQcpkf.btSqwvK96u47o1.iRFRafrxgDt1xYfpBKlqx2VBJe",
       "role": "ADMIN",
       "language": "en",
       "district": "Hyderabad",
       "state": "Telangana",
       "pincode": "500081",
-      "createdAt": "2026-09-28T17:50:19.233Z",
-      "updatedAt": "2026-09-28T17:50:19.233Z"
-    },
-    {
-      "id": "usr-8281d32b",
-      "name": "Farmer",
-      "email": "usr-8281d32b@agrodex.com",
-      "phone": "+91 9951518699",
-      "passwordHash": "",
-      "role": "FARMER",
-      "language": "en",
-      "village": "Kadiri Rural",
-      "district": "Sri Sathya Sai",
-      "state": "Andhra Pradesh",
-      "pincode": "515591",
-      "latitude": 14.1165,
-      "longitude": 78.1634,
-      "createdAt": "2026-09-28T18:44:09.561Z",
-      "updatedAt": "2026-09-28T18:44:09.562Z"
+      "createdAt": "2026-09-28T19:50:34.560Z",
+      "updatedAt": "2026-09-28T19:50:34.560Z"
     }
   ],
   "farmer_profiles": [
@@ -398,7 +381,7 @@
       "category": "UREA",
       "subcategory": "NEEM_COATED",
       "images": [
-        "https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Statutory Government-subsidized IFFCO Neem Coated Urea (45 kg). Slow-release Ammoniacal Nitrogen designed to maximize plant uptake, minimize volatilization, and fuel rapid vegetative vigor.",
       "agriculturalUse": "Primary Nitrogen nutrition for field crops, horticulture, and orchards. Recommended for basal and split top-dressing.",
@@ -494,7 +477,7 @@
       "category": "UREA",
       "subcategory": "NEEM_COATED",
       "images": [
-        "https://images.unsplash.com/photo-1628352081506-83c43123ed6d?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "High-purity KRIBHCO Neem-Coated Urea 46% N prills. Uniform grain size ensures smooth calibration in fertilizer drillers and even hand broadcasting.",
       "agriculturalUse": "Accelerates vegetative growth, tiller formation in cereals, and branch proliferation.",
@@ -588,7 +571,7 @@
       "category": "UREA",
       "subcategory": "NANO_UREA",
       "images": [
-        "https://images.unsplash.com/photo-1592417817098-8f3d6910985b?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Revolutionary nanotechnology fertilizer containing 4.0% w/v nanoscale Nitrogen particles (20-50 nm). 1 bottle of 500 ml effectively replaces 1 bag (45 kg) of conventional urea.",
       "agriculturalUse": "Foliar spray at critical crop growth stages (tillering, branch development, pre-flowering).",
@@ -683,7 +666,7 @@
       "category": "UREA",
       "subcategory": "NANO_UREA",
       "images": [
-        "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Advanced foliar delivery Nano Nitrogen formulation. Penetrates leaf stomata rapidly, providing >80% nutrient use efficiency with zero leaching losses.",
       "agriculturalUse": "Foliar application for green foliage, enhanced protein synthesis, and yield boost.",
@@ -773,7 +756,7 @@
       "category": "UREA",
       "subcategory": "NEEM_COATED",
       "images": [
-        "https://images.unsplash.com/photo-1605000797499-95a51c5269ae?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "National Fertilizers Limited premium neem-coated prilled urea. Specially treated with natural neem oil to reduce nitrogen loss into groundwater.",
       "agriculturalUse": "Basal and top dressing for high nitrogen-demanding crops.",
@@ -864,7 +847,7 @@
       "category": "UREA",
       "subcategory": "NEEM_COATED",
       "images": [
-        "https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "GSFC Sardar brand high-efficiency neem coated urea. High crushing strength prills ensure minimal dust generation and smooth broadcasting.",
       "agriculturalUse": "General nitrogen nourishment across Kharif and Rabi field crops.",
@@ -955,7 +938,7 @@
       "category": "UREA",
       "subcategory": "GRANULAR",
       "images": [
-        "https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Southern Petrochemical Industries Corporation (SPIC) Neem Coated Urea. Specially popular across Rayalaseema and Tamil Nadu farmers for moisture resilience.",
       "agriculturalUse": "Direct soil application for rapid greening and vegetative expansion.",
@@ -1045,7 +1028,7 @@
       "category": "UREA",
       "subcategory": "NEEM_COATED",
       "images": [
-        "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Chambal Uttam Neem Coated Urea with uniform prill geometry. Provides steady nitrogen feeding for long-duration crops like cotton and sugarcane.",
       "agriculturalUse": "Basal and split top-dressing.",
@@ -1135,7 +1118,7 @@
       "category": "UREA",
       "subcategory": "NEEM_COATED",
       "images": [
-        "https://images.unsplash.com/photo-1592417817098-8f3d6910a455?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Trusted Telugu state fertilizer brand. Nagarjuna Neem Coated Urea promotes strong root-to-shoot translocation and vibrant leaf color.",
       "agriculturalUse": "Main vegetative nitrogen source for paddy and irrigated cash crops.",
@@ -1225,7 +1208,7 @@
       "category": "UREA",
       "subcategory": "GRANULAR",
       "images": [
-        "https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "High mechanical strength prills ensure zero lump formation even in humid monsoons.",
       "agriculturalUse": "Soil application for sustained nitrogen absorption.",
@@ -1313,7 +1296,7 @@
       "category": "UREA",
       "subcategory": "NANO_UREA",
       "images": [
-        "https://images.unsplash.com/photo-1592417817098-8f3d6910985b?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Bio-enhanced Nano Urea formulation from Tata Rallis. Delivers nano-sized nitrogen clusters directly into plant cells through foliar stomata.",
       "agriculturalUse": "Foliar nutrition at active vegetative and branching stages.",
@@ -1404,7 +1387,7 @@
       "category": "UREA",
       "subcategory": "GRANULAR",
       "images": [
-        "https://images.unsplash.com/photo-1628352081506-83c43123ed6d?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Specialty Calcium Nitrate Nitrogen granule enriched with Boron. Directly plant-available Nitrate form ensures immediate uptake without soil conversion delays.",
       "agriculturalUse": "High-value horticulture, fruit orchards, and vegetable fertigation.",
@@ -1493,7 +1476,7 @@
       "category": "COMPLEX_NPK",
       "subcategory": "GROMOR_28",
       "images": [
-        "https://images.unsplash.com/photo-1592417817098-8f3d6910985b?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Premier high-analysis complex fertilizer offering 56% total plant nutrients. Contains equal portions of Nitrogen and Phosphorus with 85% water-soluble phosphate.",
       "agriculturalUse": "Ideal basal dressing for oilseeds, pulses, and dryland groundnut in Rayalaseema soils.",
@@ -1586,7 +1569,7 @@
       "category": "COMPLEX_NPK",
       "subcategory": "DAP",
       "images": [
-        "https://images.unsplash.com/photo-1628352081506-83c43123ed6d?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "The national benchmark for phosphorus nutrition. Supplies 46% Phosphate with 18% Nitrogen, establishing strong root systems and early nodule formation in legumes.",
       "agriculturalUse": "Essential basal application for all field crops, pulses, and oilseeds.",
@@ -1678,7 +1661,7 @@
       "category": "COMPLEX_NPK",
       "subcategory": "DAP",
       "images": [
-        "https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Coromandel high-grade Di-Ammonium Phosphate with excellent water solubility. Guarantees explosive early root growth and seedling vigor.",
       "agriculturalUse": "Basal placement for deep root establishment and robust branching.",
@@ -1768,7 +1751,7 @@
       "category": "COMPLEX_NPK",
       "subcategory": "DAP",
       "images": [
-        "https://images.unsplash.com/photo-1605000797499-95a51c5269ae?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Navratna brand DAP with uniform granule hardness and consistent 46% Phosphate content.",
       "agriculturalUse": "Root development and primary plant establishment.",
@@ -1858,7 +1841,7 @@
       "category": "COMPLEX_NPK",
       "subcategory": "MOP",
       "images": [
-        "https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Essential Potassium nutrition offering 60% Potash (K2O). Strengthens plant cell walls, enhances drought resistance, boosts grain filling, and improves crop pest tolerance.",
       "agriculturalUse": "Improves fruit weight, pod filling, grain luster, and drought resilience.",
@@ -1950,7 +1933,7 @@
       "category": "COMPLEX_NPK",
       "subcategory": "NPK_10_26_26",
       "images": [
-        "https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Balanced phosphate and high potash formulation. Delivers balanced nutrition for flowering, fruit set, and pod maturation in groundnut and vegetables.",
       "agriculturalUse": "Basal and early reproductive feeding for high-potash demanding crops.",
@@ -2041,7 +2024,7 @@
       "category": "COMPLEX_NPK",
       "subcategory": "NPK_10_26_26",
       "images": [
-        "https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "High-analysis P & K complex. Improves oil percentage in groundnut and prevents flower drop in chilli and tomato.",
       "agriculturalUse": "Root development, stem rigidity, and fruit development.",
@@ -2130,7 +2113,7 @@
       "category": "COMPLEX_NPK",
       "subcategory": "NPK_12_32_16",
       "images": [
-        "https://images.unsplash.com/photo-1592417817098-8f3d6910985b?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "High-phosphate triple complex fertilizer. Ideal for black and red soils low in phosphorus, providing vigorous early root systems and heavy flowering.",
       "agriculturalUse": "Basal application for cereals, pulses, and oilseeds.",
@@ -2220,7 +2203,7 @@
       "category": "COMPLEX_NPK",
       "subcategory": "NPK_20_20_0_13",
       "images": [
-        "https://images.unsplash.com/photo-1628352081506-83c43123ed6d?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Famous \"Gromor 20-20-0-13\" with 13% essential Sulphur. Sulphur dramatically increases oil content in groundnut pods and pungency/color in chilli.",
       "agriculturalUse": "Essential for oilseeds (Groundnut, Mustard, Sunflower) and pulses.",
@@ -2310,7 +2293,7 @@
       "category": "COMPLEX_NPK",
       "subcategory": "NPK_20_20_0_13",
       "images": [
-        "https://images.unsplash.com/photo-1605000797499-95a51c5269ae?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Factamfos ammonium phosphate sulphate with 13% water-soluble sulphur. Proven yield enhancer for oilseeds in southern Indian agro-climates.",
       "agriculturalUse": "Vegetative growth and oil synthesis in oilseeds and pulses.",
@@ -2399,7 +2382,7 @@
       "category": "COMPLEX_NPK",
       "subcategory": "NPK_19_19_19",
       "images": [
-        "https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Granular equal-ratio 1:1:1 NPK complex. Provides uniform basal nourishment for balanced root, shoot, and flowering development.",
       "agriculturalUse": "All-round primary fertilizer for vegetables and horticultural crops.",
@@ -2488,7 +2471,7 @@
       "category": "COMPLEX_NPK",
       "subcategory": "GROMOR_14_35_14",
       "images": [
-        "https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "High-phosphate specialized complex. Drives prolific root expansion and heavy tillering in paddy and cotton.",
       "agriculturalUse": "Deep root establishment and heavy reproductive branch formation.",
@@ -2576,7 +2559,7 @@
       "category": "COMPLEX_NPK",
       "subcategory": "SSP",
       "images": [
-        "https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Single Super Phosphate providing 16% water-soluble Phosphate, 11% Sulphur, and 19% Calcium. Extremely economical and vital for groundnut pegging.",
       "agriculturalUse": "Basal application for groundnut, pulses, and oilseed peg development.",
@@ -2665,7 +2648,7 @@
       "category": "COMPLEX_NPK",
       "subcategory": "SSP",
       "images": [
-        "https://images.unsplash.com/photo-1592417817098-8f3d6910985b?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Granular SSP with zero dust. Supplies bio-available Phosphate, Calcium, and Sulphur simultaneously.",
       "agriculturalUse": "Basal nutrition for oilseeds, pulses, and dryland crops.",
@@ -2753,7 +2736,7 @@
       "category": "COMPLEX_NPK",
       "subcategory": "MOP",
       "images": [
-        "https://images.unsplash.com/photo-1628352081506-83c43123ed6d?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Pink granular Muriate of Potash. Enhances starch synthesis, fruit weight, and resistance to environmental stress.",
       "agriculturalUse": "Basal and split application for potassium-hungry crops.",
@@ -2842,7 +2825,7 @@
       "category": "COMPLEX_NPK",
       "subcategory": "NPK_15_15_15",
       "images": [
-        "https://images.unsplash.com/photo-1605000797499-95a51c5269ae?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Evenly balanced 1:1:1 complex fertilizer. Excellent for orchards and multi-cut forage crops.",
       "agriculturalUse": "Maintenance nutrition for perennial crops and vegetables.",
@@ -2931,7 +2914,7 @@
       "category": "COMPLEX_NPK",
       "subcategory": "NPK_17_17_17",
       "images": [
-        "https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Equal ratio complex delivering 51% total nutrient content for vigorous vegetative and generative balance.",
       "agriculturalUse": "Basal dressing for vegetables, chillies, and cotton.",
@@ -3020,7 +3003,7 @@
       "category": "COMPLEX_NPK",
       "subcategory": "DAP",
       "images": [
-        "https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "IPL certified Di-Ammonium Phosphate with high water-soluble phosphate fraction for rapid root establishment.",
       "agriculturalUse": "Essential basal application for pulses, oilseeds, and field crops.",
@@ -3110,7 +3093,7 @@
       "category": "WATER_SOLUBLE",
       "subcategory": "WS_19_19_19",
       "images": [
-        "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "100% water-soluble NPK formulation imported from premier global sources. Dissolves instantly with zero residue, making it ideal for precision drip fertigation and foliar nutrition.",
       "agriculturalUse": "Vegetative growth booster, canopy development, and stress recovery.",
@@ -3202,7 +3185,7 @@
       "category": "WATER_SOLUBLE",
       "subcategory": "WS_19_19_19",
       "images": [
-        "https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Bulk commercial bag for drip fertigation setups. Complete balanced macro-nutrient feeding with negligible salt index.",
       "agriculturalUse": "Continuous fertigation in drip-irrigated commercial vegetables and fruit crops.",
@@ -3291,7 +3274,7 @@
       "category": "WATER_SOLUBLE",
       "subcategory": "WS_0_52_34",
       "images": [
-        "https://images.unsplash.com/photo-1592417817098-8f3d6910985b?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Pure Mono Potassium Phosphate (MKP). Completely Nitrogen-free. Stimulates abundant flowering, prevents flower drop, and enhances fruit set.",
       "agriculturalUse": "Pre-flowering, flowering, and early fruit formation stages.",
@@ -3382,7 +3365,7 @@
       "category": "WATER_SOLUBLE",
       "subcategory": "WS_0_52_34",
       "images": [
-        "https://images.unsplash.com/photo-1628352081506-83c43123ed6d?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Bulk commercial MKP bag for drip systems. Promotes uniform blossom set and root strengthening.",
       "agriculturalUse": "Drip fertigation during flower initiation and early fruit setting.",
@@ -3471,7 +3454,7 @@
       "category": "WATER_SOLUBLE",
       "subcategory": "WS_0_0_50",
       "images": [
-        "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Sulphate of Potash (SOP) containing 50% Potash and 17.5% Sulphur with virtually ZERO chloride (<1%). Enhances fruit size, sweetness (Brix), color, and post-harvest shelf life.",
       "agriculturalUse": "Fruit development, grain filling, pod maturation, and quality enhancement.",
@@ -3563,7 +3546,7 @@
       "category": "WATER_SOLUBLE",
       "subcategory": "WS_0_0_50",
       "images": [
-        "https://images.unsplash.com/photo-1605000797499-95a51c5269ae?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Bulk commercial bag for commercial drip fertigation in horticultural orchards and vegetable polyhouses.",
       "agriculturalUse": "Final fruit expansion, pod filling, and post-harvest shelf life.",
@@ -3652,7 +3635,7 @@
       "category": "WATER_SOLUBLE",
       "subcategory": "WS_13_0_45",
       "images": [
-        "https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "High-purity Potassium Nitrate containing 13% Nitrate Nitrogen and 45% Potash. Promotes fruit expansion and rapid sugar translocation.",
       "agriculturalUse": "Fruit development and grain maturation stage application.",
@@ -3741,7 +3724,7 @@
       "category": "WATER_SOLUBLE",
       "subcategory": "WS_13_0_45",
       "images": [
-        "https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Commercial 25 kg bag for drip fertigation. Nitrate form provides fast-acting nitrogen while potash bulks fruits.",
       "agriculturalUse": "Fertigation during mid-to-late crop cycle.",
@@ -3830,7 +3813,7 @@
       "category": "WATER_SOLUBLE",
       "subcategory": "CALCIUM_NITRATE",
       "images": [
-        "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Water-soluble Calcium Nitrate fortified with Boron. Completely prevents Blossom End Rot (BER) in tomatoes, fruit cracking in pomegranate, and improves groundnut shell firmness.",
       "agriculturalUse": "Prevents physiological disorders, fruit cracking, tip burn, and blossom end rot.",
@@ -3921,7 +3904,7 @@
       "category": "WATER_SOLUBLE",
       "subcategory": "CALCIUM_NITRATE",
       "images": [
-        "https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Bulk 25 kg bag for drip systems. Essential for cell wall reinforcement and uniform fruit firmness.",
       "agriculturalUse": "Fertigation in tomato, chilli, capsicum, and fruit crops.",
@@ -4010,7 +3993,7 @@
       "category": "WATER_SOLUBLE",
       "subcategory": "CALCIUM_NITRATE",
       "images": [
-        "https://images.unsplash.com/photo-1592417817098-8f3d6910985b?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Global benchmark for soluble Calcium Nitrate. Dissolves 100% transparently without clogging drip nozzles or emitters.",
       "agriculturalUse": "High-tech fertigation, polyhouses, and open-field commercial horticulture.",
@@ -4099,7 +4082,7 @@
       "category": "WATER_SOLUBLE",
       "subcategory": "WS_12_61_0",
       "images": [
-        "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Highest concentration water-soluble phosphate fertilizer. Ideal for rooting and early establishment in transplanted seedlings.",
       "agriculturalUse": "Root development and early establishment of transplanted crops.",
@@ -4188,7 +4171,7 @@
       "category": "WATER_SOLUBLE",
       "subcategory": "WS_19_19_19",
       "images": [
-        "https://images.unsplash.com/photo-1628352081506-83c43123ed6d?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Imported Israeli water-soluble NPK with chelated micronutrients (Fe, Mn, Zn, Cu, Mo). Provides complete balanced nourishment in one spray.",
       "agriculturalUse": "Vegetative growth and micronutrient deficiency prevention.",
@@ -4277,7 +4260,7 @@
       "category": "WATER_SOLUBLE",
       "subcategory": "WS_19_19_19",
       "images": [
-        "https://images.unsplash.com/photo-1605000797499-95a51c5269ae?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "IFFCO subsidized 100% water-soluble NPK. Fast absorption through foliage and drip systems.",
       "agriculturalUse": "Rapid vegetative growth and recovery from drought/pest stress.",
@@ -4366,7 +4349,7 @@
       "category": "WATER_SOLUBLE",
       "subcategory": "WS_0_52_34",
       "images": [
-        "https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "High-grade Mono Potassium Phosphate from Haifa. Proven to induce abundant flowering and enhance fruit set.",
       "agriculturalUse": "Flowering stimulant and powdery mildew suppressor.",
@@ -4455,7 +4438,7 @@
       "category": "WATER_SOLUBLE",
       "subcategory": "WS_13_40_13",
       "images": [
-        "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "High phosphorus starter formula. Accelerates root expansion and establishes sturdy stems.",
       "agriculturalUse": "Early vegetative and rooting stage.",
@@ -4543,7 +4526,7 @@
       "category": "MICRONUTRIENTS",
       "subcategory": "ZINC",
       "images": [
-        "https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "High-purity Zinc Sulphate Monohydrate containing 33% elemental Zinc and 15% Sulphur. Cures Khaira disease in paddy and little-leaf / interveinal chlorosis in groundnut and cotton.",
       "agriculturalUse": "Essential for tryptophan synthesis, auxins (growth hormones), and chlorophyll formation.",
@@ -4633,7 +4616,7 @@
       "category": "MICRONUTRIENTS",
       "subcategory": "ZINC",
       "images": [
-        "https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Traditional Zinc Sulphate Heptahydrate crystals. Highly soluble, rapidly restoring zinc levels in alkaline and calcareous soils.",
       "agriculturalUse": "Soil application for correcting severe zinc deficiency.",
@@ -4722,7 +4705,7 @@
       "category": "MICRONUTRIENTS",
       "subcategory": "BORON",
       "images": [
-        "https://images.unsplash.com/photo-1592417817098-8f3d6910985b?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "100% water-soluble Boron (20% B) as Disodium Octaborate Tetrahydrate. Crucial for pollen tube growth, pollen viability, flower fertilization, and preventing fruit cracking.",
       "agriculturalUse": "Prevents hollow-heart in groundnut, fruit cracking in tomato, and flower drop.",
@@ -4812,7 +4795,7 @@
       "category": "MICRONUTRIENTS",
       "subcategory": "BORON",
       "images": [
-        "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "High-purity soluble boron powder. Accelerates pollen germination and maximizes seed/pod set in sunflower and groundnut.",
       "agriculturalUse": "Flower retention and seed set booster.",
@@ -4901,7 +4884,7 @@
       "category": "MICRONUTRIENTS",
       "subcategory": "CHELATED",
       "images": [
-        "https://images.unsplash.com/photo-1628352081506-83c43123ed6d?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Chelated Iron (Fe 12% EDTA). Cures iron chlorosis (complete yellowing/whitening of young leaves) in calcareous, high-pH soils of Rayalaseema.",
       "agriculturalUse": "Cures interveinal chlorosis and restores dark green chlorophyll in young leaves.",
@@ -4990,7 +4973,7 @@
       "category": "MICRONUTRIENTS",
       "subcategory": "IRON",
       "images": [
-        "https://images.unsplash.com/photo-1605000797499-95a51c5269ae?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Green vitriol (Ferrous Sulphate 19% Fe + 10.5% S). Economical treatment for iron chlorosis and soil acidity adjustment.",
       "agriculturalUse": "Corrects iron deficiency in field and plantation crops.",
@@ -5078,7 +5061,7 @@
       "category": "MICRONUTRIENTS",
       "subcategory": "CHELATED",
       "images": [
-        "https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "100% chelated multi-micronutrient mixture containing Zn, Fe, Mn, Cu, B, Mo in ideal physiological proportions. Maximizes enzyme activation and yield.",
       "agriculturalUse": "Complete foliar micronutrient feeding to prevent hidden hunger.",
@@ -5168,7 +5151,7 @@
       "category": "MICRONUTRIENTS",
       "subcategory": "LIQUID_MIX",
       "images": [
-        "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Liquid micronutrient formulation containing all six essential trace elements. Fast absorption through leaf cuticle.",
       "agriculturalUse": "Foliar spray to prevent multi-nutrient deficiencies in cash crops.",
@@ -5257,7 +5240,7 @@
       "category": "MICRONUTRIENTS",
       "subcategory": "MAGNESIUM",
       "images": [
-        "https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Water-soluble Magnesium Sulphate (9.6% Mg + 12% S). Magnesium is the core central atom of chlorophyll. Cures purple/reddish leaf reddening in cotton and interveinal yellowing in vegetables.",
       "agriculturalUse": "Cures leaf reddening in cotton, stimulates photosynthesis, and aids phosphorus uptake.",
@@ -5346,7 +5329,7 @@
       "category": "MICRONUTRIENTS",
       "subcategory": "MAGNESIUM",
       "images": [
-        "https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Bulk 10 kg bag of pure Magnesium Sulphate. Vital for preventing cotton leaf reddening and supporting robust photosynthesis in irrigated crops.",
       "agriculturalUse": "Soil application and drip fertigation.",
@@ -5435,7 +5418,7 @@
       "category": "MICRONUTRIENTS",
       "subcategory": "COPPER",
       "images": [
-        "https://images.unsplash.com/photo-1592417817098-8f3d6910985b?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Technical grade Copper Sulphate crystals (24% Cu). Used for Bordeaux mixture preparation and copper deficiency correction in citrus and pomegranate.",
       "agriculturalUse": "Bordeaux mixture preparation and dieback prevention in fruit trees.",
@@ -5524,7 +5507,7 @@
       "category": "MICRONUTRIENTS",
       "subcategory": "CHELATED",
       "images": [
-        "https://images.unsplash.com/photo-1628352081506-83c43123ed6d?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Andhra Pradesh government notified Formula 7 micronutrient grade. Tailored specifically for red and black soils of Rayalaseema.",
       "agriculturalUse": "Eliminates hidden nutrient hunger, boosts flower retention and fruit quality.",
@@ -5613,7 +5596,7 @@
       "category": "MICRONUTRIENTS",
       "subcategory": "CHELATED",
       "images": [
-        "https://images.unsplash.com/photo-1605000797499-95a51c5269ae?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Chelated Manganese EDTA. Cures marsh spot and necrotic brown flecking on leaves in calcareous and sandy soils.",
       "agriculturalUse": "Activates respiration and nitrogen metabolism enzymes.",
@@ -5702,7 +5685,7 @@
       "category": "MICRONUTRIENTS",
       "subcategory": "CALCIUM_SULPHUR",
       "images": [
-        "https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Pure Agricultural Gypsum (CaSO4.2H2O) providing 21% Calcium and 18% Sulphur. Absolutely essential for groundnut pegging, shell development, and preventing \"pops\" (empty pods).",
       "agriculturalUse": "Groundnut pegging booster and sodic soil reclamation.",
@@ -5790,7 +5773,7 @@
       "category": "MICRONUTRIENTS",
       "subcategory": "ZINC",
       "images": [
-        "https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Granular slow-release zinc for easy soil broadcasting along with DAP or NPK complexes.",
       "agriculturalUse": "Basal application for season-long zinc availability.",
@@ -5879,7 +5862,7 @@
       "category": "MICRONUTRIENTS",
       "subcategory": "MOLYBDENUM",
       "images": [
-        "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "High-analysis Sodium Molybdate (52% Mo). Essential cofactor for nitrogenase enzyme in Rhizobium nodules of groundnut and pulses.",
       "agriculturalUse": "Seed treatment and foliar spray to boost biological nitrogen fixation.",
@@ -5968,7 +5951,7 @@
       "category": "BIO_ORGANIC",
       "subcategory": "BIO_FUNGICIDE",
       "images": [
-        "https://images.unsplash.com/photo-1628352081506-83c43123ed6d?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Antagonistic bio-fungicide containing live Trichoderma viride spores (min 2 x 10^6 CFU/g). Paralyzes and parasitizes soil-borne pathogens causing Root Rot, Collar Rot, Stem Rot, and Fusarium Wilt.",
       "agriculturalUse": "Biological protection against root rot, damping-off, wilt, and collar rot in Groundnut, Tomato, and Chilli.",
@@ -6060,7 +6043,7 @@
       "category": "BIO_ORGANIC",
       "subcategory": "BIO_FUNGICIDE",
       "images": [
-        "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Beneficial bacterial biocontrol agent (min 1 x 10^8 CFU/g). Produces phenazine antibiotics and siderophores that starve and kill pathogenic fungi and bacteria.",
       "agriculturalUse": "Biological management of Bacterial Leaf Blight, Sheath Blight in Paddy, and Damping-off in vegetables.",
@@ -6150,7 +6133,7 @@
       "category": "BIO_ORGANIC",
       "subcategory": "BIO_FERTILIZER",
       "images": [
-        "https://images.unsplash.com/photo-1592417817098-8f3d6910985b?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Liquid consortium containing Azotobacter/Azospirillum (Nitrogen fixers), PSB (Phosphate Solubilizing Bacteria), and KMB (Potash Mobilizing Bacteria). Saves 25-30% of chemical fertilizer usage.",
       "agriculturalUse": "Enhances soil microbial biology, solubilizes locked soil phosphate, and fixes atmospheric nitrogen.",
@@ -6236,7 +6219,7 @@
       "category": "BIO_ORGANIC",
       "subcategory": "ORGANIC_MANURE",
       "images": [
-        "https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "100% pure organic vermicompost produced by Eisenia foetida earthworms from cow dung and organic farm residues. Rich in humic acid, beneficial microbes, and macro/micronutrients.",
       "agriculturalUse": "Improves soil organic carbon, moisture retention in dryland soils, and root aeration.",
@@ -6326,7 +6309,7 @@
       "category": "BIO_ORGANIC",
       "subcategory": "NEEM_CAKE",
       "images": [
-        "https://images.unsplash.com/photo-1605000797499-95a51c5269ae?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Natural organic fertilizer containing 100% pure neem seed residue with active azadirachtin (min 1000 ppm). Inhibits nitrification, repels soil termites, and controls root-knot nematodes.",
       "agriculturalUse": "Nematode control, termite repellent, and slow-release nitrogen nutrition.",
@@ -6416,7 +6399,7 @@
       "category": "BIO_ORGANIC",
       "subcategory": "MYCORRHIZA",
       "images": [
-        "https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Vesicular Arbuscular Mycorrhiza (VAM) granular formulation. Extends root surface area by 100-300%, unlocking deep soil moisture and immobile phosphorus in drought conditions.",
       "agriculturalUse": "Drought tolerance, water absorption, and phosphorus mobilization in dryland farming.",
@@ -6506,7 +6489,7 @@
       "category": "BIO_ORGANIC",
       "subcategory": "BIO_STIMULANT",
       "images": [
-        "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Natural seaweed extract (Ascophyllum nodosum). Packed with natural auxins, cytokinins, betaines, and 60+ trace minerals to overcome climate stress and boost flowering.",
       "agriculturalUse": "Foliar bio-stimulant for flower retention, drought tolerance, and fruit sizing.",
@@ -6596,7 +6579,7 @@
       "category": "BIO_ORGANIC",
       "subcategory": "BIO_STIMULANT",
       "images": [
-        "https://images.unsplash.com/photo-1592417817098-8f3d6910985b?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Made from red and brown seaweeds harvested along Indian coasts. Naturally triggers plant immunity, flower development, and branch proliferation.",
       "agriculturalUse": "Stress alleviation and vegetative vigor.",
@@ -6685,7 +6668,7 @@
       "category": "BIO_ORGANIC",
       "subcategory": "BIO_STIMULANT",
       "images": [
-        "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Concentrated protein hydrolysate and amino acid solution. Enables plants to synthesize enzymes rapidly and withstand extreme heat or cold shock.",
       "agriculturalUse": "Revitalizes stressed crops after dry spells or pest attacks.",
@@ -6774,7 +6757,7 @@
       "category": "BIO_ORGANIC",
       "subcategory": "BIO_PESTICIDE",
       "images": [
-        "https://images.unsplash.com/photo-1628352081506-83c43123ed6d?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "High-potency organic broad-spectrum botanical insecticide and repellent (Azadirachtin 10,000 PPM / 1.0% EC). Repels sucking pests, interrupts insect oviposition, and controls whiteflies, thrips, and aphids.",
       "agriculturalUse": "Organic pest management, sucking pest repellent, and antifeedant foliar spray.",
@@ -6866,7 +6849,7 @@
       "category": "BIO_ORGANIC",
       "subcategory": "ORGANIC_MANURE",
       "images": [
-        "https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Enriched vermicompost with added neem cake and rock phosphate. Recharges biological microflora in depleted dryland soils.",
       "agriculturalUse": "Basal organic manure for nurseries, beds, and orchards.",
@@ -6954,7 +6937,7 @@
       "category": "BIO_ORGANIC",
       "subcategory": "BIO_FUNGICIDE",
       "images": [
-        "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "High performance Trichoderma harzianum strain. Highly aggressive colonizer against Pythium, Rhizoctonia, and Fusarium.",
       "agriculturalUse": "Damping-off and root rot management.",
@@ -7042,7 +7025,7 @@
       "category": "BIO_ORGANIC",
       "subcategory": "BIO_FUNGICIDE",
       "images": [
-        "https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Pioneer biological brand. Controls blast, blight, and fungal root pathogens while promoting root elongation.",
       "agriculturalUse": "Seedling root dip and foliar protection.",
@@ -7131,7 +7114,7 @@
       "category": "BIO_ORGANIC",
       "subcategory": "NEEM_CAKE",
       "images": [
-        "https://images.unsplash.com/photo-1605000797499-95a51c5269ae?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Fine powdered neem meal cake. Acts as organic fertilizer and pest repellent for subterranean pests like white grubs and nematodes.",
       "agriculturalUse": "Soil incorporation for root pest and nematode defense.",
@@ -7219,7 +7202,7 @@
       "category": "BIO_ORGANIC",
       "subcategory": "BIO_FERTILIZER",
       "images": [
-        "https://images.unsplash.com/photo-1592417817098-8f3d6910985b?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Triple bacterial consortium for simultaneous nitrogen fixation, phosphate solubilization, and potash mobilization.",
       "agriculturalUse": "Drip fertigation and seed inoculation.",
@@ -7308,7 +7291,7 @@
       "category": "BIO_ORGANIC",
       "subcategory": "MYCORRHIZA",
       "images": [
-        "https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Mycorrhizal fungus coated onto bentonite granules. Enhances nutrient uptake, soil aeration, and resistance to root stress.",
       "agriculturalUse": "Soil application at sowing or transplanting.",
@@ -7397,7 +7380,7 @@
       "category": "CROP_PROTECTION",
       "subcategory": "INSECTICIDE",
       "images": [
-        "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Systemic neonicotinoid insecticide with strong acropetal translocation. Highly effective against sucking pests including aphids, jassids, thrips, and whiteflies.",
       "agriculturalUse": "Sucking pest management in cotton, chilli, tomato, groundnut, and vegetables.",
@@ -7490,7 +7473,7 @@
       "category": "CROP_PROTECTION",
       "subcategory": "INSECTICIDE",
       "images": [
-        "https://images.unsplash.com/photo-1592417817098-8f3d6910985b?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Rynaxypyr powered anthranilic diamide insecticide. Paralyzes and kills chewing caterpillars, fruit borers, and stem borers with long-lasting residual protection.",
       "agriculturalUse": "Fruit and shoot borer control in tomato/brinjal, American bollworm in cotton, stem borer in paddy.",
@@ -7581,7 +7564,7 @@
       "category": "CROP_PROTECTION",
       "subcategory": "INSECTICIDE",
       "images": [
-        "https://images.unsplash.com/photo-1628352081506-83c43123ed6d?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Dual action ZC formulation combining systemic Thiamethoxam with contact/stomach Lambda-cyhalothrin. Controls both sucking pests and chewing caterpillars simultaneously.",
       "agriculturalUse": "Broad spectrum pest management in cotton, chilli, groundnut, and vegetables.",
@@ -7671,7 +7654,7 @@
       "category": "CROP_PROTECTION",
       "subcategory": "INSECTICIDE",
       "images": [
-        "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Avermectin derived water-soluble granular insecticide. Highly lethal to Helicoverpa, Spodoptera, fruit borer, and Diamondback moth with rapid translaminar penetration.",
       "agriculturalUse": "Caterpillar, armyworm, and fruit borer knockdown.",
@@ -7762,7 +7745,7 @@
       "category": "CROP_PROTECTION",
       "subcategory": "INSECTICIDE",
       "images": [
-        "https://images.unsplash.com/photo-1592417817098-8f3d6910985b?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Gold standard fermentation-derived Spinosyn chemistry. Decimates resistant Black Thrips (Thrips parvispinus) and fruit borers in chilli.",
       "agriculturalUse": "Specialist for invasive black thrips and fruit borers in chilli and cotton.",
@@ -7850,7 +7833,7 @@
       "category": "CROP_PROTECTION",
       "subcategory": "INSECTICIDE",
       "images": [
-        "https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Specialist lipid biosynthesis inhibitor miticide/insecticide. Controls yellow mites and whitefly nymphs on chilli, cotton, and tomato with prolonged residual action.",
       "agriculturalUse": "Red spider mites, yellow mites, and whitefly control.",
@@ -7939,7 +7922,7 @@
       "category": "CROP_PROTECTION",
       "subcategory": "INSECTICIDE",
       "images": [
-        "https://images.unsplash.com/photo-1605000797499-95a51c5269ae?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Nereistoxin analogue insecticide. Immediate contact, stomach, and systemic action against stem borer and leaf folder in paddy.",
       "agriculturalUse": "Paddy stem borer and leaf folder management.",
@@ -8026,7 +8009,7 @@
       "category": "CROP_PROTECTION",
       "subcategory": "INSECTICIDE",
       "images": [
-        "https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Selective neuro-muscular feeding blocker. Paralyzes stylet of brown planthopper (BPH) in paddy within 15 minutes, preventing hopper burn.",
       "agriculturalUse": "Brown Planthopper (BPH) and White Backed Planthopper (WBPH) control in paddy.",
@@ -8113,7 +8096,7 @@
       "category": "CROP_PROTECTION",
       "subcategory": "INSECTICIDE",
       "images": [
-        "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "High concentration WG formulation of Imidacloprid. Rapid uptake and prolonged rain-fast systemic protection against jassids and aphids.",
       "agriculturalUse": "Aphids, jassids, and thrips in cotton, groundnut, and vegetables.",
@@ -8202,7 +8185,7 @@
       "category": "CROP_PROTECTION",
       "subcategory": "INSECTICIDE",
       "images": [
-        "https://images.unsplash.com/photo-1628352081506-83c43123ed6d?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Broad-spectrum systemic insecticide with vigorous crop greening effect. Controls sucking pests while enhancing plant vigor.",
       "agriculturalUse": "Sucking pest management and stem drenching.",
@@ -8292,7 +8275,7 @@
       "category": "CROP_PROTECTION",
       "subcategory": "INSECTICIDE",
       "images": [
-        "https://images.unsplash.com/photo-1592417817098-8f3d6910985b?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Organophosphate insecticide with strong vapor and contact action. Renowned for soil drenching against termites, root grubs, and cutworms.",
       "agriculturalUse": "Soil drenching for termites and white grubs; foliar for caterpillars.",
@@ -8382,7 +8365,7 @@
       "category": "CROP_PROTECTION",
       "subcategory": "FUNGICIDE",
       "images": [
-        "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Proven dual contact and systemic fungicide formulation. Carbendazim translocates systemically through xylem, while Mancozeb forms an impenetrable protective barrier on leaf surfaces against early/late blight and leaf spots.",
       "agriculturalUse": "Tikka disease in groundnut, fruit rot/dieback in chilli, early blight in tomato, and blast in paddy.",
@@ -8474,7 +8457,7 @@
       "category": "CROP_PROTECTION",
       "subcategory": "FUNGICIDE",
       "images": [
-        "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Broad-spectrum dithiocarbamate contact fungicide with multi-site action. Fights fungal enzyme systems, preventing early and late blight without developing fungal resistance.",
       "agriculturalUse": "Early blight, late blight, leaf spots, and downy mildew control.",
@@ -8564,7 +8547,7 @@
       "category": "CROP_PROTECTION",
       "subcategory": "FUNGICIDE",
       "images": [
-        "https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Broad-spectrum systemic fungicide combining strobilurin (Azoxystrobin 18.2%) with triazole (Difenoconazole 11.4%). Eradicates Powdery Mildew, Anthracnose, Leaf Blight, and Rust with long-lasting greening effect.",
       "agriculturalUse": "Curative and preventive management of powdery mildew, anthracnose, and alternaria leaf spot.",
@@ -8656,7 +8639,7 @@
       "category": "CROP_PROTECTION",
       "subcategory": "FUNGICIDE",
       "images": [
-        "https://images.unsplash.com/photo-1628352081506-83c43123ed6d?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Systemic triazole fungicide with protective, curative, and eradicative action. Rapidly arrests Tikka leaf spot in groundnut and sheath blight in paddy.",
       "agriculturalUse": "Tikka disease in groundnut, sheath blight in paddy, powdery mildew in vegetables.",
@@ -8746,7 +8729,7 @@
       "category": "CROP_PROTECTION",
       "subcategory": "FUNGICIDE",
       "images": [
-        "https://images.unsplash.com/photo-1592417817098-8f3d6910985b?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Premium broad-spectrum systemic fungicide with mesostemic action. Cures dirty panicle and blast in paddy, and anthracnose/powdery mildew in chilli and mango.",
       "agriculturalUse": "Blast and dirty panicle in paddy, dieback/fruit rot in chilli, powdery mildew.",
@@ -8836,7 +8819,7 @@
       "category": "CROP_PROTECTION",
       "subcategory": "FUNGICIDE",
       "images": [
-        "https://images.unsplash.com/photo-1605000797499-95a51c5269ae?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Blue copper contact fungicide and bactericide. Excellent persistence on foliage, controlling late blight, leaf spots, and bacterial cankers.",
       "agriculturalUse": "Late blight in potato/tomato, bacterial leaf spot, fruit rot.",
@@ -8927,7 +8910,7 @@
       "category": "CROP_PROTECTION",
       "subcategory": "FUNGICIDE",
       "images": [
-        "https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Systemic oomycete specialist. Penetrates rapidly to stop Downy Mildew and Late Blight in tomato and potato within hours of application.",
       "agriculturalUse": "Late blight in potato/tomato, downy mildew in grapes, damping off in nurseries.",
@@ -9016,7 +8999,7 @@
       "category": "CROP_PROTECTION",
       "subcategory": "FUNGICIDE",
       "images": [
-        "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Advanced SDHI chemistry + F-500 Pyraclostrobin. Delivers unprecedented stamina, disease resistance, and yield enhancement in groundnut and soybean.",
       "agriculturalUse": "Tikka disease in groundnut, leaf spot in cotton, rust in soybean.",
@@ -9105,7 +9088,7 @@
       "category": "CROP_PROTECTION",
       "subcategory": "HERBICIDE",
       "images": [
-        "https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Non-selective systemic broad-spectrum post-emergence herbicide. Absorbed through foliage and translocated throughout weeds, killing roots of annual and perennial grasses.",
       "agriculturalUse": "Total weed clearance in bunds, channels, fallow land, and pre-planting field prep.",
@@ -9194,7 +9177,7 @@
       "category": "CROP_PROTECTION",
       "subcategory": "HERBICIDE",
       "images": [
-        "https://images.unsplash.com/photo-1592417817098-8f3d6910985b?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Broad-spectrum pre-emergence selective herbicide. Forms a chemical seal on soil surface that inhibits cell division in germinating weed seeds without injuring crop seeds.",
       "agriculturalUse": "Pre-emergence weed control in groundnut, cotton, chilli, and soybean (apply within 48h of sowing).",
@@ -9285,7 +9268,7 @@
       "category": "CROP_PROTECTION",
       "subcategory": "HERBICIDE",
       "images": [
-        "https://images.unsplash.com/photo-1628352081506-83c43123ed6d?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Selective pre-emergence herbicide for transplanted paddy. Controls grasses, sedges, and broad-leaf weeds from germination.",
       "agriculturalUse": "Transplanted paddy weed control (apply 0-4 days after transplanting).",
@@ -9370,7 +9353,7 @@
       "category": "CROP_PROTECTION",
       "subcategory": "BACTERICIDE",
       "images": [
-        "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Systemic agricultural antibiotic combination of Streptomycin Sulphate (90%) and Tetracycline Hydrochloride (10%). Rapidly cures Bacterial Leaf Blight, Black Rot, Citrus Canker, and Bacterial Wilt.",
       "agriculturalUse": "Cures bacterial blight in paddy/cotton, bacterial canker in citrus/pomegranate, bacterial spot in tomato/chilli.",
@@ -9461,7 +9444,7 @@
       "category": "CROP_PROTECTION",
       "subcategory": "BACTERICIDE",
       "images": [
-        "https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Systemic agricultural antibiotic. Excellent curative control against Bacterial Blight and Blast in paddy and bacterial cankers in vegetables.",
       "agriculturalUse": "Bacterial blight and blast control in paddy and solanaceous crops.",
@@ -9549,7 +9532,7 @@
       "category": "SEEDS",
       "subcategory": "OILSEEDS",
       "images": [
-        "https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "The golden benchmark groundnut variety for Rayalaseema rainfed and irrigated belts. High shelling percentage (73%), high oil content (48%), drought-tolerant, and yields 12-16 quintals/acre.",
       "agriculturalUse": "Kharif rainfed and Rabi irrigated commercial oilseed cultivation.",
@@ -9637,7 +9620,7 @@
       "category": "SEEDS",
       "subcategory": "OILSEEDS",
       "images": [
-        "https://images.unsplash.com/photo-1605000797499-95a51c5269ae?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Latest high-yielding Spanish bunch groundnut variety released by RARS Kadiri. 110-115 days maturity, high test weight, and superior resistance to dry root rot and stem rot.",
       "agriculturalUse": "Drought-resilient groundnut farming in Anantapur and Sri Sathya Sai districts.",
@@ -9722,7 +9705,7 @@
       "category": "SEEDS",
       "subcategory": "VEGETABLES",
       "images": [
-        "https://images.unsplash.com/photo-1592417817098-8f3d6910985b?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Famous triple disease-resistant tomato hybrid developed by ICAR-IIHR Bengaluru. Resistant to Tomato Leaf Curl Virus (ToLCV), Bacterial Wilt, and Early Blight. Yields 35-40 tonnes/acre.",
       "agriculturalUse": "Open field and staked commercial tomato cultivation with firm square-round fruits (90-100g).",
@@ -9808,7 +9791,7 @@
       "category": "SEEDS",
       "subcategory": "VEGETABLES",
       "images": [
-        "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Leader in commercial Indian tomato farming. Heavy fruit firmness suitable for long-distance transport to Delhi, Mumbai, and Kolkata mandis.",
       "agriculturalUse": "Long-distance transport commercial tomato farming.",
@@ -9893,7 +9876,7 @@
       "category": "SEEDS",
       "subcategory": "VEGETABLES",
       "images": [
-        "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "High heat set hybrid tomato with deep red color and excellent ToLCV tolerance for southern India.",
       "agriculturalUse": "Kharif and summer high-temperature tomato cultivation.",
@@ -9978,7 +9961,7 @@
       "category": "SEEDS",
       "subcategory": "SPICES",
       "images": [
-        "https://images.unsplash.com/photo-1592417817098-8f3d6910985b?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "High pungency (SHU 75,000-85,000) export-grade Teja S17 chilli seeds. Produces glossy, uniform, deep-red pods that fetch premium rates at Guntur Mirchi Yard.",
       "agriculturalUse": "Commercial dry red chilli production for export and domestic spice markets.",
@@ -10064,7 +10047,7 @@
       "category": "SEEDS",
       "subcategory": "SPICES",
       "images": [
-        "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Vigorous hybrid chilli with thick skin and high dry recovery percentage. Exceptional tolerance to Gemini virus.",
       "agriculturalUse": "High density chilli farming under drip irrigation.",
@@ -10149,7 +10132,7 @@
       "category": "SEEDS",
       "subcategory": "CEREALS",
       "images": [
-        "https://images.unsplash.com/photo-1628352081506-83c43123ed6d?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Iconic fine-grain Samba Mahsuri (Sona Masoori) paddy. Medium slender grain with unmatched cooking quality, fetching maximum millers price.",
       "agriculturalUse": "Kharif and late Kharif irrigated paddy cultivation.",
@@ -10234,7 +10217,7 @@
       "category": "SEEDS",
       "subcategory": "CEREALS",
       "images": [
-        "https://images.unsplash.com/photo-1605000797499-95a51c5269ae?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Short duration (120 days) high-yielding paddy. Highly resistant to BPH and lodging.",
       "agriculturalUse": "Rabi and early Kharif paddy.",
@@ -10319,7 +10302,7 @@
       "category": "SEEDS",
       "subcategory": "CEREALS",
       "images": [
-        "https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Yellow semi-flint grain maize hybrid. Strong stay-green trait, excellent cob placement, and yields 35-40 quintals per acre.",
       "agriculturalUse": "Kharif and Rabi grain maize and poultry feed production.",
@@ -10404,7 +10387,7 @@
       "category": "SEEDS",
       "subcategory": "FIBERS",
       "images": [
-        "https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Top-selling BG-II Bt cotton hybrid in Andhra Pradesh and Telangana. High boll retention, medium-tall compact canopy, and excellent sucking pest tolerance.",
       "agriculturalUse": "Kharif rainfed and drip irrigated commercial cotton farming.",
@@ -10490,7 +10473,7 @@
       "category": "SEEDS",
       "subcategory": "VEGETABLES",
       "images": [
-        "https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Dark green, 5-ridged tender pods with high tolerance to Yellow Vein Mosaic Virus (YVMV) and Enation Leaf Curl Virus (ELCV).",
       "agriculturalUse": "Commercial okra farming with frequent pickings.",
@@ -10575,7 +10558,7 @@
       "category": "SEEDS",
       "subcategory": "VEGETABLES",
       "images": [
-        "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Black-skinned oblong fruit with deep red, crispy sweet flesh (Brix 12-13%). High transportability without rind bursting.",
       "agriculturalUse": "Mulch and drip-irrigated summer watermelon cultivation.",
@@ -10660,7 +10643,7 @@
       "category": "SEEDS",
       "subcategory": "VEGETABLES",
       "images": [
-        "https://images.unsplash.com/photo-1592417817098-8f3d6910985b?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "High yielding purple striped round brinjal. Soft flesh, slow seed maturity, and prolonged harvesting window.",
       "agriculturalUse": "Round purple brinjal farming.",
@@ -10745,7 +10728,7 @@
       "category": "EQUIPMENT",
       "subcategory": "SPRAYER",
       "images": [
-        "https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Heavy-duty 16-litre agricultural knapsack sprayer with heavy 12V 12Ah lead-acid battery and twin high-pressure diaphragm pumps (130 PSI). Sprays 25-30 tanks (400-480 litres) on a single charge.",
       "agriculturalUse": "Foliar pesticide, bio-agent, and micronutrient spraying across all crops.",
@@ -10832,7 +10815,7 @@
       "category": "EQUIPMENT",
       "subcategory": "SPRAYER",
       "images": [
-        "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Dual-purpose sprayer with both battery power and emergency manual hand pump. Never stops working even if battery runs out in the middle of field spraying.",
       "agriculturalUse": "Field spraying in remote areas with unstable power supply.",
@@ -10917,7 +10900,7 @@
       "category": "EQUIPMENT",
       "subcategory": "SPRAYER",
       "images": [
-        "https://images.unsplash.com/photo-1628352081506-83c43123ed6d?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Petrol-driven 26cc 2-stroke power sprayer with heavy brass suction pump. Delivers 300-400 PSI pressure to spray up to 30 feet tall trees in mango and pomegranate orchards.",
       "agriculturalUse": "Orchard spraying, tall trees, and large field spraying via 50m hose.",
@@ -11007,7 +10990,7 @@
       "category": "EQUIPMENT",
       "subcategory": "DRIP_SYSTEM",
       "images": [
-        "https://images.unsplash.com/photo-1605000797499-95a51c5269ae?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Complete 1-acre drip irrigation installation package with 16mm inline lateral dripline (40cm spacing, 2 LPH emitters), screen filter, control ball valves, venturi fertigation injector, and punch fittings.",
       "agriculturalUse": "Saves 60% water while delivering precise water and soluble fertilizers directly to root zones.",
@@ -11099,7 +11082,7 @@
       "category": "EQUIPMENT",
       "subcategory": "DRIP_PIPE",
       "images": [
-        "https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "World-renowned Israeli drip lateral with self-cleaning turbulent dripper labyrinth. Resists clogging even with borewell hard water.",
       "agriculturalUse": "Row crops under mulch: Tomato, Chilli, Watermelon, Groundnut.",
@@ -11187,7 +11170,7 @@
       "category": "EQUIPMENT",
       "subcategory": "DRIP_PIPE",
       "images": [
-        "https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "High-strength virgin LLDPE plain lateral pipe. UV stabilized to endure intense Rayalaseema sun without cracking or becoming brittle for 5+ years.",
       "agriculturalUse": "Main sub-lateral pipe for online dripper insertion in orchards and vegetables.",
@@ -11276,7 +11259,7 @@
       "category": "EQUIPMENT",
       "subcategory": "DRIP_FILTER",
       "images": [
-        "https://images.unsplash.com/photo-1592417817098-8f3d6910985b?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "High-flow 120-mesh (130 micron) reinforced polypropylene filter. Traps sand, silt, and algae from borewell and open well water to prevent dripper clogging.",
       "agriculturalUse": "Essential primary filtration unit for micro-irrigation systems.",
@@ -11361,7 +11344,7 @@
       "category": "EQUIPMENT",
       "subcategory": "MULCHING",
       "images": [
-        "https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Co-extruded dual-color mulching film (1.2m width x 400m length, 25 micron). Silver side reflects 30% solar radiation (cooling soil and confusing aphids/thrips), while black side blocks 100% sunlight to completely prevent weed growth.",
       "agriculturalUse": "Weed suppression, soil moisture conservation, and micro-climate control.",
@@ -11450,7 +11433,7 @@
       "category": "EQUIPMENT",
       "subcategory": "PRO_TRAY",
       "images": [
-        "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Virgin plastic reusable 104-cell seedling propagation trays with drainage holes. Promotes uniform root ball development for 100% transplant survival.",
       "agriculturalUse": "Nursery seedling raising for tomato, chilli, brinjal, and cabbage.",
@@ -11539,7 +11522,7 @@
       "category": "EQUIPMENT",
       "subcategory": "TOOL",
       "images": [
-        "https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "High-carbon Japanese steel bypass shears with non-slip vinyl grip and safety lock. Creates razor-sharp, clean cuts that heal rapidly without bark tearing.",
       "agriculturalUse": "Pruning diseased branches, tomato staking suckers, and harvesting fruit.",
@@ -11630,7 +11613,7 @@
       "category": "EQUIPMENT",
       "subcategory": "SPRAYER_PART",
       "images": [
-        "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Forged brass high-pressure spray gun with adjustable ceramic nozzle. Switches smoothly from mist spray for vegetables to jet stream for orchard canopies.",
       "agriculturalUse": "Power sprayer accessory for orchards, field crops, and tractor sprayers.",
@@ -11715,7 +11698,7 @@
       "category": "EQUIPMENT",
       "subcategory": "SPRAYER_PART",
       "images": [
-        "https://images.unsplash.com/photo-1628352081506-83c43123ed6d?w=600&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
       ],
       "description": "Braided 3-ply heavy PVC delivery hose with 150 bar burst pressure. Flexible and kink-resistant across rough field furrows.",
       "agriculturalUse": "Power sprayer hose for moving freely across a 2-acre field from stationary pump.",
@@ -12307,7 +12290,7 @@
       "body": "Regional forecast predicts 15-20 mm rainfall over Kadiri region in the next 36 hours. Delay irrigation and wait for clear skies before foliar spraying.",
       "category": "WEATHER_ALERT",
       "isRead": false,
-      "createdAt": "2026-09-28T17:50:19.233Z"
+      "createdAt": "2026-09-28T19:50:34.560Z"
     },
     {
       "id": "notif-deal-conf",
@@ -12317,7 +12300,7 @@
       "category": "PRODUCE_REQUEST",
       "linkUrl": "/produce",
       "isRead": false,
-      "createdAt": "2026-09-28T17:20:19.233Z"
+      "createdAt": "2026-09-28T19:20:34.560Z"
     },
     {
       "id": "notif-ven-offer",
@@ -12327,7 +12310,7 @@
       "category": "PRODUCE_REQUEST",
       "linkUrl": "/vendor-portal",
       "isRead": false,
-      "createdAt": "2026-09-28T16:50:19.233Z"
+      "createdAt": "2026-09-28T18:50:34.560Z"
     },
     {
       "id": "notif-buyer-offer",
@@ -12337,7 +12320,7 @@
       "category": "PRODUCE_REQUEST",
       "linkUrl": "/buyer-portal",
       "isRead": false,
-      "createdAt": "2026-09-28T17:35:19.233Z"
+      "createdAt": "2026-09-28T19:35:34.560Z"
     }
   ],
   "market_prices": [
@@ -12358,7 +12341,7 @@
       "changeAmount": 120,
       "reportedBy": "APMC Market Secretary",
       "reportedByName": "Kadiri APMC Yard",
-      "createdAt": "2026-09-28T17:50:19.233Z"
+      "createdAt": "2026-09-28T19:50:34.560Z"
     },
     {
       "id": "price-2",
@@ -12377,7 +12360,7 @@
       "changeAmount": 0,
       "reportedBy": "Mandi Trade Board",
       "reportedByName": "Bangalore Mandi Desk",
-      "createdAt": "2026-09-28T17:50:19.233Z"
+      "createdAt": "2026-09-28T19:50:34.560Z"
     },
     {
       "id": "price-3",
@@ -12396,7 +12379,7 @@
       "changeAmount": 350,
       "reportedBy": "Spices Board Field Officer",
       "reportedByName": "Guntur Mirchi Yard",
-      "createdAt": "2026-09-28T17:50:19.233Z"
+      "createdAt": "2026-09-28T19:50:34.560Z"
     },
     {
       "id": "price-4",
@@ -12415,7 +12398,7 @@
       "changeAmount": 80,
       "reportedBy": "Cotton Corporation of India",
       "reportedByName": "Anantapur Yard",
-      "createdAt": "2026-09-28T17:50:19.233Z"
+      "createdAt": "2026-09-28T19:50:34.560Z"
     },
     {
       "id": "price-5",
@@ -12434,7 +12417,7 @@
       "changeAmount": 0,
       "reportedBy": "APMC Market Secretary",
       "reportedByName": "Kadiri APMC Yard",
-      "createdAt": "2026-09-28T17:50:19.233Z"
+      "createdAt": "2026-09-28T19:50:34.560Z"
     }
   ],
   "shops": [

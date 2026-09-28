@@ -30,6 +30,7 @@ import {
   Sprout
 } from 'lucide-react';
 import { subscribeToTable } from '../../services/supabaseClient';
+import { AgriculturalPackshot } from '../../components/AgriculturalPackshot';
 
 interface MarketplaceProps {
   setActiveTab: (tab: string) => void;
@@ -384,33 +385,29 @@ export const Marketplace: React.FC<MarketplaceProps> = ({ setActiveTab }) => {
               <div>
                 {/* Image Container with Brand & Pack Badges */}
                 <div
-                  className="relative rounded-2xl overflow-hidden bg-stone-100 h-48 cursor-pointer border border-gray-100"
+                  className="relative rounded-2xl overflow-hidden bg-white h-48 cursor-pointer border border-gray-100 flex items-center justify-center p-2 group-hover:border-emerald-300 transition"
                   onClick={() => setActiveProductModal(p)}
                 >
-                  <img
-                    src={p.images?.[0] || 'https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?w=400'}
-                    alt={p.name}
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?w=400';
-                    }}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  <AgriculturalPackshot
+                    product={p}
+                    size="card"
                   />
 
                   {/* Brand Badge */}
-                  <span className="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-lg text-[10px] font-black tracking-wide uppercase bg-emerald-900 text-white shadow-md border border-emerald-700/50">
+                  <span className="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-lg text-[10px] font-black tracking-wide uppercase bg-emerald-900 text-white shadow-md border border-emerald-700/50 z-10">
                     {p.brandBadge || p.brand}
                   </span>
 
                   {/* Packaging Type Badge */}
                   {p.packagingType && (
-                    <span className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-md text-[10px] font-bold bg-black/60 backdrop-blur-md text-white shadow">
+                    <span className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-md text-[10px] font-bold bg-black/60 backdrop-blur-md text-white shadow z-10">
                       {p.packagingType}
                     </span>
                   )}
 
                   {/* Subsidy Badge */}
                   {p.subsidyDiscountedRate && p.subsidyDiscountedRate < p.mrp && (
-                    <span className="absolute bottom-2.5 left-2.5 px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-amber-400 text-amber-950 shadow">
+                    <span className="absolute bottom-2.5 left-2.5 px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-amber-400 text-amber-950 shadow z-10">
                       Save ₹{discount}
                     </span>
                   )}
@@ -431,8 +428,24 @@ export const Marketplace: React.FC<MarketplaceProps> = ({ setActiveTab }) => {
                     </div>
                   )}
 
+                  {/* Target Crops Chips */}
+                  {p.applicableCrops && p.applicableCrops.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-1">
+                      {p.applicableCrops.slice(0, 3).map((crop: string, idx: number) => (
+                        <span key={idx} className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-100">
+                          🌾 {crop}
+                        </span>
+                      ))}
+                      {p.applicableCrops.length > 3 && (
+                        <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-stone-100 text-stone-600">
+                          +{p.applicableCrops.length - 3} more
+                        </span>
+                      )}
+                    </div>
+                  )}
+
                   {/* Description preview */}
-                  <p className="text-[11px] text-gray-500 mt-1 line-clamp-2 leading-relaxed">
+                  <p className="text-[11px] text-gray-500 mt-1.5 line-clamp-2 leading-relaxed">
                     {p.description}
                   </p>
 
@@ -798,83 +811,176 @@ export const Marketplace: React.FC<MarketplaceProps> = ({ setActiveTab }) => {
             </button>
 
             {/* Top overview */}
-            <div className="flex flex-col sm:flex-row gap-4 items-start border-b border-gray-100 pb-4">
-              <img
-                src={activeProductModal.images?.[0] || 'https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?w=400'}
-                alt={activeProductModal.name}
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?w=400';
-                }}
-                className="w-full sm:w-44 h-44 rounded-2xl object-cover border border-gray-100"
-              />
+            <div className="flex flex-col sm:flex-row gap-5 items-start border-b border-gray-100 pb-5">
+              <div className="w-full sm:w-52 h-52 rounded-2xl overflow-hidden border border-gray-100 flex-shrink-0 bg-stone-50 flex items-center justify-center p-2 shadow-sm">
+                <AgriculturalPackshot
+                  product={activeProductModal}
+                  size="modal"
+                />
+              </div>
+
               <div className="flex-1">
-                <span className="px-2.5 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-extrabold uppercase rounded">
-                  {activeProductModal.brandBadge || activeProductModal.brand}
-                </span>
-                <h2 className="text-xl font-black text-gray-900 mt-1">
+                <div className="flex items-center gap-2">
+                  <span className="px-2.5 py-0.5 bg-emerald-900 text-amber-300 text-[10px] font-black uppercase tracking-wider rounded-md shadow-sm">
+                    {activeProductModal.brandBadge || activeProductModal.brand}
+                  </span>
+                  {activeProductModal.packagingType && (
+                    <span className="px-2 py-0.5 bg-stone-100 text-stone-700 text-[10px] font-bold rounded-md border border-stone-200">
+                      {activeProductModal.packagingType}
+                    </span>
+                  )}
+                </div>
+
+                <h2 className="text-xl font-black text-gray-900 mt-2 leading-snug">
                   {activeProductModal.name}
                 </h2>
+
                 {activeProductModal.compositionFormula && (
-                  <p className="text-xs text-emerald-800 font-mono font-bold mt-1">
-                    Formula: {activeProductModal.compositionFormula}
-                  </p>
+                  <div className="mt-2 inline-block px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200">
+                    <p className="text-xs text-emerald-900 font-mono font-black">
+                      Formula: {activeProductModal.compositionFormula}
+                    </p>
+                  </div>
                 )}
-                <div className="flex items-baseline gap-2 mt-2">
-                  <span className="text-2xl font-black text-emerald-800">
+
+                <div className="flex items-baseline gap-2.5 mt-3">
+                  <span className="text-3xl font-black text-emerald-800">
                     ₹{activeProductModal.subsidyDiscountedRate || activeProductModal.price}
                   </span>
                   {activeProductModal.mrp > (activeProductModal.subsidyDiscountedRate || activeProductModal.price) && (
-                    <span className="text-sm text-gray-400 line-through">
+                    <span className="text-base text-gray-400 line-through">
                       ₹{activeProductModal.mrp}
                     </span>
                   )}
-                  <span className="text-xs text-gray-500 font-semibold">
+                  <span className="text-xs text-gray-500 font-bold">
                     ({activeProductModal.packSize})
                   </span>
+                  {activeProductModal.subsidyLabel && (
+                    <span className="text-[10px] font-extrabold px-2 py-0.5 rounded bg-amber-100 text-amber-900">
+                      {activeProductModal.subsidyLabel}
+                    </span>
+                  )}
                 </div>
-                <div className="mt-2 text-xs text-gray-600 flex items-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                  <span>Available at <strong>{activeProductModal.vendorName}</strong> (2.3 km away)</span>
+
+                <div className="mt-3 text-xs text-gray-600 flex items-center gap-2 bg-emerald-50/60 p-2 rounded-xl border border-emerald-100">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                  <span>Available at <strong>{activeProductModal.vendorName || 'Sri Lakshmi Agri Inputs'}</strong> (2.3 km away, Kadiri)</span>
                 </div>
               </div>
             </div>
 
-            {/* Agricultural details & Safety Section */}
+            {/* Target Crops Section */}
+            {activeProductModal.applicableCrops && activeProductModal.applicableCrops.length > 0 && (
+              <div>
+                <h4 className="font-black text-gray-900 text-xs uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                  <Wheat className="w-3.5 h-3.5 text-emerald-700" /> Recommended Target Crops:
+                </h4>
+                <div className="flex flex-wrap gap-1.5">
+                  {activeProductModal.applicableCrops.map((crop: string, idx: number) => (
+                    <span
+                      key={idx}
+                      className="px-2.5 py-1 rounded-lg text-xs font-extrabold bg-emerald-50 text-emerald-900 border border-emerald-200 flex items-center gap-1"
+                    >
+                      <Sprout className="w-3 h-3 text-emerald-600" />
+                      {crop}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Technical Specifications Table */}
+            <div className="bg-stone-50 rounded-2xl p-3.5 border border-stone-200/80 space-y-2">
+              <h4 className="font-black text-gray-900 text-xs uppercase tracking-wider flex items-center gap-1.5">
+                <Layers className="w-3.5 h-3.5 text-stone-700" /> Technical Composition & Regulatory Purity:
+              </h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                <div className="p-2 bg-white rounded-xl border border-stone-200">
+                  <span className="text-gray-400 block text-[10px] font-bold">ACTIVE COMPOSITION:</span>
+                  <span className="font-bold text-gray-900">{activeProductModal.compositionFormula || activeProductModal.chemicalComposition || 'Certified FCO Specification'}</span>
+                </div>
+                <div className="p-2 bg-white rounded-xl border border-stone-200">
+                  <span className="text-gray-400 block text-[10px] font-bold">REGULATORY STANDARD:</span>
+                  <span className="font-bold text-gray-900">Fertilizer (Inorganic, Organic or Mixed) (Control) Order 1985</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Agricultural details & Dosage */}
             <div className="space-y-3 text-xs">
               <div>
-                <h4 className="font-bold text-gray-900 uppercase tracking-wider mb-1">
-                  Agricultural Use & Agronomic Fit:
+                <h4 className="font-black text-gray-900 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-600" /> Agricultural Use & Agronomic Fit:
                 </h4>
-                <p className="text-gray-700 bg-gray-50 p-3 rounded-xl border border-gray-100 leading-relaxed">
-                  {activeProductModal.agriculturalUse}
+                <p className="text-gray-700 bg-gray-50 p-3 rounded-xl border border-gray-100 leading-relaxed font-medium">
+                  {activeProductModal.agriculturalUse || activeProductModal.description}
                 </p>
               </div>
 
               <div>
-                <h4 className="font-bold text-gray-900 uppercase tracking-wider mb-1">
-                  Dosage & Field Calibration Guidance:
+                <h4 className="font-black text-gray-900 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+                  <Droplets className="w-3.5 h-3.5 text-blue-600" /> Dosage & Application Guidance:
                 </h4>
-                <p className="text-gray-700 bg-gray-50 p-3 rounded-xl border border-gray-100 leading-relaxed">
-                  {activeProductModal.dosageGuidance}
+                <p className="text-gray-700 bg-gray-50 p-3 rounded-xl border border-gray-100 leading-relaxed font-medium">
+                  {activeProductModal.dosageGuidance || 'Apply based on soil test report and local agricultural extension guidelines.'}
                 </p>
               </div>
 
               {/* Safety Precautions & Legal label */}
               <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-2xl space-y-1.5 text-amber-950">
-                <h4 className="font-extrabold flex items-center gap-1.5 text-amber-900 uppercase">
+                <h4 className="font-extrabold flex items-center gap-1.5 text-amber-900 uppercase text-xs">
                   <ShieldCheck className="w-4 h-4 text-amber-700" /> Official Label & Safety Instructions:
                 </h4>
-                <p className="text-[11px] leading-relaxed">
-                  {activeProductModal.labelInstructions}
+                <p className="text-[11px] leading-relaxed font-medium">
+                  {activeProductModal.labelInstructions || 'Subsidized by Government of India / Certified by Department of Agriculture.'}
                 </p>
                 {activeProductModal.safetyPrecautions?.length > 0 && (
-                  <ul className="text-[11px] space-y-0.5 pl-4 list-disc text-amber-900">
+                  <ul className="text-[11px] space-y-0.5 pl-4 list-disc text-amber-900 font-medium">
                     {activeProductModal.safetyPrecautions.map((sec: string, i: number) => (
                       <li key={i}>{sec}</li>
                     ))}
                   </ul>
                 )}
               </div>
+
+              {/* Nearby Retailers & Real-Time Stock */}
+              {activeProductModal.nearbyShops && activeProductModal.nearbyShops.length > 0 && (
+                <div className="space-y-2 pt-1">
+                  <h4 className="font-black text-gray-900 uppercase tracking-wider text-xs flex items-center gap-1.5">
+                    <Store className="w-3.5 h-3.5 text-emerald-700" /> Nearby Retailers with Verified Stock in Kadiri:
+                  </h4>
+                  <div className="space-y-1.5 max-h-36 overflow-y-auto pr-1">
+                    {activeProductModal.nearbyShops.map((shop: any, sIdx: number) => (
+                      <div
+                        key={sIdx}
+                        className="flex items-center justify-between p-2 rounded-xl bg-stone-50 border border-stone-200 text-xs"
+                      >
+                        <div>
+                          <div className="flex items-center gap-1.5 font-bold text-gray-900">
+                            <span>{shop.shopName}</span>
+                            <span className="text-[10px] text-gray-500 font-semibold">({shop.distanceKm} km)</span>
+                          </div>
+                          <p className="text-[10px] text-gray-500">{shop.address}</p>
+                        </div>
+                        <div className="text-right flex items-center gap-2">
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800">
+                            {shop.stockCount || 25} in stock
+                          </span>
+                          {shop.phone && (
+                            <a
+                              href={`tel:${shop.phone}`}
+                              className="p-1.5 rounded-lg bg-stone-200 text-stone-700 hover:bg-emerald-600 hover:text-white transition"
+                              title="Call Store"
+                            >
+                              <Phone className="w-3 h-3" />
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Action Buttons */}

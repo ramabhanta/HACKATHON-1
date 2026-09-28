@@ -378,7 +378,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
             <span>📍 {user?.village || 'Kadiri Mandal'}, {user?.district || 'Sri Sathya Sai'}</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-            {t('greeting')}
+            {language === 'te'
+              ? `నమస్కారం, ${user?.name || 'రైతు'} గారు 👋`
+              : language === 'hi'
+              ? `नमस्ते, ${user?.name || 'किसान'} जी 👋`
+              : `Good morning, ${user?.name || 'Farmer'} 👋`}
           </h1>
           <p className="text-emerald-100 text-sm sm:text-base mt-2">
             {t('subGreeting')}

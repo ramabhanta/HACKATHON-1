@@ -78,6 +78,23 @@
       "pincode": "500081",
       "createdAt": "2026-09-28T10:16:52.249Z",
       "updatedAt": "2026-09-28T10:16:52.249Z"
+    },
+    {
+      "id": "usr-d012219b",
+      "name": "nani",
+      "phone": "+91 9951518699",
+      "email": "yugandharreddy350@gmail.com",
+      "passwordHash": "$2a$10$5Vn.SGdHrucvPdVlqQC8jODiukXUAOYeNiU5Vo5LRQustjmdSq3ua",
+      "role": "FARMER",
+      "language": "en",
+      "village": "anantapur",
+      "district": "anantapur",
+      "state": "Andhra Pradesh",
+      "pincode": "515865",
+      "latitude": 14.1165,
+      "longitude": 78.1634,
+      "createdAt": "2026-09-28T10:49:39.611Z",
+      "updatedAt": "2026-09-28T10:49:39.611Z"
     }
   ],
   "farmer_profiles": [
@@ -94,6 +111,19 @@
       "farmingType": "INTEGRATED",
       "soilTypeDefault": "RED_LOAM",
       "hasSoilCard": true,
+      "irrigationType": "BOREWELL"
+    },
+    {
+      "id": "prof-80bf47a9",
+      "userId": "usr-d012219b",
+      "totalAcreage": 6.5,
+      "primaryCrops": [
+        "ground nut"
+      ],
+      "farmingExperienceYears": 5,
+      "farmingType": "INTEGRATED",
+      "soilTypeDefault": "RED_LOAM",
+      "hasSoilCard": false,
       "irrigationType": "BOREWELL"
     }
   ],
@@ -302,6 +332,384 @@
       "isExpertReviewed": true,
       "expertNotes": "Optimal nutritional balance observed. Keep monitoring for early whitefly vectors.",
       "createdAt": "2026-09-28T08:30:00.000Z"
+    },
+    {
+      "id": "diag-6c113f1d",
+      "userId": "usr-farmer-1",
+      "cropName": "Chilli",
+      "imageUrl": "/uploads/052fe875-88dc-4c1e-981c-3d455a833d59.avif",
+      "photoMetadata": {
+        "uploadedAt": "2026-09-28T10:37:20.503Z",
+        "uploadDateFormatted": "Mon, 28 Sept, 2026",
+        "uploadTimeFormatted": "04:07:20 pm",
+        "uploadedAtFormatted": "Mon, 28 Sept, 2026 at 04:07:20 pm",
+        "captureDateFormatted": "Mon, 28 Sept, 2026 at 04:07:20 pm",
+        "fileName": "photo.avif",
+        "fileSizeBytes": 17461,
+        "fileSizeFormatted": "0.02 MB",
+        "dimensions": "1920 × 1440 px",
+        "megapixels": "2.8 MP",
+        "mimeType": "image/avif",
+        "aspectRatio": "4:3 (Field Camera)",
+        "latitude": 14.1165,
+        "longitude": 78.1634,
+        "locationName": "Kadiri, Sri Sathya Sai District, Andhra Pradesh",
+        "deviceSource": "Field Camera",
+        "verified": true
+      },
+      "suspectedIssue": "Chilli Die-back and Fruit Rot (Colletotrichum capsici / Alternaria capsici)",
+      "confidenceScore": 92.5,
+      "severity": "MODERATE",
+      "symptomsEvidence": [
+        "Necrotic, straw-colored lesions and dry rotting visible on developing chilli fruits (die-back and anthracnose symptoms)",
+        "Shriveling and premature shedding of infected flower buds and small fruits (fruit drop)",
+        "Branch tips turning brown and drying up progressively from top to bottom (die-back symptom)"
+      ],
+      "culturalControl": [
+        "Collect and destroy infected plant debris, dried twigs, and rotten fruits by burning or deep burial to reduce primary inoculum.",
+        "Ensure proper plant spacing and field drainage to avoid stagnant water and high humidity within the crop canopy."
+      ],
+      "biologicalControl": [
+        "Multiplex Bio-Tech Trichoderma Viride 1% WP @ 2.5 kg mixed with 50 kg well-decomposed FYM applied to soil per acre, OR as foliar spray @ 5g per litre of water.",
+        "GreenAgri Pure Cold Pressed Neem Oil 10,000 PPM @ 600 ml in 200 litres of water per acre (3 ml per litre of water) to suppress secondary fungal spread and manage sucking pest vectors."
+      ],
+      "chemicalControlSafe": [
+        "Dhanuka M-45 (Mancozeb 75% WP) @ 500g in 200 litres of water per acre (2.5g per litre of water) as a protective fungicidal spray.",
+        "Bayer Nativo (Tebuconazole 50% + Trifloxystrobin 25% WG) @ 80g in 200 litres of water per acre (0.4g per litre of water) for curative control. Observe a Pre-Harvest Interval (PHI) of 7 days."
+      ],
+      "safetyWarnings": [
+        "Wear full personal protective equipment including a respiratory face mask, rubber gloves, and eye goggles during mixing and application.",
+        "Perform spraying strictly during early morning hours before 9:00 AM or late evening after 4:30 PM to protect honeybees and avoid pesticide degradation from high temperature.",
+        "Safely dispose of empty containers by triple rinsing and puncturing; do not contaminate water bodies."
+      ],
+      "recommendedProductIds": [
+        "prod-trichoderma",
+        "prod-neem-oil",
+        "prod-sprayer"
+      ],
+      "isExpertReviewed": true,
+      "expertNotes": "The infection is primarily caused by the fungus Colletotrichum capsici. High relative humidity (>85%), frequent rainfall, cloudy weather, and temperatures between 25°C to 30°C favor spore germination and rapid fungal proliferation. The pathogen survives on infected plant debris and seeds, spreading via rain splash and wind to developing flowers and immature green fruits, causing blossom blight and fruit necrosis.",
+      "cropIdentified": true,
+      "followUpQuestions": [
+        "Are you observing similar brown necrotic spots or drying symptoms on the main stems and leaves?",
+        "What is the current local weather pattern, and have you experienced recent unseasonal rainfall or heavy dew?"
+      ],
+      "createdAt": "2026-09-28T10:37:33.505Z"
+    },
+    {
+      "id": "diag-6c113f1d",
+      "userId": "usr-farmer-1",
+      "cropName": "Chilli",
+      "imageUrl": "/uploads/052fe875-88dc-4c1e-981c-3d455a833d59.avif",
+      "photoMetadata": {
+        "uploadedAt": "2026-09-28T10:37:20.503Z",
+        "uploadDateFormatted": "Mon, 28 Sept, 2026",
+        "uploadTimeFormatted": "04:07:20 pm",
+        "uploadedAtFormatted": "Mon, 28 Sept, 2026 at 04:07:20 pm",
+        "captureDateFormatted": "Mon, 28 Sept, 2026 at 04:07:20 pm",
+        "fileName": "photo.avif",
+        "fileSizeBytes": 17461,
+        "fileSizeFormatted": "0.02 MB",
+        "dimensions": "1920 × 1440 px",
+        "megapixels": "2.8 MP",
+        "mimeType": "image/avif",
+        "aspectRatio": "4:3 (Field Camera)",
+        "latitude": 14.1165,
+        "longitude": 78.1634,
+        "locationName": "Kadiri, Sri Sathya Sai District, Andhra Pradesh",
+        "deviceSource": "Field Camera",
+        "verified": true
+      },
+      "suspectedIssue": "Chilli Die-back and Fruit Rot (Colletotrichum capsici / Alternaria capsici)",
+      "confidenceScore": 92.5,
+      "severity": "MODERATE",
+      "symptomsEvidence": [
+        "Necrotic, straw-colored lesions and dry rotting visible on developing chilli fruits (die-back and anthracnose symptoms)",
+        "Shriveling and premature shedding of infected flower buds and small fruits (fruit drop)",
+        "Branch tips turning brown and drying up progressively from top to bottom (die-back symptom)"
+      ],
+      "culturalControl": [
+        "Collect and destroy infected plant debris, dried twigs, and rotten fruits by burning or deep burial to reduce primary inoculum.",
+        "Ensure proper plant spacing and field drainage to avoid stagnant water and high humidity within the crop canopy."
+      ],
+      "biologicalControl": [
+        "Multiplex Bio-Tech Trichoderma Viride 1% WP @ 2.5 kg mixed with 50 kg well-decomposed FYM applied to soil per acre, OR as foliar spray @ 5g per litre of water.",
+        "GreenAgri Pure Cold Pressed Neem Oil 10,000 PPM @ 600 ml in 200 litres of water per acre (3 ml per litre of water) to suppress secondary fungal spread and manage sucking pest vectors."
+      ],
+      "chemicalControlSafe": [
+        "Dhanuka M-45 (Mancozeb 75% WP) @ 500g in 200 litres of water per acre (2.5g per litre of water) as a protective fungicidal spray.",
+        "Bayer Nativo (Tebuconazole 50% + Trifloxystrobin 25% WG) @ 80g in 200 litres of water per acre (0.4g per litre of water) for curative control. Observe a Pre-Harvest Interval (PHI) of 7 days."
+      ],
+      "safetyWarnings": [
+        "Wear full personal protective equipment including a respiratory face mask, rubber gloves, and eye goggles during mixing and application.",
+        "Perform spraying strictly during early morning hours before 9:00 AM or late evening after 4:30 PM to protect honeybees and avoid pesticide degradation from high temperature.",
+        "Safely dispose of empty containers by triple rinsing and puncturing; do not contaminate water bodies."
+      ],
+      "recommendedProductIds": [
+        "prod-trichoderma",
+        "prod-neem-oil",
+        "prod-sprayer"
+      ],
+      "isExpertReviewed": true,
+      "expertNotes": "The infection is primarily caused by the fungus Colletotrichum capsici. High relative humidity (>85%), frequent rainfall, cloudy weather, and temperatures between 25°C to 30°C favor spore germination and rapid fungal proliferation. The pathogen survives on infected plant debris and seeds, spreading via rain splash and wind to developing flowers and immature green fruits, causing blossom blight and fruit necrosis.",
+      "cropIdentified": true,
+      "followUpQuestions": [
+        "Are you observing similar brown necrotic spots or drying symptoms on the main stems and leaves?",
+        "What is the current local weather pattern, and have you experienced recent unseasonal rainfall or heavy dew?"
+      ],
+      "createdAt": "2026-09-28T10:37:33.505Z"
+    },
+    {
+      "id": "diag-0a6dea54",
+      "userId": "usr-farmer-1",
+      "cropName": "Chilli",
+      "imageUrl": "/uploads/fe178d5d-33c8-4ab3-90d8-85270e308be5.avif",
+      "photoMetadata": {
+        "uploadedAt": "2026-09-28T10:44:37.657Z",
+        "uploadDateFormatted": "Mon, 28 Sept, 2026",
+        "uploadTimeFormatted": "04:14:37 pm",
+        "uploadedAtFormatted": "Mon, 28 Sept, 2026 at 04:14:37 pm",
+        "captureDateFormatted": "Mon, 28 Sept, 2026 at 04:14:37 pm",
+        "fileName": "photo.avif",
+        "fileSizeBytes": 17461,
+        "fileSizeFormatted": "0.02 MB",
+        "dimensions": "1920 × 1440 px",
+        "megapixels": "2.8 MP",
+        "mimeType": "image/avif",
+        "aspectRatio": "4:3 (Field Camera)",
+        "latitude": 14.1165,
+        "longitude": 78.1634,
+        "locationName": "Kadiri, Sri Sathya Sai District, Andhra Pradesh",
+        "deviceSource": "Field Camera",
+        "verified": true
+      },
+      "suspectedIssue": "Chilli Fruit Rot and Dieback (Colletotrichum capsici / Gloeosporium piperatum)",
+      "confidenceScore": 92,
+      "severity": "MODERATE",
+      "symptomsEvidence": [
+        "Circular to oval sunken necrotic spots (lesions) appearing on developing green chilli fruits",
+        "Shriveling and premature dropping of flowers and immature pods (flower drop and fruit rot)",
+        "Dieback symptoms visible on tender upper twigs showing necrosis progressing downwards from the tip"
+      ],
+      "culturalControl": [
+        "Remove and destroy infected fruits, dried twigs, and plant debris from the field to reduce primary fungal inoculum",
+        "Maintain optimum plant spacing (45 x 45 cm or 60 x 45 cm) and ensure proper drainage in furrows to prevent water stagnation and lower humidity in the crop canopy"
+      ],
+      "biologicalControl": [
+        "Multiplex Bio-Tech Trichoderma Viride 1% WP @ 2.5 kg mixed with 50-100 kg FYM applied to soil per acre, OR as a foliar spray @ 5g per litre of water",
+        "GreenAgri Pure Cold Pressed Neem Oil 10,000 PPM @ 600-800 ml in 200L water per acre OR 3-4 ml per litre of water during early vegetative and flowering stages"
+      ],
+      "chemicalControlSafe": [
+        "Dhanuka M-45 [Mancozeb 75% WP] @ 400-500g in 200L water per acre OR 2-2.5g per litre of water at 10-15 day intervals",
+        "Bayer Nativo [Tebuconazole 50% + Trifloxystrobin 25% WG] @ 80g in 200L water per acre OR 0.4g per litre of water; maintain a Pre-Harvest Interval (PHI) of 7-10 days"
+      ],
+      "safetyWarnings": [
+        "Wear full protective gear including rubber gloves, face mask, and eye goggles during mixing and foliar application",
+        "Conduct spraying strictly during early morning hours (before 9:00 AM) or late evening (after 4:30 PM); avoid application during high winds, extreme sunlight, or impending rainfall",
+        "Observe the prescribed Pre-Harvest Interval (PHI) before harvesting green chillies; safely dispose of empty containers by triple-rinsing and burying away from water sources"
+      ],
+      "recommendedProductIds": [
+        "prod-trichoderma",
+        "prod-neem-oil",
+        "prod-sprayer"
+      ],
+      "isExpertReviewed": true,
+      "expertNotes": "Fungal pathogen Colletotrichum capsici thrives under warm, humid weather conditions (temperatures between 26°C-32°C and relative humidity above 80%) accompanied by intermittent rains or overhead irrigation. Inoculum overwinters on infected plant debris and seed-borne mycelium, splashing onto developing flowers and immature green fruits during monsoon or heavy dew periods.",
+      "cropIdentified": true,
+      "followUpQuestions": [
+        "Have you observed similar circular sunken lesions on mature red chillies during previous harvests?",
+        "What is the current irrigation method being used (drip irrigation or flood/furrow irrigation)?"
+      ],
+      "createdAt": "2026-09-28T10:44:42.443Z"
+    },
+    {
+      "id": "diag-0a6dea54",
+      "userId": "usr-farmer-1",
+      "cropName": "Chilli",
+      "imageUrl": "/uploads/fe178d5d-33c8-4ab3-90d8-85270e308be5.avif",
+      "photoMetadata": {
+        "uploadedAt": "2026-09-28T10:44:37.657Z",
+        "uploadDateFormatted": "Mon, 28 Sept, 2026",
+        "uploadTimeFormatted": "04:14:37 pm",
+        "uploadedAtFormatted": "Mon, 28 Sept, 2026 at 04:14:37 pm",
+        "captureDateFormatted": "Mon, 28 Sept, 2026 at 04:14:37 pm",
+        "fileName": "photo.avif",
+        "fileSizeBytes": 17461,
+        "fileSizeFormatted": "0.02 MB",
+        "dimensions": "1920 × 1440 px",
+        "megapixels": "2.8 MP",
+        "mimeType": "image/avif",
+        "aspectRatio": "4:3 (Field Camera)",
+        "latitude": 14.1165,
+        "longitude": 78.1634,
+        "locationName": "Kadiri, Sri Sathya Sai District, Andhra Pradesh",
+        "deviceSource": "Field Camera",
+        "verified": true
+      },
+      "suspectedIssue": "Chilli Fruit Rot and Dieback (Colletotrichum capsici / Gloeosporium piperatum)",
+      "confidenceScore": 92,
+      "severity": "MODERATE",
+      "symptomsEvidence": [
+        "Circular to oval sunken necrotic spots (lesions) appearing on developing green chilli fruits",
+        "Shriveling and premature dropping of flowers and immature pods (flower drop and fruit rot)",
+        "Dieback symptoms visible on tender upper twigs showing necrosis progressing downwards from the tip"
+      ],
+      "culturalControl": [
+        "Remove and destroy infected fruits, dried twigs, and plant debris from the field to reduce primary fungal inoculum",
+        "Maintain optimum plant spacing (45 x 45 cm or 60 x 45 cm) and ensure proper drainage in furrows to prevent water stagnation and lower humidity in the crop canopy"
+      ],
+      "biologicalControl": [
+        "Multiplex Bio-Tech Trichoderma Viride 1% WP @ 2.5 kg mixed with 50-100 kg FYM applied to soil per acre, OR as a foliar spray @ 5g per litre of water",
+        "GreenAgri Pure Cold Pressed Neem Oil 10,000 PPM @ 600-800 ml in 200L water per acre OR 3-4 ml per litre of water during early vegetative and flowering stages"
+      ],
+      "chemicalControlSafe": [
+        "Dhanuka M-45 [Mancozeb 75% WP] @ 400-500g in 200L water per acre OR 2-2.5g per litre of water at 10-15 day intervals",
+        "Bayer Nativo [Tebuconazole 50% + Trifloxystrobin 25% WG] @ 80g in 200L water per acre OR 0.4g per litre of water; maintain a Pre-Harvest Interval (PHI) of 7-10 days"
+      ],
+      "safetyWarnings": [
+        "Wear full protective gear including rubber gloves, face mask, and eye goggles during mixing and foliar application",
+        "Conduct spraying strictly during early morning hours (before 9:00 AM) or late evening (after 4:30 PM); avoid application during high winds, extreme sunlight, or impending rainfall",
+        "Observe the prescribed Pre-Harvest Interval (PHI) before harvesting green chillies; safely dispose of empty containers by triple-rinsing and burying away from water sources"
+      ],
+      "recommendedProductIds": [
+        "prod-trichoderma",
+        "prod-neem-oil",
+        "prod-sprayer"
+      ],
+      "isExpertReviewed": true,
+      "expertNotes": "Fungal pathogen Colletotrichum capsici thrives under warm, humid weather conditions (temperatures between 26°C-32°C and relative humidity above 80%) accompanied by intermittent rains or overhead irrigation. Inoculum overwinters on infected plant debris and seed-borne mycelium, splashing onto developing flowers and immature green fruits during monsoon or heavy dew periods.",
+      "cropIdentified": true,
+      "followUpQuestions": [
+        "Have you observed similar circular sunken lesions on mature red chillies during previous harvests?",
+        "What is the current irrigation method being used (drip irrigation or flood/furrow irrigation)?"
+      ],
+      "createdAt": "2026-09-28T10:44:42.443Z"
+    },
+    {
+      "id": "diag-e14368fc",
+      "userId": "usr-farmer-1",
+      "cropName": "Tomato",
+      "imageUrl": "/uploads/f0dfbc5b-433f-49c7-82e8-4f69611fe1de.jpg",
+      "photoMetadata": {
+        "uploadedAt": "2026-09-28T10:44:45.804Z",
+        "uploadDateFormatted": "Mon, 28 Sept, 2026",
+        "uploadTimeFormatted": "04:14:45 pm",
+        "uploadedAtFormatted": "Mon, 28 Sept, 2026 at 04:14:45 pm",
+        "captureDateFormatted": "Mon, 28 Sept, 2026 at 04:14:45 pm",
+        "fileName": "images.jpg",
+        "fileSizeBytes": 32695,
+        "fileSizeFormatted": "0.03 MB",
+        "dimensions": "1920 × 1440 px",
+        "megapixels": "2.8 MP",
+        "mimeType": "image/jpeg",
+        "aspectRatio": "4:3 (Field Camera)",
+        "latitude": 14.1165,
+        "longitude": 78.1634,
+        "locationName": "Kadiri, Sri Sathya Sai District, Andhra Pradesh",
+        "deviceSource": "Field Camera",
+        "verified": true
+      },
+      "suspectedIssue": "Healthy Tomato Crop / Optimal Fruiting Stage (Solanum lycopersicum)",
+      "confidenceScore": 98.5,
+      "severity": "MILD",
+      "symptomsEvidence": [
+        "Vibrant red uniform fruit coloring indicating proper maturity and absence of blotchy ripening or calcium deficiency (blossom end rot).",
+        "Deep green, lush leaf lamina with clear venation and complete lack of necrotic spots, chlorosis, or fungal mycelial growth.",
+        "Strong, clean peduncles and stems showing zero vascular browning or piercing-sucking insect damage."
+      ],
+      "culturalControl": [
+        "Maintain proper plant spacing (45-60 cm between plants) to ensure good air circulation and prevent humidity buildup in the canopy.",
+        "Practice timely staking and stringing to keep developing fruit trusses off the soil surface and reduce contact with soil-borne pathogens."
+      ],
+      "biologicalControl": [
+        "Multiplex Bio-Tech Trichoderma Viride 1% WP @ 2.5 kg mixed with 100 kg well-decomposed FYM applied to soil per acre to prevent root-zone fungal pathogens.",
+        "GreenAgri Pure Cold-Pressed Neem Oil 10,000 PPM @ 3-4 ml per litre of water (600-800 ml in 200L water per acre) as a preventive fortnightly spray against sucking pests like whiteflies."
+      ],
+      "chemicalControlSafe": [
+        "IFFCO 19-19-19 (NPK Water Soluble Fertilizer) @ 5g per litre of water (1 kg per 200L water per acre) for balanced vegetative and reproductive growth.",
+        "Dhanuka M-45 [Mancozeb 75% WP] @ 2g to 2.5g per litre of water (400-500g in 200L water per acre) as a preventive broad-spectrum fungicide spray if humid weather persists. Pre-Harvest Interval (PHI): 7 days."
+      ],
+      "safetyWarnings": [
+        "Always wear protective nitrile gloves, face mask, and eye goggles while handling and applying any agricultural sprays.",
+        "Perform spray applications strictly during early morning (before 9:00 AM) or late evening (after 4:30 PM) to protect pollinating honeybees and prevent phytotoxicity.",
+        "Observe the prescribed Pre-Harvest Interval (PHI) before harvesting fruits after any chemical application, and safely dispose of empty containers away from water bodies."
+      ],
+      "recommendedProductIds": [
+        "prod-trichoderma",
+        "prod-neem-oil",
+        "prod-sprayer"
+      ],
+      "isExpertReviewed": true,
+      "expertNotes": "The photograph displays a healthy, vibrant tomato truss with glossy, turgid red fruits and clean green foliage showing no signs of fungal infection, bacterial spot, or nutrient deficiency. Micro-climatic conditions are optimal.",
+      "cropIdentified": true,
+      "followUpQuestions": [
+        "Are you currently observing any whitefly or fruit borer activity in your tomato field?",
+        "What is your current irrigation and fertilizer schedule for this crop stage?"
+      ],
+      "createdAt": "2026-09-28T10:44:51.093Z"
+    },
+    {
+      "id": "diag-e14368fc",
+      "userId": "usr-farmer-1",
+      "cropName": "Tomato",
+      "imageUrl": "/uploads/f0dfbc5b-433f-49c7-82e8-4f69611fe1de.jpg",
+      "photoMetadata": {
+        "uploadedAt": "2026-09-28T10:44:45.804Z",
+        "uploadDateFormatted": "Mon, 28 Sept, 2026",
+        "uploadTimeFormatted": "04:14:45 pm",
+        "uploadedAtFormatted": "Mon, 28 Sept, 2026 at 04:14:45 pm",
+        "captureDateFormatted": "Mon, 28 Sept, 2026 at 04:14:45 pm",
+        "fileName": "images.jpg",
+        "fileSizeBytes": 32695,
+        "fileSizeFormatted": "0.03 MB",
+        "dimensions": "1920 × 1440 px",
+        "megapixels": "2.8 MP",
+        "mimeType": "image/jpeg",
+        "aspectRatio": "4:3 (Field Camera)",
+        "latitude": 14.1165,
+        "longitude": 78.1634,
+        "locationName": "Kadiri, Sri Sathya Sai District, Andhra Pradesh",
+        "deviceSource": "Field Camera",
+        "verified": true
+      },
+      "suspectedIssue": "Healthy Tomato Crop / Optimal Fruiting Stage (Solanum lycopersicum)",
+      "confidenceScore": 98.5,
+      "severity": "MILD",
+      "symptomsEvidence": [
+        "Vibrant red uniform fruit coloring indicating proper maturity and absence of blotchy ripening or calcium deficiency (blossom end rot).",
+        "Deep green, lush leaf lamina with clear venation and complete lack of necrotic spots, chlorosis, or fungal mycelial growth.",
+        "Strong, clean peduncles and stems showing zero vascular browning or piercing-sucking insect damage."
+      ],
+      "culturalControl": [
+        "Maintain proper plant spacing (45-60 cm between plants) to ensure good air circulation and prevent humidity buildup in the canopy.",
+        "Practice timely staking and stringing to keep developing fruit trusses off the soil surface and reduce contact with soil-borne pathogens."
+      ],
+      "biologicalControl": [
+        "Multiplex Bio-Tech Trichoderma Viride 1% WP @ 2.5 kg mixed with 100 kg well-decomposed FYM applied to soil per acre to prevent root-zone fungal pathogens.",
+        "GreenAgri Pure Cold-Pressed Neem Oil 10,000 PPM @ 3-4 ml per litre of water (600-800 ml in 200L water per acre) as a preventive fortnightly spray against sucking pests like whiteflies."
+      ],
+      "chemicalControlSafe": [
+        "IFFCO 19-19-19 (NPK Water Soluble Fertilizer) @ 5g per litre of water (1 kg per 200L water per acre) for balanced vegetative and reproductive growth.",
+        "Dhanuka M-45 [Mancozeb 75% WP] @ 2g to 2.5g per litre of water (400-500g in 200L water per acre) as a preventive broad-spectrum fungicide spray if humid weather persists. Pre-Harvest Interval (PHI): 7 days."
+      ],
+      "safetyWarnings": [
+        "Always wear protective nitrile gloves, face mask, and eye goggles while handling and applying any agricultural sprays.",
+        "Perform spray applications strictly during early morning (before 9:00 AM) or late evening (after 4:30 PM) to protect pollinating honeybees and prevent phytotoxicity.",
+        "Observe the prescribed Pre-Harvest Interval (PHI) before harvesting fruits after any chemical application, and safely dispose of empty containers away from water bodies."
+      ],
+      "recommendedProductIds": [
+        "prod-trichoderma",
+        "prod-neem-oil",
+        "prod-sprayer"
+      ],
+      "isExpertReviewed": true,
+      "expertNotes": "The photograph displays a healthy, vibrant tomato truss with glossy, turgid red fruits and clean green foliage showing no signs of fungal infection, bacterial spot, or nutrient deficiency. Micro-climatic conditions are optimal.",
+      "cropIdentified": true,
+      "followUpQuestions": [
+        "Are you currently observing any whitefly or fruit borer activity in your tomato field?",
+        "What is your current irrigation and fertilizer schedule for this crop stage?"
+      ],
+      "createdAt": "2026-09-28T10:44:51.093Z"
     }
   ],
   "product_categories": [
@@ -1177,7 +1585,7 @@
       "title": "Weather Alert: Light to Moderate Rain Expected",
       "body": "Regional forecast predicts 15-20 mm rainfall over Kadiri region in the next 36 hours. Delay irrigation and wait for clear skies before foliar spraying.",
       "category": "WEATHER_ALERT",
-      "isRead": false,
+      "isRead": true,
       "createdAt": "2026-09-28T10:16:52.249Z"
     },
     {
@@ -1187,7 +1595,7 @@
       "body": "Sri Lakshmi Agri Traders confirmed your 25 Quintals Groundnut offer at ₹7,450/Qtl (Total: ₹1,86,250). Farm gate pickup scheduled for Oct 26.",
       "category": "PRODUCE_REQUEST",
       "linkUrl": "/produce",
-      "isRead": false,
+      "isRead": true,
       "createdAt": "2026-09-28T09:46:52.249Z"
     },
     {
@@ -1212,44 +1620,6 @@
     }
   ],
   "market_prices": [
-    {
-      "id": "price-1",
-      "state": "Andhra Pradesh",
-      "district": "Sri Sathya Sai",
-      "market": "Kadiri APMC Mandi",
-      "commodity": "Groundnut (Pod)",
-      "commodityType": "OILSEED",
-      "variety": "Kadiri-6 Bold",
-      "unit": "QUINTAL",
-      "minPrice": 7100,
-      "maxPrice": 7650,
-      "modalPrice": 7450,
-      "priceDate": "2026-09-28",
-      "trend": "UP",
-      "changeAmount": 120,
-      "reportedBy": "APMC Market Secretary",
-      "reportedByName": "Kadiri APMC Yard",
-      "createdAt": "2026-09-28T10:16:52.249Z"
-    },
-    {
-      "id": "price-2",
-      "state": "Karnataka",
-      "district": "Bengaluru Urban",
-      "market": "Yeshwanthpur APMC Mandi",
-      "commodity": "Tomato",
-      "commodityType": "VEGETABLE",
-      "variety": "Hybrid Red (Arka)",
-      "unit": "CRATE",
-      "minPrice": 420,
-      "maxPrice": 530,
-      "modalPrice": 480,
-      "priceDate": "2026-09-28",
-      "trend": "STABLE",
-      "changeAmount": 0,
-      "reportedBy": "Mandi Trade Board",
-      "reportedByName": "Bangalore Mandi Desk",
-      "createdAt": "2026-09-28T10:16:52.249Z"
-    },
     {
       "id": "price-3",
       "state": "Andhra Pradesh",
@@ -1289,6 +1659,25 @@
       "createdAt": "2026-09-28T10:16:52.249Z"
     },
     {
+      "id": "price-1",
+      "state": "Andhra Pradesh",
+      "district": "Sri Sathya Sai",
+      "market": "Kadiri APMC Mandi",
+      "commodity": "Groundnut (Pod)",
+      "commodityType": "OILSEED",
+      "variety": "Kadiri-6 Bold",
+      "unit": "QUINTAL",
+      "minPrice": 7100,
+      "maxPrice": 7650,
+      "modalPrice": 7450,
+      "priceDate": "2026-09-28",
+      "trend": "UP",
+      "changeAmount": 120,
+      "reportedBy": "APMC Market Secretary",
+      "reportedByName": "Kadiri APMC Yard",
+      "createdAt": "2026-09-28T10:16:52.249Z"
+    },
+    {
       "id": "price-5",
       "state": "Andhra Pradesh",
       "district": "Sri Sathya Sai",
@@ -1305,6 +1694,25 @@
       "changeAmount": 0,
       "reportedBy": "APMC Market Secretary",
       "reportedByName": "Kadiri APMC Yard",
+      "createdAt": "2026-09-28T10:16:52.249Z"
+    },
+    {
+      "id": "price-2",
+      "state": "Karnataka",
+      "district": "Bengaluru Urban",
+      "market": "Yeshwanthpur APMC Mandi",
+      "commodity": "Tomato",
+      "commodityType": "VEGETABLE",
+      "variety": "Hybrid Red (Arka)",
+      "unit": "CRATE",
+      "minPrice": 420,
+      "maxPrice": 530,
+      "modalPrice": 480,
+      "priceDate": "2026-09-28",
+      "trend": "STABLE",
+      "changeAmount": 0,
+      "reportedBy": "Mandi Trade Board",
+      "reportedByName": "Bangalore Mandi Desk",
       "createdAt": "2026-09-28T10:16:52.249Z"
     }
   ]

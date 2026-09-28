@@ -351,11 +351,88 @@ BEGIN
     END IF;
 END $$;
 
--- 19. COMPATIBILITY VIEWS (profiles, marketplace_products, disease_scans, soil_health_records)
-CREATE OR REPLACE VIEW profiles AS SELECT * FROM users;
-CREATE OR REPLACE VIEW marketplace_products AS SELECT * FROM products;
-CREATE OR REPLACE VIEW disease_scans AS SELECT * FROM ai_diagnoses;
-CREATE OR REPLACE VIEW soil_health_records AS SELECT * FROM soil_tests;
+-- 19. PROFILES TABLE & COLUMN MIGRATIONS
+CREATE TABLE IF NOT EXISTS profiles (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL DEFAULT 'Farmer',
+    email TEXT,
+    password TEXT,
+    password_hash TEXT,
+    phone TEXT,
+    avatar TEXT,
+    avatar_url TEXT,
+    role TEXT DEFAULT 'FARMER',
+    village TEXT,
+    district TEXT,
+    state TEXT,
+    pincode TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Ensure all columns exist on profiles
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS email TEXT;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS password TEXT;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS password_hash TEXT;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS phone TEXT;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS avatar TEXT;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS avatar_url TEXT;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS name TEXT;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS role TEXT DEFAULT 'FARMER';
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS village TEXT;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS district TEXT;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS state TEXT;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS pincode TEXT;
+
+-- 20. DISEASE SCANS TABLE (Exact format requested)
+CREATE TABLE IF NOT EXISTS disease_scans (
+    id TEXT PRIMARY KEY,
+    farmer_id TEXT,
+    user_id TEXT,
+    crop_name TEXT,
+    image_url TEXT NOT NULL,
+    detected_disease TEXT,
+    suspected_issue TEXT,
+    confidence DOUBLE PRECISION,
+    confidence_score DOUBLE PRECISION,
+    remedies TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE disease_scans ADD COLUMN IF NOT EXISTS farmer_id TEXT;
+ALTER TABLE disease_scans ADD COLUMN IF NOT EXISTS detected_disease TEXT;
+ALTER TABLE disease_scans ADD COLUMN IF NOT EXISTS confidence DOUBLE PRECISION;
+ALTER TABLE disease_scans ADD COLUMN IF NOT EXISTS remedies TEXT;
+
+-- 21. MARKETPLACE PRODUCTS TABLE
+CREATE TABLE IF NOT EXISTS marketplace_products (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    brand TEXT NOT NULL,
+    category TEXT NOT NULL,
+    price DOUBLE PRECISION NOT NULL,
+    original_price DOUBLE PRECISION,
+    pack_size TEXT,
+    in_stock BOOLEAN DEFAULT true,
+    stock_quantity INTEGER DEFAULT 50,
+    images TEXT[] DEFAULT '{}',
+    description TEXT,
+    agricultural_use TEXT,
+    dosage_guidance TEXT,
+    safety_warnings TEXT[] DEFAULT '{}',
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Disable RLS or allow full API access for all tables
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public Profiles API" ON profiles FOR ALL USING (true);
+
+ALTER TABLE disease_scans ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public Disease Scans API" ON disease_scans FOR ALL USING (true);
+
+ALTER TABLE marketplace_products ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public Marketplace Products API" ON marketplace_products FOR ALL USING (true);
+
 
 
 

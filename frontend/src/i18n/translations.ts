@@ -41,7 +41,7 @@ export const translations: Record<Language, Record<string, string>> = {
     buyerPortal: 'Mandi Desk',
     
     // Dashboard
-    greeting: 'Good morning, Ramesh Patel 👋',
+    greeting: 'Good morning 👋',
     subGreeting: 'How can AgroDex assist your fields today?',
     askAiBtn: 'Ask AI Farmer Assistant',
     scanCropBtn: 'Scan My Crop',

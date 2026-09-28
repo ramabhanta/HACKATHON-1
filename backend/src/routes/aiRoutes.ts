@@ -96,28 +96,26 @@ aiRouter.post('/crop-disease', optionalAuthenticate, upload.single('image'), asy
       parsedMetadata
     );
 
-    // Asynchronously sync image and diagnosis record to Supabase Storage and DB in background
-    (async () => {
-      try {
-        if (req.file) {
-          const filePath = req.file.path || path.join(config.uploadDir, req.file.filename);
-          if (fs.existsSync(filePath)) {
-            const fileBuf = fs.readFileSync(filePath);
-            const supabaseImageUrl = await uploadScanImageToStorage(
-              fileBuf,
-              req.file.originalname || req.file.filename,
-              req.file.mimetype || 'image/jpeg'
-            );
-            if (supabaseImageUrl && supabaseImageUrl.startsWith('http')) {
-              diagnosis.imageUrl = supabaseImageUrl;
-            }
+    // Immediately save diagnosis to Supabase 'disease_scans' table
+    try {
+      if (req.file) {
+        const filePath = req.file.path || path.join(config.uploadDir, req.file.filename);
+        if (fs.existsSync(filePath)) {
+          const fileBuf = fs.readFileSync(filePath);
+          const supabaseImageUrl = await uploadScanImageToStorage(
+            fileBuf,
+            req.file.originalname || req.file.filename,
+            req.file.mimetype || 'image/jpeg'
+          );
+          if (supabaseImageUrl && supabaseImageUrl.startsWith('http')) {
+            diagnosis.imageUrl = supabaseImageUrl;
           }
         }
-        await SupabaseDataService.saveDiagnosis(diagnosis);
-      } catch (uploadErr) {
-        console.warn('[Background Supabase Scan Sync Note]:', uploadErr);
       }
-    })();
+      await SupabaseDataService.saveDiagnosis(diagnosis);
+    } catch (saveErr: any) {
+      console.error('[SUPABASE ERROR] Error saving disease scan to Supabase:', saveErr?.message || saveErr);
+    }
 
     // Fetch matched verified inputs from instant in-memory cache (0ms)
     const allProducts = db.getTable('products');

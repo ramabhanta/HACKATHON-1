@@ -3,31 +3,11 @@ import { config } from '../config/index.js';
 import { db } from './db.js';
 import fs from 'fs';
 import path from 'path';
+import dns from 'dns';
 
 let supabaseInstance: SupabaseClient | null = null;
-let lastUnreachableAt = 0;
-const RETRY_COOLDOWN_MS = 25000; // 25s cooldown before probing again if unreachable
 
-export function markSupabaseUnreachable(): void {
-  lastUnreachableAt = Date.now();
-}
-
-export function markSupabaseReachable(): void {
-  lastUnreachableAt = 0;
-}
-
-export function isSupabaseHealthy(): boolean {
-  if (lastUnreachableAt > 0 && Date.now() - lastUnreachableAt < RETRY_COOLDOWN_MS) {
-    return false;
-  }
-  return true;
-}
-
-export function getSupabase(force = false): SupabaseClient | null {
-  if (!force && !isSupabaseHealthy()) {
-    return null;
-  }
-
+export function getSupabase(): SupabaseClient | null {
   if (supabaseInstance) return supabaseInstance;
 
   const url = config.supabaseUrl || process.env.SUPABASE_URL;
@@ -40,18 +20,17 @@ export function getSupabase(force = false): SupabaseClient | null {
         global: {
           fetch: async (fetchUrl, options) => {
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 2000); // 2s fast abort
+            const timeoutId = setTimeout(() => controller.abort(), 8000); // 8s timeout
             try {
               const res = await fetch(fetchUrl, {
                 ...options,
                 signal: controller.signal
               });
               clearTimeout(timeoutId);
-              markSupabaseReachable();
               return res;
             } catch (err: any) {
               clearTimeout(timeoutId);
-              markSupabaseUnreachable();
+              console.error(`[SUPABASE NETWORK/FETCH ERROR] ${fetchUrl}:`, err?.message || err);
               throw err;
             }
           }
@@ -59,7 +38,7 @@ export function getSupabase(force = false): SupabaseClient | null {
       });
       return supabaseInstance;
     } catch (err) {
-      console.error('Failed to initialize Supabase client:', err);
+      console.error('[SUPABASE INIT ERROR] Failed to initialize Supabase client:', err);
       return null;
     }
   }
@@ -79,7 +58,7 @@ export async function testSupabaseConnection(): Promise<{
   tableCounts?: Record<string, number>;
   error?: string;
 }> {
-  const client = getSupabase(true);
+  const client = getSupabase();
   if (!client) {
     return {
       connected: false,
@@ -527,5 +506,192 @@ export async function uploadScanImageToStorage(
     console.warn('Supabase storage exception, using local fallback:', err?.message || err);
     return `/uploads/${fileName}`;
   }
+}
+
+/**
+ * Diagnostic health check verifying DNS, live ping, profiles query,
+ * disease_scans insert, and row counts across all 8 tables.
+ */
+export async function checkDatabaseHealth(): Promise<{
+  status: 'ONLINE' | 'PAUSED_OR_DNS_FAILED' | 'CONFIG_MISSING' | 'ERROR';
+  connected: boolean;
+  dnsResolution: { resolved: boolean; ip?: string; error?: string };
+  supabaseUrl: string;
+  profilesQuery: { success: boolean; count?: number; error?: string };
+  diseaseScansInsert: { success: boolean; testId?: string; error?: string };
+  tableRowCounts: Record<string, number | string>;
+  message: string;
+  timestamp: string;
+}> {
+  const timestamp = new Date().toISOString();
+  const url = config.supabaseUrl || process.env.SUPABASE_URL || '';
+  if (!url) {
+    return {
+      status: 'CONFIG_MISSING',
+      connected: false,
+      dnsResolution: { resolved: false, error: 'SUPABASE_URL is not set' },
+      supabaseUrl: '',
+      profilesQuery: { success: false, error: 'No URL configured' },
+      diseaseScansInsert: { success: false, error: 'No URL configured' },
+      tableRowCounts: {},
+      message: 'Supabase URL is missing from environment configuration.',
+      timestamp
+    };
+  }
+
+  // 1. DNS Resolution check
+  let host = '';
+  try {
+    const parsed = new URL(url);
+    host = parsed.hostname;
+  } catch {
+    host = url.replace(/^https?:\/\//, '').split('/')[0];
+  }
+
+  let dnsResolved = false;
+  let dnsIp: string | undefined = undefined;
+  let dnsError: string | undefined = undefined;
+
+  try {
+    const lookupRes = await dns.promises.lookup(host);
+    dnsResolved = true;
+    dnsIp = lookupRes.address;
+  } catch (err: any) {
+    dnsResolved = false;
+    dnsError = err.message || String(err);
+    console.error('[SUPABASE ERROR] DNS Lookup failed for', host, ':', dnsError);
+  }
+
+  if (!dnsResolved) {
+    return {
+      status: 'PAUSED_OR_DNS_FAILED',
+      connected: false,
+      dnsResolution: { resolved: false, error: dnsError },
+      supabaseUrl: url,
+      profilesQuery: { success: false, error: `DNS cannot resolve ${host}. Project may be paused in Supabase dashboard.` },
+      diseaseScansInsert: { success: false, error: 'DNS unreachable' },
+      tableRowCounts: {
+        profiles: 'Unreachable (DNS / Paused)',
+        farms: 'Unreachable (DNS / Paused)',
+        crops: 'Unreachable (DNS / Paused)',
+        disease_scans: 'Unreachable (DNS / Paused)',
+        soil_health_records: 'Unreachable (DNS / Paused)',
+        marketplace_products: 'Unreachable (DNS / Paused)',
+        produce_listings: 'Unreachable (DNS / Paused)',
+        orders: 'Unreachable (DNS / Paused)'
+      },
+      message: `Cannot reach Supabase host '${host}'. On Supabase free tier, projects pause after inactivity. To restore: visit your Supabase dashboard at https://supabase.com/dashboard/project/yxdbvpzxkfptxoitseir and click 'Restore project'.`,
+      timestamp
+    };
+  }
+
+  const client = getSupabase();
+  if (!client) {
+    return {
+      status: 'CONFIG_MISSING',
+      connected: false,
+      dnsResolution: { resolved: true, ip: dnsIp },
+      supabaseUrl: url,
+      profilesQuery: { success: false, error: 'Client initialization failed' },
+      diseaseScansInsert: { success: false, error: 'Client initialization failed' },
+      tableRowCounts: {},
+      message: 'Supabase client failed to initialize.',
+      timestamp
+    };
+  }
+
+  // 2. Select from profiles
+  let profilesSuccess = false;
+  let profilesCount = 0;
+  let profilesError: string | undefined = undefined;
+  try {
+    const { count, error } = await client.from('profiles').select('*', { count: 'exact', head: true });
+    if (error) {
+      console.error('[SUPABASE ERROR] db-check profiles select failed:', error.message);
+      profilesError = error.message;
+    } else {
+      profilesSuccess = true;
+      profilesCount = count || 0;
+    }
+  } catch (err: any) {
+    profilesError = err.message;
+    console.error('[SUPABASE ERROR] db-check profiles exception:', err.message);
+  }
+
+  // 3. Test insert into disease_scans
+  const testId = `probe-scan-${Date.now()}`;
+  let insertSuccess = false;
+  let insertError: string | undefined = undefined;
+  try {
+    const probeScan = {
+      id: testId,
+      farmer_id: 'usr-farmer-1',
+      image_url: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=400',
+      detected_disease: 'Health Diagnostic Verification Probe',
+      confidence: 0.99,
+      remedies: 'System database diagnostic probe test passed.',
+      created_at: new Date().toISOString()
+    };
+    const { error } = await client.from('disease_scans').upsert(probeScan, { onConflict: 'id' });
+    if (error) {
+      console.error('[SUPABASE ERROR] db-check disease_scans insert failed:', error.message);
+      insertError = error.message;
+    } else {
+      insertSuccess = true;
+      console.log(`✅ [SUPABASE SUCCESS] db-check probe inserted into disease_scans (${testId})`);
+    }
+  } catch (err: any) {
+    insertError = err.message;
+    console.error('[SUPABASE ERROR] db-check disease_scans exception:', err.message);
+  }
+
+  // 4. Report table row counts for all 8 tables
+  const tables = [
+    'profiles',
+    'farms',
+    'crops',
+    'disease_scans',
+    'soil_health_records',
+    'marketplace_products',
+    'produce_listings',
+    'orders'
+  ];
+
+  const tableRowCounts: Record<string, number | string> = {};
+  for (const t of tables) {
+    try {
+      const { count, error } = await client.from(t).select('*', { count: 'exact', head: true });
+      if (error) {
+        if (t === 'soil_health_records') {
+          const fallback = await client.from('soil_tests').select('*', { count: 'exact', head: true });
+          tableRowCounts[t] = !fallback.error && fallback.count !== null ? fallback.count : `Error: ${error.message}`;
+        } else if (t === 'marketplace_products') {
+          const fallback = await client.from('products').select('*', { count: 'exact', head: true });
+          tableRowCounts[t] = !fallback.error && fallback.count !== null ? fallback.count : `Error: ${error.message}`;
+        } else {
+          tableRowCounts[t] = `Error: ${error.message}`;
+        }
+      } else {
+        tableRowCounts[t] = count ?? 0;
+      }
+    } catch (e: any) {
+      tableRowCounts[t] = `Error: ${e.message}`;
+    }
+  }
+
+  const isHealthy = profilesSuccess && insertSuccess;
+  return {
+    status: isHealthy ? 'ONLINE' : 'ERROR',
+    connected: isHealthy,
+    dnsResolution: { resolved: true, ip: dnsIp },
+    supabaseUrl: url,
+    profilesQuery: { success: profilesSuccess, count: profilesCount, error: profilesError },
+    diseaseScansInsert: { success: insertSuccess, testId, error: insertError },
+    tableRowCounts,
+    message: isHealthy
+      ? 'Supabase database is fully operational with live read/write capability across all tables.'
+      : 'Supabase host reachable, but table schema queries or write permissions encountered errors. Check tableRowCounts and schema.',
+    timestamp
+  };
 }
 

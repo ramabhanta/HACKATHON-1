@@ -18,6 +18,7 @@ import { priceRouter } from './routes/priceRoutes.js';
 import { supabaseRouter } from './routes/supabaseRoutes.js';
 import { seedDatabase } from './database/seed.js';
 import { db } from './database/db.js';
+import { checkDatabaseHealth } from './database/supabaseClient.js';
 
 const app = express();
 
@@ -46,6 +47,22 @@ app.get('/api/health', (_req, res) => {
     version: '1.0.0',
     timestamp: new Date().toISOString()
   });
+});
+
+// Supabase live database diagnostics endpoint
+app.get('/api/health/db-check', async (_req, res) => {
+  try {
+    const healthResult = await checkDatabaseHealth();
+    return res.status(healthResult.connected ? 200 : 503).json(healthResult);
+  } catch (err: any) {
+    console.error('[SUPABASE ERROR] /api/health/db-check uncaught exception:', err);
+    return res.status(500).json({
+      status: 'ERROR',
+      connected: false,
+      error: err.message || String(err),
+      timestamp: new Date().toISOString()
+    });
+  }
 });
 
 // Mount modular REST routes

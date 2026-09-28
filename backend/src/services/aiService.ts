@@ -1,3 +1,4 @@
+import { GoogleGenAI } from '@google/genai';
 import { db } from '../database/db.js';
 import { AiDiagnosis, Product, SoilTestRecord } from '../models/types.js';
 import { config } from '../config/index.js';
@@ -11,7 +12,6 @@ export interface ChatRequestPayload {
   farmId?: string;
   cropId?: string;
   imageUrl?: string;
-  customApiKey?: string;
 }
 
 export interface ChatResponsePayload {
@@ -33,32 +33,112 @@ const LANGUAGE_NAMES: Record<string, string> = {
   mr: 'Marathi (मराठी)',
   bn: 'Bengali (বাংলা)',
   gu: 'Gujarati (ગુજરાતી)',
-  pa: 'Punjabi (ਪੰਜਾਬੀ)',
+  pa: 'Punjabi (ਪੰਜਾਬీ)',
   or: 'Odia (ଓଡ଼ିଆ)'
 };
 
+const INDIAN_AGRONOMY_SYSTEM_INSTRUCTION = `You are AgriDex, an expert Senior Agricultural Scientist, Plant Pathologist, and Mandi Trade Consultant for the Indian agricultural ecosystem, aligned with ICAR (Indian Council of Agricultural Research) standards and Krishi Vigyan Kendras (KVKs).
+
+Your core mission is to provide genuine, factually accurate, practical, and localized agronomic advice to Indian farmers, FPOs, and rural agri-dealers without generic or hallucinated guidance.
+
+STRICT OPERATIONAL GUIDELINES:
+1. LOCALIZED CONTEXT & LANGUAGE:
+   - Always respond in the requested language (e.g., Telugu, Hindi, Tamil, Kannada, Marathi, English, etc.) with fluent, respectful, natural tone suitable for farmers.
+   - Tailor all advice to Indian farming conditions, agro-climatic zones, and soil types (Red sandy loam, Black cotton, Alluvial, Laterite, Clay).
+   - Use Indian units of measurement: acres, guntas, bighas, quintals (100 kg), kg, grams, litres, ml, and ₹ (INR).
+
+2. CROP PATHOLOGY & NUTRIENT DEFICIENCIES:
+   - Identify exact scientific pathogen names (e.g., Tikka disease / Cercospora arachidicola in Groundnut; Early Blight / Alternaria solani in Tomato; Rice Blast / Magnaporthe oryzae in Paddy; Pink Bollworm / Pectinophora gossypiella in Cotton).
+   - Distinguish carefully between fungal, bacterial, viral, sucking pest, and physiological nutrient chlorosis (e.g., Nitrogen vs Iron vs Zinc deficiency).
+   - Never provide vague or hallucinated chemical recommendations.
+
+3. INTEGRATED PEST MANAGEMENT (IPM) & DOSAGES:
+   - Provide a 3-tier practical solution:
+     a) Cultural & Mechanical Practices (spacing, field sanitation, mulching, pheromone/sticky traps).
+     b) Bio-Control / Organic Solutions with exact dosages (e.g., cold-pressed Neem Oil 10,000 PPM @ 3-4 ml/L water, Trichoderma viride @ 5g/L or 2.5 kg/ha, Pseudomonas fluorescens, Bacillus subtilis, Jeevamrutham).
+     c) CIBRC-Registered Safe Chemical Fungicide/Pesticide Options with precise dilution rates (e.g., Mancozeb 75% WP @ 2g/L water; Chlorothalonil 75% WP @ 2g/L; Imidacloprid 17.8% SL @ 0.5 ml/L; Emamectin Benzoate 5% SG @ 0.4g/L).
+   - Always state Safety Precautions: personal protective equipment (gloves, mask), spray timing (early morning or late evening), pre-harvest interval (PHI), and safety for pollinators/honeybees.
+
+4. REAL MANDI & MARKET INTELLIGENCE:
+   - Provide authentic Mandi market dynamics (e.g., APMC wholesale prices, MSP minimum support prices, seasonal arrival trends, quality grading parameters like moisture percentage and pod filling).
+   - Encourage direct farm-gate and local mandi aggregation to prevent distress selling.
+
+5. FORMATTING & CLARITY:
+   - Use clear markdown bullet points, bold headings, and actionable step-by-step numbers.
+   - Avoid generic disclaimers or repetitive AI boilerplate. Provide confident, scientifically sound, farmer-first guidance.`;
+
 export class AiService {
+  /**
+   * Helper to execute Gemini models with primary 'gemini-1.5-flash' and auto-fallback
+   */
+  private static async executeGemini(
+    contents: any,
+    systemInstruction: string,
+    options: { temperature?: number; maxOutputTokens?: number; responseMimeType?: string } = {}
+  ): Promise<string> {
+    const apiKey = process.env.GEMINI_API_KEY || config.geminiApiKey;
+    if (!apiKey || apiKey.length < 5) {
+      throw new Error('GEMINI_API_KEY not configured in backend environment');
+    }
+
+    const ai = new GoogleGenAI({ apiKey });
+    const modelsToTry = [
+      'gemini-1.5-flash',
+      'gemini-flash-latest',
+      'gemini-flash-lite-latest',
+      'gemini-3.5-flash-lite',
+      'gemini-3.6-flash',
+      'gemini-3.8-flash'
+    ];
+    let lastError: any = null;
+
+    for (const model of modelsToTry) {
+      try {
+        const response = await ai.models.generateContent({
+          model,
+          contents,
+          config: {
+            systemInstruction,
+            temperature: options.temperature ?? 0.25,
+            maxOutputTokens: options.maxOutputTokens ?? 1500,
+            ...(options.responseMimeType ? { responseMimeType: options.responseMimeType } : {})
+          }
+        });
+
+        if (response && response.text) {
+          return response.text.trim();
+        }
+      } catch (err: any) {
+        lastError = err;
+        const msg = err?.message || String(err);
+        console.warn(`[AiService] Model '${model}' returned: ${msg.slice(0, 80)}. Falling back to next model...`);
+        continue;
+      }
+    }
+
+    throw lastError || new Error('All Gemini model candidates failed to return response');
+  }
+
   /**
    * Main conversational AI assistant with Gemini 1.5 Flash + Live Knowledge Engine
    */
   public static async processChat(
     userId: string,
-    payload: ChatRequestPayload,
-    requestApiKey?: string
+    payload: ChatRequestPayload
   ): Promise<ChatResponsePayload> {
     const lang = payload.language || 'en';
     const query = payload.message.trim();
-    const effectiveApiKey = requestApiKey || payload.customApiKey || config.geminiApiKey || process.env.GEMINI_API_KEY;
+    const effectiveApiKey = process.env.GEMINI_API_KEY || config.geminiApiKey;
 
     // Retrieve user and farm context
     const farm = payload.farmId ? db.findById('farms', payload.farmId) : db.findOne('farms', f => f.userId === userId);
     const crop = payload.cropId ? db.findById('crops', payload.cropId) : (farm ? db.findOne('crops', c => c.farmId === farm.id) : undefined);
     const soil = farm ? db.findOne('soil_tests', s => s.farmId === farm.id) : undefined;
 
-    // 1. If real Gemini API key is available, call Google Gemini 1.5 Flash
-    if (effectiveApiKey && effectiveApiKey.length > 10) {
+    // 1. If backend Gemini API key is configured, call Google Gemini directly
+    if (effectiveApiKey && effectiveApiKey.length > 5) {
       try {
-        const geminiResult = await this.callGeminiChat(effectiveApiKey, query, lang, { farm, crop, soil });
+        const geminiResult = await this.callGeminiChat(query, lang, { farm, crop, soil });
         if (geminiResult && geminiResult.reply) {
           const matchedProducts = this.findMatchingProducts(query, geminiResult.reply);
           const suggestedActions = this.generateSmartActions(query, crop?.cropName);
@@ -73,7 +153,7 @@ export class AiService {
           };
         }
       } catch (geminiError: any) {
-        console.error('Gemini API call failed, falling back to Live Knowledge Engine:', geminiError?.message || geminiError);
+        console.error('Backend Gemini API call error, falling back to Live Knowledge Engine:', geminiError?.message || geminiError);
       }
     }
 
@@ -93,71 +173,32 @@ export class AiService {
   }
 
   /**
-   * Call Google Gemini 1.5 Flash API with System Prompt and Agronomic Context
+   * Call Google Gemini with Indian Agronomy & Mandi Expert System Instruction
    */
   private static async callGeminiChat(
-    apiKey: string,
     userQuery: string,
     language: string,
     context: { farm?: any; crop?: any; soil?: any }
   ): Promise<{ reply: string }> {
     const langName = LANGUAGE_NAMES[language] || 'English';
 
-    const systemPrompt = `You are AgriDex, an elite agricultural scientist, plant pathologist, and agronomist supporting Indian farmers and agri-dealers.
-Context:
-- Farmer Location: ${context.farm?.district || 'Sri Sathya Sai / Kadiri'}, ${context.farm?.state || 'Andhra Pradesh'}
+    const contextualInstruction = `${INDIAN_AGRONOMY_SYSTEM_INSTRUCTION}
+
+Farmer & Regional Context:
+- Target Language: **${langName}** (Always reply fluently in this language).
+- Farm Location: ${context.farm?.district || 'Sri Sathya Sai / Kadiri'}, ${context.farm?.state || 'Andhra Pradesh'}
 - Soil Type: ${context.farm?.soilType || 'Red Sandy Loam'}
-- Standing Crops: ${context.crop?.cropName || 'Groundnut & Tomato'} (Acreage: ${context.farm?.totalAcres || 5} acres)
-${context.soil ? `- Soil pH: ${context.soil.ph}, N: ${context.soil.nitrogenKgPerHa} kg/ha, P: ${context.soil.phosphorusKgPerHa} kg/ha, K: ${context.soil.potassiumKgPerHa} kg/ha` : ''}
+- Standing Crops: ${context.crop?.cropName || 'Groundnut & Tomato'} (Acreage: ${context.farm?.totalArea || context.farm?.totalAcres || 5} acres)
+${context.soil ? `- Soil Health Data: pH ${context.soil.ph}, N: ${context.soil.nitrogenKgPerHa} kg/ha, P: ${context.soil.phosphorusKgPerHa} kg/ha, K: ${context.soil.potassiumKgPerHa} kg/ha, Organic Carbon: ${context.soil.organicCarbonPct}%` : ''}`;
 
-CRITICAL INSTRUCTIONS:
-1. Always respond in the requested language: **${langName}**.
-2. Give real, precise, exact agricultural answers.
-3. If recommending fertilizers or pesticides, give exact dosages (e.g., grams/ml per litre of water, or kg per acre).
-4. Include both organic/biological methods (e.g., Neem oil, Trichoderma) and registered chemical options if necessary.
-5. Provide practical, step-by-step guidance tailored to the farmer's crop and regional conditions.
-6. Emphasize safety warnings and personal protective equipment (PPE).
-7. Format with clear markdown bullet points and bold headings.`;
-
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-
-    const requestBody = {
-      contents: [
-        {
-          role: 'user',
-          parts: [{ text: userQuery }]
-        }
-      ],
-      systemInstruction: {
-        parts: [{ text: systemPrompt }]
-      },
-      generationConfig: {
-        temperature: 0.25,
-        maxOutputTokens: 1200
-      }
-    };
-
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(requestBody),
-      signal: AbortSignal.timeout(15000)
+    const text = await this.executeGemini(userQuery, contextualInstruction, {
+      temperature: 0.25,
+      maxOutputTokens: 1500
     });
 
-    if (!response.ok) {
-      const errText = await response.text();
-      throw new Error(`Gemini API error (${response.status}): ${errText}`);
-    }
-
-    const data = (await response.json()) as any;
-    const candidateText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-
-    if (!candidateText) {
-      throw new Error('No candidate content returned by Gemini');
-    }
-
-    return { reply: candidateText.trim() };
+    return { reply: text };
   }
+
 
   /**
    * Fetch Live Real Knowledge from Wikipedia and Agricultural Databases
@@ -254,8 +295,7 @@ CRITICAL INSTRUCTIONS:
     file?: Express.Multer.File,
     cropNameHint?: string,
     farmId?: string,
-    rawPhotoMetadata?: any,
-    requestApiKey?: string
+    rawPhotoMetadata?: any
   ): Promise<AiDiagnosis> {
     const imageUrl = file 
       ? `/uploads/${file.filename}` 
@@ -295,11 +335,11 @@ CRITICAL INSTRUCTIONS:
       verified: true
     };
 
-    const effectiveApiKey = requestApiKey || config.geminiApiKey || process.env.GEMINI_API_KEY;
+    const effectiveApiKey = process.env.GEMINI_API_KEY || config.geminiApiKey;
     const cropHint = cropNameHint || 'Groundnut';
 
-    // 1. If Gemini API key is available, run Real Gemini Vision Multimodal Inspection!
-    if (effectiveApiKey && effectiveApiKey.length > 10) {
+    // 1. If backend Gemini API key is configured, run Real Gemini Vision Multimodal Inspection!
+    if (effectiveApiKey && effectiveApiKey.length > 5) {
       try {
         let imageBase64 = '';
         let mimeType = 'image/jpeg';
@@ -325,7 +365,7 @@ CRITICAL INSTRUCTIONS:
         }
 
         if (imageBase64) {
-          const visionResult = await this.callGeminiVision(effectiveApiKey, imageBase64, mimeType, cropHint);
+          const visionResult = await this.callGeminiVision(imageBase64, mimeType, cropHint);
           if (visionResult) {
             const diagnosis: AiDiagnosis = {
               id: `diag-${uuidv4().substring(0, 8)}`,
@@ -486,20 +526,17 @@ CRITICAL INSTRUCTIONS:
   }
 
   /**
-   * Multimodal Gemini 1.5 Flash Vision Inspection
+   * Multimodal Gemini Vision Inspection
    */
   private static async callGeminiVision(
-    apiKey: string,
     imageBase64: string,
     mimeType: string,
     cropHint: string
   ): Promise<any> {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-
-    const prompt = `You are a world-class plant pathologist and agronomic diagnostician. Analyze this photo of an affected plant leaf or crop tissue.
+    const prompt = `You are a world-class plant pathologist and agronomic diagnostician specializing in Indian crops. Analyze this photo of an affected plant leaf or crop tissue.
 Crop context: ${cropHint}.
 
-Examine the visible visual patterns (lesions, chlorosis, fungal mycelia, necrosis, pest damage, mottling).
+Examine visible visual markers (lesions, concentric rings, chlorosis, fungal pustules, necrosis, bacterial water-soaking, pest damage).
 Return your diagnosis in STRICT JSON format with EXACTLY these keys:
 {
   "cropName": "Identified Crop Name",
@@ -517,12 +554,12 @@ Return your diagnosis in STRICT JSON format with EXACTLY these keys:
     "Cultural measure 3"
   ],
   "biologicalControl": [
-    "Organic/biological remedy 1 with exact dosage",
-    "Organic/biological remedy 2 with exact dosage"
+    "Organic/biological remedy 1 with exact dosage (e.g. Trichoderma viride @ 5g/L water)",
+    "Organic/biological remedy 2 with exact dosage (e.g. Neem Oil 10,000 PPM @ 3-4 ml/L)"
   ],
   "chemicalControlSafe": [
-    "Registered chemical fungicide/pesticide 1 with exact rate per litre",
-    "Registered chemical option 2 with safety interval"
+    "Registered chemical fungicide/pesticide 1 with exact rate per litre of water and spray timing",
+    "Registered chemical option 2 with safety interval (PHI)"
   ],
   "safetyWarnings": [
     "PPE requirement during spray",
@@ -536,49 +573,33 @@ Return your diagnosis in STRICT JSON format with EXACTLY these keys:
   ]
 }
 
-DO NOT output markdown backticks around the JSON. Output only valid JSON.`;
+Ensure all advice adheres strictly to Indian agronomy and ICAR crop protection guidelines. DO NOT output markdown backticks around the JSON. Output only valid JSON.`;
 
-    const requestBody = {
-      contents: [
-        {
-          role: 'user',
-          parts: [
-            {
-              inlineData: {
-                mimeType,
-                data: imageBase64
-              }
-            },
-            {
-              text: prompt
+    const contents = [
+      {
+        role: 'user',
+        parts: [
+          {
+            inlineData: {
+              mimeType,
+              data: imageBase64
             }
-          ]
-        }
-      ],
-      generationConfig: {
-        temperature: 0.1,
-        maxOutputTokens: 1500
+          },
+          {
+            text: prompt
+          }
+        ]
       }
-    };
+    ];
 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(requestBody),
-      signal: AbortSignal.timeout(20000)
+    const rawText = await this.executeGemini(contents, INDIAN_AGRONOMY_SYSTEM_INSTRUCTION, {
+      temperature: 0.1,
+      maxOutputTokens: 1500
     });
 
-    if (!response.ok) {
-      throw new Error(`Gemini Vision HTTP ${response.status}`);
-    }
-
-    const data = (await response.json()) as any;
-    let text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!text) throw new Error('Empty response from Gemini Vision');
-
     // Clean JSON formatting if enclosed in ```json
-    text = text.replace(/```json/g, '').replace(/```/g, '').trim();
-    return JSON.parse(text);
+    const cleaned = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
+    return JSON.parse(cleaned);
   }
 
   /**

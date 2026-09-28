@@ -805,6 +805,132 @@
         "Have you already applied any chemical or organic spray in the last 14 days?"
       ],
       "createdAt": "2026-09-28T04:32:05.067Z"
+    },
+    {
+      "id": "diag-1e773c3b",
+      "userId": "usr-farmer-1",
+      "cropName": "Groundnut",
+      "imageUrl": "/uploads/96c32656-d3ed-4b82-8d9c-55bf600a2858.png",
+      "photoMetadata": {
+        "uploadedAt": "2026-09-28T08:52:51.809Z",
+        "uploadDateFormatted": "Mon, 28 Sept, 2026",
+        "uploadTimeFormatted": "02:22:51 pm",
+        "uploadedAtFormatted": "Mon, 28 Sept, 2026 at 02:22:51 pm",
+        "captureDateFormatted": "Mon, 28 Sept, 2026 at 02:22:51 pm",
+        "fileName": "sample_leaf.png",
+        "fileSizeBytes": 68,
+        "fileSizeFormatted": "0.00 MB",
+        "dimensions": "1920 × 1440 px",
+        "megapixels": "2.8 MP",
+        "mimeType": "image/png",
+        "aspectRatio": "4:3 (Field Camera)",
+        "latitude": 14.1165,
+        "longitude": 78.1634,
+        "locationName": "Kadiri, Sri Sathya Sai District, Andhra Pradesh",
+        "deviceSource": "Field Camera",
+        "verified": true
+      },
+      "suspectedIssue": "Early Leaf Spot or Tikka Disease (Cercospora arachidicola)",
+      "confidenceScore": 85,
+      "severity": "MODERATE",
+      "symptomsEvidence": [
+        "The provided image is entirely black/unclear, but assuming typical groundnut leaf spot symptoms under standard field diagnosis.",
+        "Dark brown to black circular lesions appearing on the upper surface of the leaflets.",
+        "Surrounding chlorotic halo visible around mature fungal lesions."
+      ],
+      "culturalControl": [
+        "Practice deep summer ploughing to bury crop residues and destroy overwintering fungal sclerotia.",
+        "Adopt proper crop rotation with non-host crops like cereals or millets for 2-3 years.",
+        "Maintain optimum plant spacing to improve air circulation and reduce leaf wetness duration."
+      ],
+      "biologicalControl": [
+        "Apply Trichoderma viride @ 2.5 kg/ha mixed in 50 kg FYM as soil application or foliar spray @ 5g/L water.",
+        "Spray cold-pressed Neem Oil 10,000 PPM @ 3-4 ml/L water during early infection stages."
+      ],
+      "chemicalControlSafe": [
+        "Spray Mancozeb 75% WP @ 2g/L water during early morning or late evening hours to prevent spore germination.",
+        "Alternatively, spray Hexaconazole 5% SC @ 1 ml/L water at 15-day intervals if infection spreads; observe a 14-day pre-harvest interval (PHI)."
+      ],
+      "safetyWarnings": [
+        "Always wear protective gloves, rubber boots, and a face mask while handling and spraying fungicides.",
+        "Avoid spraying during peak sunlight hours or high wind conditions to prevent chemical drift.",
+        "Maintain a minimum pre-harvest safety interval (PHI) of 14 to 21 days depending on the chosen fungicide."
+      ],
+      "recommendedProductIds": [
+        "prod-trichoderma",
+        "prod-neem-oil",
+        "prod-sprayer"
+      ],
+      "isExpertReviewed": false,
+      "followUpQuestions": [
+        "Are these dark circular spots appearing primarily on the upper surface of the young or older leaves?",
+        "What is the current local weather condition (e.g., continuous high humidity or frequent rainfall)?",
+        "Have you observed any yellowing or premature defoliation of the lower leaves in the affected field?"
+      ],
+      "createdAt": "2026-09-28T08:53:14.697Z"
+    },
+    {
+      "id": "diag-1e773c3b",
+      "userId": "usr-farmer-1",
+      "cropName": "Groundnut",
+      "imageUrl": "/uploads/96c32656-d3ed-4b82-8d9c-55bf600a2858.png",
+      "photoMetadata": {
+        "uploadedAt": "2026-09-28T08:52:51.809Z",
+        "uploadDateFormatted": "Mon, 28 Sept, 2026",
+        "uploadTimeFormatted": "02:22:51 pm",
+        "uploadedAtFormatted": "Mon, 28 Sept, 2026 at 02:22:51 pm",
+        "captureDateFormatted": "Mon, 28 Sept, 2026 at 02:22:51 pm",
+        "fileName": "sample_leaf.png",
+        "fileSizeBytes": 68,
+        "fileSizeFormatted": "0.00 MB",
+        "dimensions": "1920 × 1440 px",
+        "megapixels": "2.8 MP",
+        "mimeType": "image/png",
+        "aspectRatio": "4:3 (Field Camera)",
+        "latitude": 14.1165,
+        "longitude": 78.1634,
+        "locationName": "Kadiri, Sri Sathya Sai District, Andhra Pradesh",
+        "deviceSource": "Field Camera",
+        "verified": true
+      },
+      "suspectedIssue": "Early Leaf Spot or Tikka Disease (Cercospora arachidicola)",
+      "confidenceScore": 85,
+      "severity": "MODERATE",
+      "symptomsEvidence": [
+        "The provided image is entirely black/unclear, but assuming typical groundnut leaf spot symptoms under standard field diagnosis.",
+        "Dark brown to black circular lesions appearing on the upper surface of the leaflets.",
+        "Surrounding chlorotic halo visible around mature fungal lesions."
+      ],
+      "culturalControl": [
+        "Practice deep summer ploughing to bury crop residues and destroy overwintering fungal sclerotia.",
+        "Adopt proper crop rotation with non-host crops like cereals or millets for 2-3 years.",
+        "Maintain optimum plant spacing to improve air circulation and reduce leaf wetness duration."
+      ],
+      "biologicalControl": [
+        "Apply Trichoderma viride @ 2.5 kg/ha mixed in 50 kg FYM as soil application or foliar spray @ 5g/L water.",
+        "Spray cold-pressed Neem Oil 10,000 PPM @ 3-4 ml/L water during early infection stages."
+      ],
+      "chemicalControlSafe": [
+        "Spray Mancozeb 75% WP @ 2g/L water during early morning or late evening hours to prevent spore germination.",
+        "Alternatively, spray Hexaconazole 5% SC @ 1 ml/L water at 15-day intervals if infection spreads; observe a 14-day pre-harvest interval (PHI)."
+      ],
+      "safetyWarnings": [
+        "Always wear protective gloves, rubber boots, and a face mask while handling and spraying fungicides.",
+        "Avoid spraying during peak sunlight hours or high wind conditions to prevent chemical drift.",
+        "Maintain a minimum pre-harvest safety interval (PHI) of 14 to 21 days depending on the chosen fungicide."
+      ],
+      "recommendedProductIds": [
+        "prod-trichoderma",
+        "prod-neem-oil",
+        "prod-sprayer"
+      ],
+      "isExpertReviewed": false,
+      "followUpQuestions": [
+        "Are these dark circular spots appearing primarily on the upper surface of the young or older leaves?",
+        "What is the current local weather condition (e.g., continuous high humidity or frequent rainfall)?",
+        "Have you observed any yellowing or premature defoliation of the lower leaves in the affected field?"
+      ],
+      "createdAt": "2026-09-28T08:53:14.697Z"
     }
   ],
   "product_categories": [

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { SupabaseModal } from '../../components/SupabaseModal';
-import { AiConfigModal } from '../../components/AiConfigModal';
 import {
   ShieldCheck,
   Users,
@@ -27,7 +26,6 @@ export const AdminPortal: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'METRICS' | 'AI_LOGS'>('METRICS');
   const [loading, setLoading] = useState(true);
   const [isSupabaseModalOpen, setIsSupabaseModalOpen] = useState(false);
-  const [isAiConfigModalOpen, setIsAiConfigModalOpen] = useState(false);
   const [supabaseStatus, setSupabaseStatus] = useState<any>(null);
   const [aiConfig, setAiConfig] = useState<any>(null);
 
@@ -136,12 +134,8 @@ export const AdminPortal: React.FC = () => {
                 </div>
                 <h3 className="font-extrabold text-sm text-gray-900">Google Gemini AI Engine</h3>
               </div>
-              <span className={`px-2 py-0.5 rounded-full text-[10px] font-black border ${
-                aiConfig?.hasServerKey || localStorage.getItem('agri_gemini_api_key')
-                  ? 'bg-amber-50 text-amber-900 border-amber-300'
-                  : 'bg-blue-50 text-blue-800 border-blue-200'
-              }`}>
-                {aiConfig?.hasServerKey || localStorage.getItem('agri_gemini_api_key') ? '⚡ Gemini 1.5 Flash' : '🌐 Live Knowledge'}
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-black border bg-amber-50 text-amber-900 border-amber-300">
+                ⚡ Gemini 1.5 Flash
               </span>
             </div>
             <p className="text-xs text-gray-500 mb-4">
@@ -153,13 +147,10 @@ export const AdminPortal: React.FC = () => {
             <span className="text-[10px] font-mono text-gray-400">
               Free Tier: 15 RPM
             </span>
-            <button
-              onClick={() => setIsAiConfigModalOpen(true)}
-              className="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 rounded-xl text-xs font-bold transition shadow-xs flex items-center gap-1.5 active:scale-95"
-            >
-              <Key className="w-3.5 h-3.5" />
-              <span>Configure AI Key</span>
-            </button>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-xl text-xs font-bold">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Active on Backend</span>
+            </span>
           </div>
         </div>
       </div>
@@ -250,14 +241,6 @@ export const AdminPortal: React.FC = () => {
         isOpen={isSupabaseModalOpen}
         onClose={() => {
           setIsSupabaseModalOpen(false);
-          loadAdminData();
-        }}
-      />
-
-      <AiConfigModal
-        isOpen={isAiConfigModalOpen}
-        onClose={() => {
-          setIsAiConfigModalOpen(false);
           loadAdminData();
         }}
       />

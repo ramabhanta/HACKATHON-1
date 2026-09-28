@@ -27,7 +27,6 @@ import {
   Database
 } from 'lucide-react';
 import { SupabaseModal } from './SupabaseModal';
-import { AiConfigModal } from './AiConfigModal';
 
 interface NavbarProps {
   activeTab: string;
@@ -49,8 +48,8 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenV
   const [showModeMenu, setShowModeMenu] = useState(false);
   const [showNotifMenu, setShowNotifMenu] = useState(false);
   const [showSupabaseModal, setShowSupabaseModal] = useState(false);
-  const [showAiConfigModal, setShowAiConfigModal] = useState(false);
   const [notifications, setNotifications] = useState<any[]>([]);
+
 
   const fetchNotifications = async () => {
     try {
@@ -333,16 +332,6 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenV
             >
               <Database className="w-3.5 h-3.5 text-emerald-300" />
               <span className="hidden md:inline">Supabase</span>
-            </button>
-
-            {/* AI Key & Settings Button */}
-            <button
-              onClick={() => setShowAiConfigModal(true)}
-              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-bold rounded-lg bg-emerald-700/70 hover:bg-emerald-600 border border-emerald-500/60 transition shadow-sm text-amber-300"
-              title="Configure Google Gemini AI API Key"
-            >
-              <span>⚡</span>
-              <span className="hidden lg:inline">AI Key</span>
             </button>
 
             {/* Display Mode Switcher (Clean Pro / Simple Field / Dark Night) */}
@@ -710,12 +699,6 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenV
       <SupabaseModal
         isOpen={showSupabaseModal}
         onClose={() => setShowSupabaseModal(false)}
-      />
-
-      {/* AI Key & Settings Modal */}
-      <AiConfigModal
-        isOpen={showAiConfigModal}
-        onClose={() => setShowAiConfigModal(false)}
       />
     </header>
   );

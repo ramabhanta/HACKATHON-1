@@ -33,6 +33,10 @@ Thumbs.db
 *.sublime-project
 *.sublime-workspace
 
+# Uploads
+uploads/
+*/uploads/
+
 # Antigravity & Scratch Artifacts
 .gemini/
 scratch/

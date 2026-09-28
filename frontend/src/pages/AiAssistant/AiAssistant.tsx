@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { useCart } from '../../context/CartContext';
-import { AiConfigModal } from '../../components/AiConfigModal';
 import {
   Send,
   Bot,
@@ -16,7 +15,6 @@ import {
   ChevronRight,
   Info,
   Settings,
-  Key,
   Zap,
   Globe
 } from 'lucide-react';
@@ -44,13 +42,11 @@ export const AiAssistant: React.FC<AiAssistantProps> = ({ onOpenVoice, setActive
   const { addToCart } = useCart();
 
   const [input, setInput] = useState('');
-  const [apiKey, setApiKey] = useState<string>(() => localStorage.getItem('agri_gemini_api_key') || '');
-  const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 'welcome-1',
       sender: 'ai',
-      source: apiKey ? 'GEMINI_AI' : 'LIVE_KNOWLEDGE_ENGINE',
+      source: 'GEMINI_AI',
       text: language === 'te'
         ? 'నమస్కారం రమేష్ గారు! నేను మీ అగ్రిడెక్స్ AI వ్యవసాయ సహాయకుడిని. మీ కదిరి పొలంలోని వేరుశనగ మరియు టమాటా పంటల రక్షణ, ఎరువుల నిర్వహణ, నీటి తడులు లేదా విత్తనాల గురించి మీకు ఎలాంటి సందేహం ఉన్నా అడగండి.'
         : language === 'hi'
@@ -96,19 +92,13 @@ export const AiAssistant: React.FC<AiAssistantProps> = ({ onOpenVoice, setActive
       Authorization: `Bearer ${localStorage.getItem('agri_token') || ''}`
     };
 
-    const currentKey = localStorage.getItem('agri_gemini_api_key') || apiKey;
-    if (currentKey) {
-      headers['X-Gemini-Key'] = currentKey;
-    }
-
     try {
       const res = await fetch('/api/ai/chat', {
         method: 'POST',
         headers,
         body: JSON.stringify({
           message: textToSend,
-          language,
-          apiKey: currentKey || undefined
+          language
         })
       });
 
@@ -153,18 +143,10 @@ export const AiAssistant: React.FC<AiAssistantProps> = ({ onOpenVoice, setActive
           <div>
             <div className="flex items-center gap-2">
               <h2 className="font-extrabold text-sm sm:text-base tracking-tight">AI Farming Assistant</h2>
-              <button
-                onClick={() => setIsConfigModalOpen(true)}
-                className={`text-[10px] font-black px-2 py-0.5 rounded-full flex items-center gap-1 transition ${
-                  apiKey
-                    ? 'bg-amber-400 text-amber-950 hover:bg-amber-300'
-                    : 'bg-emerald-700 text-emerald-100 hover:bg-emerald-600 border border-emerald-500'
-                }`}
-                title="Configure Real AI API Key"
-              >
-                {apiKey ? <Zap className="w-3 h-3 fill-amber-950" /> : <Globe className="w-3 h-3" />}
-                <span>{apiKey ? 'Gemini 1.5 Flash' : 'Live Data Mode'}</span>
-              </button>
+              <span className="text-[10px] font-black px-2 py-0.5 rounded-full flex items-center gap-1 bg-amber-400 text-amber-950 shadow-xs">
+                <Zap className="w-3 h-3 fill-amber-950" />
+                <span>Google Gemini 1.5 Flash</span>
+              </span>
             </div>
             <p className="text-[11px] text-emerald-200 truncate max-w-xs sm:max-w-md">
               Sri Venkateswara Farm • Kadiri (Groundnut & Tomato)
@@ -173,16 +155,6 @@ export const AiAssistant: React.FC<AiAssistantProps> = ({ onOpenVoice, setActive
         </div>
 
         <div className="flex items-center gap-2">
-          {/* AI Settings / Key button */}
-          <button
-            onClick={() => setIsConfigModalOpen(true)}
-            className="p-2 sm:px-3 sm:py-2 rounded-xl bg-emerald-700/80 hover:bg-emerald-700 text-white border border-emerald-600 shadow-sm transition active:scale-95 flex items-center gap-1.5 text-xs font-semibold"
-            title="Configure Gemini API Key"
-          >
-            <Key className="w-3.5 h-3.5 text-amber-300" />
-            <span className="hidden sm:inline">AI Settings</span>
-          </button>
-
           {/* Voice button */}
           <button
             onClick={onOpenVoice}
@@ -202,14 +174,6 @@ export const AiAssistant: React.FC<AiAssistantProps> = ({ onOpenVoice, setActive
             <strong>AI Agricultural Copilot:</strong> Real answers tailored to Indian agro-climatic conditions. Always adhere to chemical container safety labels.
           </span>
         </div>
-        {!apiKey && (
-          <button
-            onClick={() => setIsConfigModalOpen(true)}
-            className="hidden sm:inline-flex items-center gap-1 text-[10px] font-extrabold text-emerald-800 bg-white px-2 py-0.5 rounded-lg border border-amber-300 shadow-2xs hover:bg-amber-50 shrink-0"
-          >
-            <span>+ Add Gemini Key</span>
-          </button>
-        )}
       </div>
 
       {/* Message Chat Flow */}
@@ -394,12 +358,6 @@ export const AiAssistant: React.FC<AiAssistantProps> = ({ onOpenVoice, setActive
         </form>
       </div>
 
-      {/* AI Key & Settings Modal */}
-      <AiConfigModal
-        isOpen={isConfigModalOpen}
-        onClose={() => setIsConfigModalOpen(false)}
-        onKeySaved={key => setApiKey(key)}
-      />
     </div>
   );
 };

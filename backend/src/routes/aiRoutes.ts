@@ -16,8 +16,7 @@ export const aiRouter = Router();
 aiRouter.post('/chat', optionalAuthenticate, async (req: AuthenticatedRequest, res: Response) => {
   try {
     const userId = req.user?.id || 'usr-farmer-1';
-    const { message, language, farmId, cropId, apiKey } = req.body;
-    const clientApiKey = (req.headers['x-gemini-key'] as string) || apiKey;
+    const { message, language, farmId, cropId } = req.body;
 
     if (!message) {
       return res.status(400).json({ error: 'Message content is required' });
@@ -30,8 +29,7 @@ aiRouter.post('/chat', optionalAuthenticate, async (req: AuthenticatedRequest, r
         language: language || req.user?.language || 'en',
         farmId,
         cropId
-      },
-      clientApiKey
+      }
     );
 
     return res.json(response);
@@ -44,8 +42,7 @@ aiRouter.post('/chat', optionalAuthenticate, async (req: AuthenticatedRequest, r
 aiRouter.post('/crop-disease', optionalAuthenticate, upload.single('image'), async (req: AuthenticatedRequest, res: Response) => {
   try {
     const userId = req.user?.id || 'usr-farmer-1';
-    const { cropName, farmId, photoMetadata, apiKey } = req.body;
-    const clientApiKey = (req.headers['x-gemini-key'] as string) || apiKey;
+    const { cropName, farmId, photoMetadata } = req.body;
 
     let parsedMetadata = undefined;
     if (photoMetadata) {
@@ -79,8 +76,7 @@ aiRouter.post('/crop-disease', optionalAuthenticate, upload.single('image'), asy
       req.file,
       cropName,
       farmId,
-      parsedMetadata,
-      clientApiKey
+      parsedMetadata
     );
 
     // If Supabase storage returned a public URL, store that in diagnosis

@@ -20,24 +20,24 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab })
 
   if (role === 'BUYER') {
     navItems = [
-      { id: 'buyer-portal', label: 'Mandi Desk', icon: Package },
+      { id: 'buyer-portal', label: t('buyerPortal'), icon: Package },
       { id: 'prices', label: t('mandiPrices'), icon: TrendingUp },
-      { id: 'produce', label: 'Farmer Lots', icon: Layers, isCenter: true },
-      { id: 'chat', label: 'Messages', icon: MessageSquare },
-      { id: 'home', label: 'Overview', icon: Home }
+      { id: 'produce', label: t('farmerLots'), icon: Layers, isCenter: true },
+      { id: 'chat', label: t('chat'), icon: MessageSquare },
+      { id: 'home', label: t('overview'), icon: Home }
     ];
   } else if (role === 'VENDOR') {
     navItems = [
-      { id: 'vendor-portal', label: 'Vendor Desk', icon: Store },
+      { id: 'vendor-portal', label: t('vendorDesk'), icon: Store },
       { id: 'store', label: t('store'), icon: ShoppingBag, badge: totalItems },
       { id: 'prices', label: t('mandiPrices'), icon: TrendingUp, isCenter: true },
-      { id: 'chat', label: 'Messages', icon: MessageSquare },
-      { id: 'home', label: 'Overview', icon: Home }
+      { id: 'chat', label: t('chat'), icon: MessageSquare },
+      { id: 'home', label: t('overview'), icon: Home }
     ];
   } else {
     // Default: Farmer
     navItems = [
-      { id: 'home', label: isSimpleMode ? 'రైతు హోమ్' : t('home'), icon: Home },
+      { id: 'home', label: isSimpleMode ? t('farmerHome') : t('home'), icon: Home },
       { id: 'prices', label: t('mandiPrices'), icon: TrendingUp },
       { id: 'scan', label: t('scanCrop'), icon: Camera, isCenter: true },
       { id: 'store', label: t('store'), icon: ShoppingBag, badge: totalItems },

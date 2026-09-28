@@ -1,7 +1,8 @@
 import enLocale from './locales/en.json';
 import teLocale from './locales/te.json';
+import hiLocale from './locales/hi.json';
 
-export { enLocale, teLocale };
+export { enLocale, teLocale, hiLocale };
 
 export type Language = 'en' | 'hi' | 'te' | 'ta' | 'kn' | 'ml' | 'mr' | 'bn' | 'gu' | 'pa' | 'or';
 
@@ -148,6 +149,7 @@ export const translations: Record<Language, Record<string, string>> = {
   },
   
   hi: {
+    ...hiLocale,
     appName: 'एग्रोडेक्स (AgroDex)',
     tagline: 'हर किसान के लिए AI — पहचानें, निर्णय लें, खरीदें, बेचें और आगे बढ़ें',
     home: 'मेरा खेत',

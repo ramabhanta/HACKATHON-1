@@ -201,21 +201,21 @@ export const BuyerPortal: React.FC<BuyerPortalProps> = ({ setActiveTab }) => {
           <div className="space-y-2 max-w-2xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-semibold text-amber-300">
               <Building2 className="w-3.5 h-3.5" />
-              <span>Wholesale APMC Produce & Flower Trading Desk</span>
+              <span>{t('buyerBadgeWholesale')}</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight">
-              📦 Mandi Buyer & Procurement Portal
+              📦 {t('buyerHeading')}
             </h1>
             <p className="text-emerald-100 text-xs sm:text-sm leading-relaxed">
-              Source verified farm harvests directly from cultivators across Andhra Pradesh, Telangana & Karnataka with zero middleman margin.
+              {t('buyerSubheading')}
             </p>
           </div>
 
           <div className="flex items-center gap-3">
             <div className="bg-white/10 backdrop-blur-md p-3 rounded-2xl border border-white/15 text-right">
-              <span className="text-[11px] text-emerald-200 block font-semibold">Active Buyer Account</span>
+              <span className="text-[11px] text-emerald-200 block font-semibold">{t('activeBuyerAccount')}</span>
               <span className="text-sm font-black text-white">{user?.name || 'Kisan Mandi Wholesalers'}</span>
-              <span className="text-[10px] text-amber-300 block">Verified APMC License #AP-KDR-8812</span>
+              <span className="text-[10px] text-amber-300 block">{t('verifiedApmcLicense')}</span>
             </div>
           </div>
         </div>
@@ -223,33 +223,33 @@ export const BuyerPortal: React.FC<BuyerPortalProps> = ({ setActiveTab }) => {
         {/* Procurement KPI Summary */}
         <div className="mt-6 pt-5 border-t border-white/15 grid grid-cols-2 sm:grid-cols-4 gap-3">
           <div className="bg-white/10 rounded-2xl p-3 border border-white/10">
-            <span className="text-xs text-emerald-200 block font-medium">Available Farmer Lots</span>
-            <div className="text-xl sm:text-2xl font-black text-white mt-0.5">{listings.length} Lots</div>
-            <span className="text-[10px] text-emerald-300">Groundnut, Tomato, Flowers</span>
+            <span className="text-xs text-emerald-200 block font-medium">{t('availableFarmerLots')}</span>
+            <div className="text-xl sm:text-2xl font-black text-white mt-0.5">{t('lotsCount', { count: listings.length })}</div>
+            <span className="text-[10px] text-emerald-300">{t('groundnutTomatoFlowers')}</span>
           </div>
 
           <div className="bg-white/10 rounded-2xl p-3 border border-white/10">
-            <span className="text-xs text-emerald-200 block font-medium">My Bids & Orders</span>
+            <span className="text-xs text-emerald-200 block font-medium">{t('myBidsOrders')}</span>
             <div className="text-xl sm:text-2xl font-black text-amber-300 mt-0.5">
-              {myRequests.outgoing.length} Submitted
+              {t('submittedCount', { count: myRequests.outgoing.length })}
             </div>
-            <span className="text-[10px] text-amber-200">Active negotiations</span>
+            <span className="text-[10px] text-amber-200">{t('activeNegotiations')}</span>
           </div>
 
           <div className="bg-white/10 rounded-2xl p-3 border border-white/10">
-            <span className="text-xs text-emerald-200 block font-medium">Active Mandi Dispatches</span>
+            <span className="text-xs text-emerald-200 block font-medium">{t('activeMandiDispatches')}</span>
             <div className="text-xl sm:text-2xl font-black text-white mt-0.5">
-              {logisticsTrucks.length} Trucks
+              {t('trucksCount', { count: logisticsTrucks.length })}
             </div>
-            <span className="text-[10px] text-emerald-300">Kadiri & Bengaluru yards</span>
+            <span className="text-[10px] text-emerald-300">{t('kadiriBengaluruYards')}</span>
           </div>
 
           <div className="bg-white/10 rounded-2xl p-3 border border-white/10">
-            <span className="text-xs text-emerald-200 block font-medium">Tracked Mandi Commodities</span>
+            <span className="text-xs text-emerald-200 block font-medium">{t('trackedMandiCommodities')}</span>
             <div className="text-xl sm:text-2xl font-black text-pink-300 mt-0.5">
-              {mandiPrices.length} Items
+              {t('itemsCount', { count: mandiPrices.length })}
             </div>
-            <span className="text-[10px] text-pink-200">Including 9 Flower yards</span>
+            <span className="text-[10px] text-pink-200">{t('includingFlowerYards')}</span>
           </div>
         </div>
       </div>
@@ -263,7 +263,7 @@ export const BuyerPortal: React.FC<BuyerPortalProps> = ({ setActiveTab }) => {
           }`}
         >
           <Package className="w-3.5 h-3.5" />
-          <span>Farmer Harvest Lots ({listings.length})</span>
+          <span>{t('tabFarmerLots', { count: listings.length })}</span>
         </button>
 
         <button
@@ -273,7 +273,7 @@ export const BuyerPortal: React.FC<BuyerPortalProps> = ({ setActiveTab }) => {
           }`}
         >
           <Tag className="w-3.5 h-3.5" />
-          <span>My Purchase Offers ({myRequests.outgoing.length})</span>
+          <span>{t('tabMyOffers', { count: myRequests.outgoing.length })}</span>
         </button>
 
         <button
@@ -283,7 +283,7 @@ export const BuyerPortal: React.FC<BuyerPortalProps> = ({ setActiveTab }) => {
           }`}
         >
           <Truck className="w-3.5 h-3.5" />
-          <span>Mandi Logistics ({logisticsTrucks.length})</span>
+          <span>{t('tabLogistics', { count: logisticsTrucks.length })}</span>
         </button>
 
         <button
@@ -291,7 +291,7 @@ export const BuyerPortal: React.FC<BuyerPortalProps> = ({ setActiveTab }) => {
           className="flex-1 py-2.5 px-3 rounded-xl transition whitespace-nowrap text-pink-700 hover:bg-pink-100/50 flex items-center justify-center gap-1.5"
         >
           <span>🌸</span>
-          <span>All-India Mandi Ticker →</span>
+          <span>{t('tabLivePrices')} →</span>
         </button>
       </div>
 
@@ -311,7 +311,7 @@ export const BuyerPortal: React.FC<BuyerPortalProps> = ({ setActiveTab }) => {
                       : 'bg-stone-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
-                  {c === 'ALL' ? 'All Harvests' : c}
+                  {c === 'ALL' ? t('catAll') + ' ' + t('farmerLots') : c}
                 </button>
               ))}
             </div>
@@ -321,7 +321,7 @@ export const BuyerPortal: React.FC<BuyerPortalProps> = ({ setActiveTab }) => {
                 type="text"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                placeholder="Search lot, variety, district..."
+                placeholder={t('searchLotsPlaceholder')}
                 className="w-full pl-8 pr-3 py-1.5 rounded-xl border border-gray-300 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
               <Search className="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-2.5" />
@@ -336,7 +336,7 @@ export const BuyerPortal: React.FC<BuyerPortalProps> = ({ setActiveTab }) => {
             </div>
           ) : filteredLots.length === 0 ? (
             <div className="p-12 text-center bg-white rounded-3xl border border-gray-100 text-gray-500 text-xs">
-              No harvest lots match your criteria.
+              {t('noLotsFound')}
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -361,19 +361,19 @@ export const BuyerPortal: React.FC<BuyerPortalProps> = ({ setActiveTab }) => {
 
                     <div className="mt-3 bg-stone-50 p-3 rounded-2xl border border-stone-200/70 space-y-1 text-xs">
                       <div className="flex justify-between">
-                        <span className="text-gray-500">Available Quantity:</span>
+                        <span className="text-gray-500">{t('Quantity')}:</span>
                         <span className="font-bold text-gray-900">
                           {lot.quantity} {lot.unit}
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-500">Farmer Asking Price:</span>
+                        <span className="text-gray-500">{t('expectedRate')}</span>
                         <span className="font-black text-emerald-800 text-sm">
                           ₹{lot.expectedPrice?.toLocaleString('en-IN')} /{lot.unit}
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-500">Cultivator:</span>
+                        <span className="text-gray-500">{t('verifiedFarmer')}</span>
                         <span className="font-medium text-gray-700">{lot.farmerName}</span>
                       </div>
                     </div>
@@ -386,13 +386,13 @@ export const BuyerPortal: React.FC<BuyerPortalProps> = ({ setActiveTab }) => {
                   </div>
 
                   <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between gap-2">
-                    <span className="text-[10px] text-gray-400">Harvest: {lot.harvestDate}</span>
+                    <span className="text-[10px] text-gray-400">{t('harvestDate')} {lot.harvestDate}</span>
                     <button
                       onClick={() => openBidModal(lot)}
                       className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-95 flex items-center gap-1"
                     >
                       <DollarSign className="w-3.5 h-3.5" />
-                      <span>Make Purchase Offer</span>
+                      <span>{t('sendPurchaseOffer')}</span>
                     </button>
                   </div>
                 </div>

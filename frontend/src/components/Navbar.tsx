@@ -101,10 +101,10 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenV
   const unreadNotifs = notifications.filter(n => !n.isRead);
 
   const roles: { role: UserRole; label: string; icon: string; defaultTab: string }[] = [
-    { role: 'FARMER', label: 'Farmer (రైతు / किसान)', icon: '🌾', defaultTab: 'home' },
-    { role: 'BUYER', label: 'Produce Buyer (Mandi Desk)', icon: '📦', defaultTab: 'buyer-portal' },
-    { role: 'VENDOR', label: 'Agri Shop Vendor (Storefront)', icon: '🏪', defaultTab: 'vendor-portal' },
-    { role: 'ADMIN', label: 'Platform Overseer (Admin)', icon: '⚙️', defaultTab: 'admin-portal' }
+    { role: 'FARMER', label: t('roleFarmerTitle'), icon: '🌾', defaultTab: 'home' },
+    { role: 'BUYER', label: t('roleBuyerTitle'), icon: '📦', defaultTab: 'buyer-portal' },
+    { role: 'VENDOR', label: t('roleVendorTitle'), icon: '🏪', defaultTab: 'vendor-portal' },
+    { role: 'ADMIN', label: t('roleAdminTitle'), icon: '⚙️', defaultTab: 'admin-portal' }
   ];
 
   const displayModes: { mode: DisplayMode; label: string; sub: string; icon: any }[] = [
@@ -166,7 +166,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenV
                     activeTab === 'buyer-portal' ? 'bg-amber-500 text-slate-950 font-bold shadow-sm' : 'text-emerald-100 hover:bg-emerald-700/50'
                   }`}
                 >
-                  <span>📦</span> Mandi Lots Desk
+                  <span>📦</span> {t('mandiLotsDesk')}
                 </button>
                 <button
                   onClick={() => setActiveTab('produce')}
@@ -174,7 +174,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenV
                     activeTab === 'produce' ? 'bg-amber-500 text-slate-950 font-bold shadow-sm' : 'text-emerald-100 hover:bg-emerald-700/50'
                   }`}
                 >
-                  <span>🌾</span> Farmer Market
+                  <span>🌾</span> {t('farmerMarket')}
                 </button>
                 <button
                   onClick={() => setActiveTab('prices')}
@@ -182,7 +182,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenV
                     activeTab === 'prices' ? 'bg-amber-500 text-slate-950 font-bold shadow-sm' : 'text-emerald-100 hover:bg-emerald-700/50'
                   }`}
                 >
-                  <span>📊</span> All-India Rates
+                  <span>📊</span> {t('allIndiaRates')}
                 </button>
                 <button
                   onClick={() => setActiveTab('chat')}
@@ -190,7 +190,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenV
                     activeTab === 'chat' ? 'bg-amber-500 text-slate-950 font-bold shadow-sm' : 'text-emerald-100 hover:bg-emerald-700/50'
                   }`}
                 >
-                  <span>💬</span> Logistics Chat
+                  <span>💬</span> {t('logisticsChat')}
                 </button>
               </>
             ) : role === 'VENDOR' ? (
@@ -201,7 +201,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenV
                     activeTab === 'vendor-portal' ? 'bg-amber-500 text-slate-950 font-bold shadow-sm' : 'text-emerald-100 hover:bg-emerald-700/50'
                   }`}
                 >
-                  <span>🏪</span> Vendor Dashboard
+                  <span>🏪</span> {t('vendorDashboard')}
                 </button>
                 <button
                   onClick={() => setActiveTab('store')}
@@ -209,7 +209,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenV
                     activeTab === 'store' ? 'bg-amber-500 text-slate-950 font-bold shadow-sm' : 'text-emerald-100 hover:bg-emerald-700/50'
                   }`}
                 >
-                  <span>🛒</span> Product Catalog
+                  <span>🛒</span> {t('productCatalog')}
                 </button>
                 <button
                   onClick={() => setActiveTab('prices')}
@@ -217,7 +217,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenV
                     activeTab === 'prices' ? 'bg-amber-500 text-slate-950 font-bold shadow-sm' : 'text-emerald-100 hover:bg-emerald-700/50'
                   }`}
                 >
-                  <span>📊</span> Mandi Market Prices
+                  <span>📊</span> {t('mandiMarketPrices')}
                 </button>
               </>
             ) : role === 'ADMIN' ? (
@@ -228,7 +228,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenV
                     activeTab === 'admin-portal' ? 'bg-amber-500 text-slate-950 font-bold shadow-sm' : 'text-emerald-100 hover:bg-emerald-700/50'
                   }`}
                 >
-                  <span>⚙️</span> Platform Admin Hub
+                  <span>⚙️</span> {t('platformAdminHub')}
                 </button>
                 <button
                   onClick={() => setActiveTab('prices')}
@@ -236,7 +236,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenV
                     activeTab === 'prices' ? 'bg-emerald-900/80 text-white' : 'text-emerald-100 hover:bg-emerald-700/50'
                   }`}
                 >
-                  <span>📊</span> Market Rates
+                  <span>📊</span> {t('marketRates')}
                 </button>
               </>
             ) : (
@@ -486,15 +486,15 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenV
                 title="Switch Demonstration Role"
               >
                 <UserCheck className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline capitalize">{role.toLowerCase()}</span>
+                <span className="hidden sm:inline capitalize">{t('role_' + role.toLowerCase())}</span>
                 <ChevronDown className="w-3 h-3" />
               </button>
 
               {showRoleMenu && (
                 <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl py-2 text-gray-800 border border-gray-100 z-50">
                   <div className="px-3 py-1.5 border-b border-gray-100">
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Test Any Platform Role</p>
-                    <p className="text-[11px] text-gray-500">Instantly switch role workstations</p>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{t('roleSwitcherTitle')}</p>
+                    <p className="text-[11px] text-gray-500">{t('roleSwitcherSubtitle')}</p>
                   </div>
                   {roles.map(r => (
                     <button
@@ -511,7 +511,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenV
                       <span className="text-xl">{r.icon}</span>
                       <div className="flex-1">
                         <p className="font-bold text-xs">{r.label}</p>
-                        <p className="text-[10px] text-gray-400">Opens {r.defaultTab.replace('-', ' ')}</p>
+                        <p className="text-[10px] text-gray-400">{t('opensWorkspace', { tab: r.defaultTab.replace('-', ' ') })}</p>
                       </div>
                     </button>
                   ))}

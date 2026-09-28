@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 import {
   ShieldCheck,
   Users,
@@ -19,6 +20,7 @@ import {
 
 export const AdminPortal: React.FC = () => {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [overview, setOverview] = useState<any>(null);
   const [users, setUsers] = useState<any[]>([]);
   const [aiLogs, setAiLogs] = useState<any[]>([]);
@@ -58,10 +60,10 @@ export const AdminPortal: React.FC = () => {
       <div className="bg-gradient-to-r from-gray-900 to-emerald-950 rounded-3xl p-6 sm:p-8 text-white shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-emerald-300 text-xs font-bold mb-2">
-            <span>🛡️ Platform Governance & Supervision</span>
+            <span>🛡️ {t('roleAdminSub')}</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-black tracking-tight">
-            AgroDex Administration Hub
+            {t('platformAdminHub')}
           </h1>
           <p className="text-gray-400 text-xs sm:text-sm mt-0.5">
             Cloud database sync, Google Gemini AI configuration, and platform management
@@ -73,7 +75,7 @@ export const AdminPortal: React.FC = () => {
             onClick={() => setActiveTab('METRICS')}
             className={`px-3 py-1.5 rounded-xl transition ${activeTab === 'METRICS' ? 'bg-white text-gray-900' : 'text-gray-300'}`}
           >
-            Overview
+            {t('overview')}
           </button>
           <button
             onClick={() => setActiveTab('AI_LOGS')}

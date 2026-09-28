@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 import {
   Store,
   Package,
@@ -32,6 +33,7 @@ import {
 
 export const VendorPortal: React.FC = () => {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [orders, setOrders] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<'ORDERS' | 'INVENTORY' | 'PROCUREMENT' | 'FARMER_OFFERS' | 'LOGISTICS'>('ORDERS');
@@ -421,20 +423,20 @@ export const VendorPortal: React.FC = () => {
       <div className="bg-gradient-to-r from-amber-700 via-amber-800 to-emerald-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 border border-white/20 text-amber-200 text-xs font-bold mb-2">
-            <span>✓ Verified Agro-Dealer Depot & Procurement Yard</span>
+            <span>✓ {t('vendorBadgeDepot')}</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-black tracking-tight">
-            Sri Lakshmi Agri Traders & Procurement Yard
+            {t('vendorShopName')}
           </h1>
           <p className="text-amber-100 text-xs sm:text-sm mt-0.5">
-            Shop #14, Main Bazaar, Kadiri • License #AP/SSS/FERT/2023/8891 • APMC Mandi Agent
+            {t('vendorDepotSub')}
           </p>
         </div>
 
         <div className="flex items-center gap-3">
           <div className="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20 text-center">
             <span className="text-[10px] font-extrabold text-amber-200 uppercase tracking-wider block">
-              Total Sales Revenue
+              {t('totalSalesRevenue')}
             </span>
             <span className="text-2xl font-black text-white">
               ₹{totalSales.toLocaleString('en-IN')}
@@ -448,7 +450,7 @@ export const VendorPortal: React.FC = () => {
             className="px-4 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-2xl transition shadow-lg active:scale-95 text-xs flex items-center gap-1.5"
           >
             <Plus className="w-4 h-4" />
-            <span>Add Product</span>
+            <span>{t('addProductBtn')}</span>
           </button>
         </div>
       </div>
@@ -456,17 +458,17 @@ export const VendorPortal: React.FC = () => {
       {/* KPI Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-          <span className="text-[10px] font-extrabold text-gray-400 uppercase">Incoming Customer Orders</span>
+          <span className="text-[10px] font-extrabold text-gray-400 uppercase">{t('tabIncomingOrders')}</span>
           <p className="text-xl font-black text-gray-900 mt-1">{orders.length}</p>
         </div>
         <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-          <span className="text-[10px] font-extrabold text-gray-400 uppercase">Farmer Direct Offers</span>
+          <span className="text-[10px] font-extrabold text-gray-400 uppercase">{t('tabFarmerDirectOffers')}</span>
           <p className="text-xl font-black text-amber-600 mt-1">
             {pendingFarmerDeals.length} Pending
           </p>
         </div>
         <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-          <span className="text-[10px] font-extrabold text-gray-400 uppercase">Ready Farmer Lots</span>
+          <span className="text-[10px] font-extrabold text-gray-400 uppercase">{t('availableFarmerLots')}</span>
           <p className="text-xl font-black text-emerald-700 mt-1">{readyFarmerHarvests.length} Lots</p>
         </div>
         <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
@@ -484,7 +486,7 @@ export const VendorPortal: React.FC = () => {
           }`}
         >
           <span>🌾</span>
-          <span>Buy Crops from Farmers</span>
+          <span>{t('tabProcureFarmers')}</span>
         </button>
 
         <button
@@ -494,7 +496,7 @@ export const VendorPortal: React.FC = () => {
           }`}
         >
           <span>📥</span>
-          <span>Farmer Direct Offers</span>
+          <span>{t('tabFarmerDirectOffers')}</span>
           {pendingFarmerDeals.length > 0 && (
             <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-amber-500 text-white font-black animate-pulse">
               {pendingFarmerDeals.length}
@@ -509,7 +511,7 @@ export const VendorPortal: React.FC = () => {
           }`}
         >
           <ShoppingBag className="w-3.5 h-3.5" />
-          <span>Customer Orders ({orders.length})</span>
+          <span>{t('tabIncomingOrders')} ({orders.length})</span>
         </button>
 
         <button
@@ -519,7 +521,7 @@ export const VendorPortal: React.FC = () => {
           }`}
         >
           <Package className="w-3.5 h-3.5" />
-          <span>Inventory & Stock ({products.length})</span>
+          <span>{t('tabStoreInventory')} ({products.length})</span>
         </button>
 
         <button
@@ -529,7 +531,7 @@ export const VendorPortal: React.FC = () => {
           }`}
         >
           <Truck className="w-3.5 h-3.5" />
-          <span>Transport & Fleet</span>
+          <span>{t('tabDeliveryFleet')}</span>
         </button>
       </div>
 
@@ -823,10 +825,10 @@ export const VendorPortal: React.FC = () => {
           <div className="bg-white rounded-3xl p-6 shadow-sm border border-emerald-100 space-y-4">
             <div>
               <h3 className="font-extrabold text-base text-gray-900 flex items-center gap-2">
-                <span>📥</span> Incoming Farmer Direct Sell Requests ({incomingFarmerDeals.length})
+                <span>📥</span> {t('farmerDirectSellRequests')} ({incomingFarmerDeals.length})
               </h3>
               <p className="text-xs text-gray-500">
-                Farmers who selected your business to sell their harvested produce. Confirm deals to lock gate pickup or decline with reason.
+                {t('farmersOfferingDirect')}
               </p>
             </div>
 
@@ -944,7 +946,7 @@ export const VendorPortal: React.FC = () => {
                               className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs rounded-xl shadow-xs transition active:scale-95 flex items-center gap-1.5"
                             >
                               <Check className="w-3.5 h-3.5" />
-                              <span>Confirm & Accept Deal</span>
+                              <span>{t('acceptOffer')}</span>
                             </button>
 
                             <button
@@ -955,7 +957,7 @@ export const VendorPortal: React.FC = () => {
                               className="px-3 py-2 bg-gray-100 hover:bg-red-50 text-gray-700 hover:text-red-700 font-bold text-xs rounded-xl transition flex items-center gap-1"
                             >
                               <X className="w-3.5 h-3.5" />
-                              <span>Decline</span>
+                              <span>{t('declineOffer')}</span>
                             </button>
                           </div>
                         )}
@@ -976,10 +978,10 @@ export const VendorPortal: React.FC = () => {
         <div className="space-y-4">
           <div className="bg-white rounded-3xl p-6 shadow-sm border border-emerald-100 space-y-4">
             <h3 className="font-extrabold text-base text-gray-900">
-              Customer Agro-Input Orders ({orders.length})
+              {t('customerOrdersHeading')} ({orders.length})
             </h3>
             {orders.length === 0 ? (
-              <div className="text-center py-8 text-gray-400 text-xs">No orders received yet.</div>
+              <div className="text-center py-8 text-gray-400 text-xs">{t('noOrdersYet')}</div>
             ) : (
               <div className="space-y-3">
                 {orders.map(order => (
@@ -991,7 +993,7 @@ export const VendorPortal: React.FC = () => {
                       </span>
                     </div>
                     <div className="text-gray-600">
-                      <span>Total: <strong>₹{order.totalAmount}</strong></span> • <span>Payment: <strong>{order.paymentMethod} ({order.paymentStatus})</strong></span>
+                      <span>{t('Total')}: <strong>₹{order.totalAmount}</strong></span> • <span>Payment: <strong>{order.paymentMethod} ({order.paymentStatus})</strong></span>
                     </div>
                     <div className="flex gap-2 pt-2">
                       {order.status === 'PROCESSING' && (
@@ -1000,7 +1002,7 @@ export const VendorPortal: React.FC = () => {
                           disabled={updatingOrderId === order.id}
                           className="px-3 py-1.5 bg-emerald-700 text-white rounded-xl font-bold"
                         >
-                          Mark Shipped
+                          {t('dispatchDelivery')}
                         </button>
                       )}
                       {order.status === 'SHIPPED' && (
@@ -1009,7 +1011,7 @@ export const VendorPortal: React.FC = () => {
                           disabled={updatingOrderId === order.id}
                           className="px-3 py-1.5 bg-emerald-700 text-white rounded-xl font-bold"
                         >
-                          Mark Delivered
+                          {t('markDelivered')}
                         </button>
                       )}
                     </div>
@@ -1027,12 +1029,12 @@ export const VendorPortal: React.FC = () => {
       {activeTab === 'INVENTORY' && (
         <div className="bg-white rounded-3xl p-6 shadow-sm border border-emerald-100 space-y-4">
           <div className="flex justify-between items-center">
-            <h3 className="font-extrabold text-base text-gray-900">Live Godown Inventory ({products.length})</h3>
+            <h3 className="font-extrabold text-base text-gray-900">{t('tabStoreInventory')} ({products.length})</h3>
             <button
               onClick={() => setShowAddProductModal(true)}
               className="px-3 py-1.5 bg-emerald-700 text-white rounded-xl text-xs font-bold"
             >
-              + Add Product
+              {t('addProductBtn')}
             </button>
           </div>
 

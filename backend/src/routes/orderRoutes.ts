@@ -1,23 +1,16 @@
 import { Router, Response } from 'express';
 import { authenticate, AuthenticatedRequest } from '../middleware/auth.js';
 import { db } from '../database/db.js';
+import { SupabaseDataService } from '../database/supabaseDataService.js';
 import { Order, OrderItem, AppNotification } from '../models/types.js';
 import { v4 as uuidv4 } from 'uuid';
 
 export const orderRouter = Router();
 
-// GET orders for logged in user (Farmer sees own orders; Vendor sees incoming orders)
-orderRouter.get('/', authenticate, (req: AuthenticatedRequest, res: Response) => {
+// GET orders for logged in user (Farmer sees own orders; Vendor sees incoming orders - from Supabase)
+orderRouter.get('/', authenticate, async (req: AuthenticatedRequest, res: Response) => {
   const user = req.user!;
-  let orders: Order[] = [];
-
-  if (user.role === 'VENDOR') {
-    orders = db.find('orders', o => o.vendorId === user.id);
-  } else if (user.role === 'ADMIN') {
-    orders = db.getTable('orders');
-  } else {
-    orders = db.find('orders', o => o.farmerId === user.id);
-  }
+  let orders: Order[] = await SupabaseDataService.getOrders(user.id, user.role);
 
   // Sort latest first
   orders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
@@ -38,7 +31,7 @@ orderRouter.get('/:id', authenticate, (req: AuthenticatedRequest, res: Response)
 });
 
 // POST create order from cart
-orderRouter.post('/', authenticate, (req: AuthenticatedRequest, res: Response) => {
+orderRouter.post('/', authenticate, async (req: AuthenticatedRequest, res: Response) => {
   const { items, deliveryAddress, paymentMethod } = req.body as {
     items: { productId: string; quantity: number }[];
     deliveryAddress: any;
@@ -138,7 +131,7 @@ orderRouter.post('/', authenticate, (req: AuthenticatedRequest, res: Response) =
     updatedAt: new Date().toISOString()
   };
 
-  db.insert('orders', newOrder);
+  await SupabaseDataService.createOrder(newOrder);
 
   // Send notification to farmer
   const notif: AppNotification = {
@@ -156,8 +149,8 @@ orderRouter.post('/', authenticate, (req: AuthenticatedRequest, res: Response) =
   return res.status(201).json(newOrder);
 });
 
-// PATCH update order status (Vendor / Admin only)
-orderRouter.patch('/:id/status', authenticate, (req: AuthenticatedRequest, res: Response) => {
+// PATCH update order status (Vendor / Admin only - updates in Supabase)
+orderRouter.patch('/:id/status', authenticate, async (req: AuthenticatedRequest, res: Response) => {
   const { id } = req.params;
   const { status, message } = req.body;
 
@@ -182,11 +175,7 @@ orderRouter.patch('/:id/status', authenticate, (req: AuthenticatedRequest, res: 
     }
   ];
 
-  const updated = db.update('orders', id, {
-    status,
-    trackingUpdates,
-    updatedAt: new Date().toISOString()
-  });
-
+  const updated = await SupabaseDataService.updateOrderStatus(id, status, trackingUpdates);
   return res.json(updated);
 });
+

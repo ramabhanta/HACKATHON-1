@@ -1,17 +1,18 @@
 import { Router, Response } from 'express';
 import { authenticate, AuthenticatedRequest } from '../middleware/auth.js';
+import { SupabaseDataService } from '../database/supabaseDataService.js';
 import { db } from '../database/db.js';
 import { Farm, Crop } from '../models/types.js';
 import { v4 as uuidv4 } from 'uuid';
 
 export const farmRouter = Router();
 
-// GET all farms for current user
-farmRouter.get('/', authenticate, (req: AuthenticatedRequest, res: Response) => {
+// GET all farms for current user (queries directly from Supabase)
+farmRouter.get('/', authenticate, async (req: AuthenticatedRequest, res: Response) => {
   const userId = req.user!.id;
-  const farms = db.find('farms', f => f.userId === userId);
-  const crops = db.find('crops');
-  const soilTests = db.find('soil_tests');
+  const farms = await SupabaseDataService.getFarms(userId);
+  const crops = await SupabaseDataService.getCrops();
+  const soilTests = await SupabaseDataService.getSoilTests();
 
   const farmsWithDetails = farms.map(farm => ({
     ...farm,
@@ -22,8 +23,8 @@ farmRouter.get('/', authenticate, (req: AuthenticatedRequest, res: Response) => 
   return res.json(farmsWithDetails);
 });
 
-// POST create new farm
-farmRouter.post('/', authenticate, (req: AuthenticatedRequest, res: Response) => {
+// POST create new farm (persists directly to Supabase)
+farmRouter.post('/', authenticate, async (req: AuthenticatedRequest, res: Response) => {
   const { name, location, district, state, totalArea, areaUnit, soilType, irrigationSource, waterAvailability } = req.body;
   
   if (!name || !totalArea) {
@@ -45,12 +46,12 @@ farmRouter.post('/', authenticate, (req: AuthenticatedRequest, res: Response) =>
     createdAt: new Date().toISOString()
   };
 
-  db.insert('farms', newFarm);
-  return res.status(201).json(newFarm);
+  const created = await SupabaseDataService.createFarm(newFarm);
+  return res.status(201).json(created);
 });
 
-// POST add crop to farm
-farmRouter.post('/:farmId/crops', authenticate, (req: AuthenticatedRequest, res: Response) => {
+// POST add crop to farm (persists directly to Supabase)
+farmRouter.post('/:farmId/crops', authenticate, async (req: AuthenticatedRequest, res: Response) => {
   const { farmId } = req.params;
   const { cropName, variety, sowingDate, expectedHarvestDate, growthStage, areaPlanted, previousCrop, currentProblems } = req.body;
 
@@ -59,7 +60,7 @@ farmRouter.post('/:farmId/crops', authenticate, (req: AuthenticatedRequest, res:
   }
 
   const farm = db.findById('farms', farmId);
-  if (!farm || farm.userId !== req.user!.id) {
+  if (!farm || (farm.userId !== req.user!.id && req.user!.role !== 'ADMIN')) {
     return res.status(404).json({ error: 'Farm not found or unauthorized' });
   }
 
@@ -78,12 +79,12 @@ farmRouter.post('/:farmId/crops', authenticate, (req: AuthenticatedRequest, res:
     createdAt: new Date().toISOString()
   };
 
-  db.insert('crops', newCrop);
-  return res.status(201).json(newCrop);
+  const created = await SupabaseDataService.createCrop(newCrop);
+  return res.status(201).json(created);
 });
 
-// PUT edit crop
-farmRouter.put('/crops/:cropId', authenticate, (req: AuthenticatedRequest, res: Response) => {
+// PUT edit crop (updates in Supabase)
+farmRouter.put('/crops/:cropId', authenticate, async (req: AuthenticatedRequest, res: Response) => {
   const { cropId } = req.params;
   const crop = db.findById('crops', cropId);
   if (!crop) return res.status(404).json({ error: 'Crop not found' });
@@ -94,7 +95,7 @@ farmRouter.put('/crops/:cropId', authenticate, (req: AuthenticatedRequest, res: 
   }
 
   const { cropName, variety, growthStage, healthStatus, areaPlanted, expectedHarvestDate, currentProblems } = req.body;
-  const updated = db.update('crops', cropId, {
+  const updated = await SupabaseDataService.updateCrop(cropId, {
     cropName: cropName ?? crop.cropName,
     variety: variety ?? crop.variety,
     growthStage: growthStage ?? crop.growthStage,
@@ -107,8 +108,8 @@ farmRouter.put('/crops/:cropId', authenticate, (req: AuthenticatedRequest, res: 
   return res.json(updated);
 });
 
-// DELETE crop
-farmRouter.delete('/crops/:cropId', authenticate, (req: AuthenticatedRequest, res: Response) => {
+// DELETE crop (deletes from Supabase)
+farmRouter.delete('/crops/:cropId', authenticate, async (req: AuthenticatedRequest, res: Response) => {
   const { cropId } = req.params;
   const crop = db.findById('crops', cropId);
   if (!crop) return res.status(404).json({ error: 'Crop not found' });
@@ -118,22 +119,19 @@ farmRouter.delete('/crops/:cropId', authenticate, (req: AuthenticatedRequest, re
     return res.status(403).json({ error: 'Unauthorized to delete this crop' });
   }
 
-  db.delete('crops', cropId);
+  await SupabaseDataService.deleteCrop(cropId);
   return res.json({ success: true, message: 'Crop deleted' });
 });
 
-// DELETE farm
-farmRouter.delete('/:farmId', authenticate, (req: AuthenticatedRequest, res: Response) => {
+// DELETE farm (deletes from Supabase)
+farmRouter.delete('/:farmId', authenticate, async (req: AuthenticatedRequest, res: Response) => {
   const { farmId } = req.params;
   const farm = db.findById('farms', farmId);
   if (!farm || (farm.userId !== req.user!.id && req.user!.role !== 'ADMIN')) {
     return res.status(403).json({ error: 'Unauthorized or farm not found' });
   }
 
-  // Delete associated crops
-  const farmCrops = db.find('crops', c => c.farmId === farmId);
-  farmCrops.forEach(c => db.delete('crops', c.id));
-
-  db.delete('farms', farmId);
+  await SupabaseDataService.deleteFarm(farmId);
   return res.json({ success: true, message: 'Farm deleted' });
 });
+

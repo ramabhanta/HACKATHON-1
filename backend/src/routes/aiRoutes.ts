@@ -5,6 +5,8 @@ import { AiService } from '../services/aiService.js';
 import { fetchWeather } from '../services/weatherService.js';
 import { db } from '../database/db.js';
 import { config } from '../config/index.js';
+import { uploadScanImageToStorage } from '../database/supabaseClient.js';
+import { SupabaseDataService } from '../database/supabaseDataService.js';
 import fs from 'fs';
 import path from 'path';
 
@@ -54,6 +56,24 @@ aiRouter.post('/crop-disease', optionalAuthenticate, upload.single('image'), asy
       }
     }
 
+    // 1. If an image file was uploaded, upload directly to Supabase Storage 'scan-images'
+    let supabaseImageUrl: string | undefined = undefined;
+    if (req.file) {
+      try {
+        const filePath = req.file.path || path.join(config.uploadDir, req.file.filename);
+        if (fs.existsSync(filePath)) {
+          const fileBuf = fs.readFileSync(filePath);
+          supabaseImageUrl = await uploadScanImageToStorage(
+            fileBuf,
+            req.file.originalname || req.file.filename,
+            req.file.mimetype || 'image/jpeg'
+          );
+        }
+      } catch (uploadErr) {
+        console.warn('Direct Supabase image upload note:', uploadErr);
+      }
+    }
+
     const diagnosis = await AiService.diagnoseDisease(
       userId,
       req.file,
@@ -63,8 +83,17 @@ aiRouter.post('/crop-disease', optionalAuthenticate, upload.single('image'), asy
       clientApiKey
     );
 
-    // Fetch details of matched products
-    const matchedProducts = db.find('products', p => diagnosis.recommendedProductIds.includes(p.id));
+    // If Supabase storage returned a public URL, store that in diagnosis
+    if (supabaseImageUrl && supabaseImageUrl.startsWith('http')) {
+      diagnosis.imageUrl = supabaseImageUrl;
+    }
+
+    // Persist diagnosis directly to Supabase ai_diagnoses table
+    await SupabaseDataService.saveDiagnosis(diagnosis);
+
+    // Fetch details of matched products from Supabase products table
+    const allProducts = await SupabaseDataService.getProducts();
+    const matchedProducts = allProducts.filter(p => diagnosis.recommendedProductIds.includes(p.id));
 
     return res.json({
       ...diagnosis,
@@ -135,6 +164,7 @@ aiRouter.post('/soil-analysis', optionalAuthenticate, upload.single('report'), a
       soilType
     });
 
+    await SupabaseDataService.saveSoilTest(result);
     return res.json(result);
   } catch (err: any) {
     return res.status(500).json({ error: err.message || 'Soil analysis service failed' });
@@ -155,8 +185,8 @@ aiRouter.get('/weather', async (req, res) => {
   }
 });
 
-// 6. History of diagnoses for user
-aiRouter.get('/diagnoses', authenticate, (req: AuthenticatedRequest, res: Response) => {
-  const diagnoses = db.find('ai_diagnoses', d => d.userId === req.user!.id);
+// 6. History of diagnoses for user (directly from Supabase)
+aiRouter.get('/diagnoses', authenticate, async (req: AuthenticatedRequest, res: Response) => {
+  const diagnoses = await SupabaseDataService.getDiagnoses(req.user!.id);
   return res.json(diagnoses);
 });

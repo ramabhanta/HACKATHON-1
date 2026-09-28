@@ -6,6 +6,7 @@ import { config } from '../config/index.js';
 import { authenticate, AuthenticatedRequest } from '../middleware/auth.js';
 import { User, UserRole } from '../models/types.js';
 import { v4 as uuidv4 } from 'uuid';
+import { SupabaseDataService } from '../database/supabaseDataService.js';
 
 export const authRouter = Router();
 
@@ -17,7 +18,7 @@ authRouter.post('/register', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Name, email, and password are required' });
     }
 
-    const existingUser = db.findOne('users', u => u.email.toLowerCase() === email.toLowerCase());
+    const existingUser = await SupabaseDataService.getUserByEmailOrPhone(email);
     if (existingUser) {
       return res.status(400).json({ error: 'User with this email already exists' });
     }
@@ -41,11 +42,11 @@ authRouter.post('/register', async (req: Request, res: Response) => {
       updatedAt: new Date().toISOString()
     };
 
-    db.insert('users', newUser);
+    await SupabaseDataService.createUser(newUser);
 
     // Create profile based on selected role
     if (newUser.role === 'FARMER') {
-      db.insert('farmer_profiles', {
+      await SupabaseDataService.createFarmerProfile({
         id: `prof-${uuidv4().substring(0, 8)}`,
         userId: newUser.id,
         totalAcreage: req.body.totalAcreage ? parseFloat(req.body.totalAcreage) : 3.0,
@@ -57,7 +58,7 @@ authRouter.post('/register', async (req: Request, res: Response) => {
         irrigationType: req.body.irrigationType || 'BOREWELL'
       });
     } else if (newUser.role === 'VENDOR') {
-      db.insert('vendor_profiles', {
+      await SupabaseDataService.createVendorProfile({
         id: `prof-${uuidv4().substring(0, 8)}`,
         userId: newUser.id,
         shopName: req.body.shopName || `${name}'s Agri Center`,
@@ -108,16 +109,8 @@ authRouter.post('/login', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Email or phone number and password are required' });
     }
 
-    // Match by email OR phone (supports local 10-digit or +91 format)
-    const cleanId = identifier.replace(/\D/g, '');
-    const user = db.findOne('users', u => {
-      if (u.email.toLowerCase() === identifier) return true;
-      const cleanUserPhone = (u.phone || '').replace(/\D/g, '');
-      if (cleanId.length >= 10 && cleanUserPhone.length >= 10) {
-        return cleanUserPhone.endsWith(cleanId.slice(-10));
-      }
-      return false;
-    });
+    // Match by email OR phone directly from Supabase / db
+    const user = await SupabaseDataService.getUserByEmailOrPhone(identifier);
 
     if (!user) {
       return res.status(401).json({ error: 'Invalid email, phone number, or password' });
@@ -139,15 +132,15 @@ authRouter.post('/login', async (req: Request, res: Response) => {
   }
 });
 
-authRouter.get('/me', authenticate, (req: AuthenticatedRequest, res: Response) => {
+authRouter.get('/me', authenticate, async (req: AuthenticatedRequest, res: Response) => {
   if (!req.user) return res.status(401).json({ error: 'Not authenticated' });
   const { passwordHash: _, ...userSafe } = req.user;
   
-  let profile = null;
+  let profile: any = null;
   if (req.user.role === 'FARMER') {
-    profile = db.findOne('farmer_profiles', p => p.userId === req.user!.id);
+    profile = await SupabaseDataService.getFarmerProfile(req.user.id);
   } else if (req.user.role === 'VENDOR') {
-    profile = db.findOne('vendor_profiles', p => p.userId === req.user!.id);
+    profile = await SupabaseDataService.getVendorProfile(req.user.id);
   } else if (req.user.role === 'EXPERT') {
     profile = db.findOne('expert_profiles', p => p.userId === req.user!.id);
   }
@@ -156,9 +149,10 @@ authRouter.get('/me', authenticate, (req: AuthenticatedRequest, res: Response) =
 });
 
 // Demo Role Switcher endpoint to easily test Farmer, Vendor, Buyer, Expert, Admin workflows
-authRouter.post('/demo-switch', (req: Request, res: Response) => {
+authRouter.post('/demo-switch', async (req: Request, res: Response) => {
   const { role } = req.body as { role: UserRole };
-  const user = db.findOne('users', u => u.role === role);
+  const users = await SupabaseDataService.getUsers(role);
+  const user = users && users.length > 0 ? users[0] : db.findOne('users', u => u.role === role);
   if (!user) {
     return res.status(404).json({ error: `Demo user for role ${role} not found` });
   }
@@ -170,3 +164,4 @@ authRouter.post('/demo-switch', (req: Request, res: Response) => {
   const { passwordHash: _, ...userSafe } = user;
   return res.json({ user: userSafe, token });
 });
+

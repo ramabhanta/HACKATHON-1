@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { authenticate, AuthenticatedRequest } from '../middleware/auth.js';
 import { db } from '../database/db.js';
+import { SupabaseDataService } from '../database/supabaseDataService.js';
 import { ProduceListing, BuyerRequest, AppNotification, ProcurementVendor, VendorDealRequest } from '../models/types.js';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -50,9 +51,9 @@ produceRouter.get('/procurement-vendors/:id', (req: Request, res: Response) => {
 // ==========================================
 
 // GET my vendor deal requests (Farmer sees sent requests; Vendor sees received requests)
-produceRouter.get('/vendor-requests/my', authenticate, (req: AuthenticatedRequest, res: Response) => {
+produceRouter.get('/vendor-requests/my', authenticate, async (req: AuthenticatedRequest, res: Response) => {
   const userId = req.user!.id;
-  const allRequests = db.getTable('vendor_deal_requests') || [];
+  const allRequests = await SupabaseDataService.getVendorDeals();
 
   // Farmer perspective: requests I sent
   const asFarmer = allRequests.filter(r => r.farmerId === userId);
@@ -119,6 +120,7 @@ produceRouter.post('/vendor-requests', authenticate, (req: AuthenticatedRequest,
   };
 
   db.insert('vendor_deal_requests', newDealRequest);
+  SupabaseDataService.createVendorDeal(newDealRequest);
 
   // 1. Notify the Target Vendor
   const vendorNotif: AppNotification = {
@@ -150,7 +152,7 @@ produceRouter.post('/vendor-requests', authenticate, (req: AuthenticatedRequest,
 });
 
 // PATCH vendor confirms (accepts) or rejects farmer sell request
-produceRouter.patch('/vendor-requests/:id/respond', authenticate, (req: AuthenticatedRequest, res: Response) => {
+produceRouter.patch('/vendor-requests/:id/respond', authenticate, async (req: AuthenticatedRequest, res: Response) => {
   const { id } = req.params;
   const { status, vendorResponseNotes, pickupScheduledDate } = req.body as {
     status: 'CONFIRMED' | 'REJECTED';
@@ -174,6 +176,7 @@ produceRouter.patch('/vendor-requests/:id/respond', authenticate, (req: Authenti
   };
 
   const updatedDeal = db.update('vendor_deal_requests', id, updateData);
+  await SupabaseDataService.updateVendorDealStatus(id, status);
 
   // Notify the Farmer of Vendor's decision
   const farmerNotif: AppNotification = {
@@ -199,10 +202,10 @@ produceRouter.patch('/vendor-requests/:id/respond', authenticate, (req: Authenti
 // 3. Existing Produce Listings & Bids
 // ==========================================
 
-// GET all produce listings
-produceRouter.get('/', (req: Request, res: Response) => {
+// GET all produce listings (queries Supabase)
+produceRouter.get('/', async (req: Request, res: Response) => {
   const { crop, district } = req.query;
-  let listings = db.getTable('produce_listings');
+  let listings = await SupabaseDataService.getProduceListings();
 
   if (crop) {
     const c = (crop as string).toLowerCase();
@@ -276,8 +279,8 @@ produceRouter.get('/:id', (req: Request, res: Response) => {
 });
 
 
-// POST create produce listing (Farmer)
-produceRouter.post('/', authenticate, (req: AuthenticatedRequest, res: Response) => {
+// POST create produce listing (Farmer - persists to Supabase)
+produceRouter.post('/', authenticate, async (req: AuthenticatedRequest, res: Response) => {
   const { cropName, variety, quantity, unit, expectedPricePerUnit, harvestDate, village, district, state, qualityGrade, images, description, photoMetadata } = req.body;
 
   if (!cropName || !quantity || !expectedPricePerUnit) {
@@ -306,8 +309,8 @@ produceRouter.post('/', authenticate, (req: AuthenticatedRequest, res: Response)
     createdAt: new Date().toISOString()
   };
 
-  db.insert('produce_listings', newListing);
-  return res.status(201).json(newListing);
+  const created = await SupabaseDataService.createProduceListing(newListing);
+  return res.status(201).json(created);
 });
 
 // POST submit buyer purchase offer on farmer's lot (Vendor -> Farmer)

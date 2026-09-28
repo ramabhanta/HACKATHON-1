@@ -330,3 +330,24 @@ CREATE POLICY "Public Produce Listings" ON produce_listings FOR SELECT USING (tr
 CREATE POLICY "Allow All for Authenticated & Anon API" ON users FOR ALL USING (true);
 CREATE POLICY "Allow All for Authenticated Deals" ON vendor_deal_requests FOR ALL USING (true);
 CREATE POLICY "Allow All for Authenticated Orders" ON orders FOR ALL USING (true);
+
+-- 18. STORAGE BUCKET FOR CROP DISEASE SCANS ('scan-images')
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('scan-images', 'scan-images', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- Storage policies for scan-images
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_policies WHERE schemaname = 'storage' AND tablename = 'objects' AND policyname = 'Public Scan Images Access'
+    ) THEN
+        CREATE POLICY "Public Scan Images Access" ON storage.objects FOR SELECT USING (bucket_id = 'scan-images');
+    END IF;
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_policies WHERE schemaname = 'storage' AND tablename = 'objects' AND policyname = 'Public Scan Images Upload'
+    ) THEN
+        CREATE POLICY "Public Scan Images Upload" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'scan-images');
+    END IF;
+END $$;
+

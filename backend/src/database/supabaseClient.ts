@@ -294,3 +294,57 @@ export function saveSupabaseConfig(url: string, anonKey: string, serviceKey?: st
     console.error('Failed to write .env file:', e);
   }
 }
+
+/**
+ * Uploads a disease scan leaf photo directly to Supabase Storage bucket 'scan-images'
+ * and returns the public CDN URL.
+ */
+export async function uploadScanImageToStorage(
+  fileBuffer: Buffer,
+  fileName: string,
+  mimeType: string = 'image/jpeg'
+): Promise<string> {
+  const client = getSupabase();
+  if (!client) {
+    return `/uploads/${fileName}`;
+  }
+
+  try {
+    const bucketName = 'scan-images';
+    // Ensure bucket exists or create it
+    try {
+      const { data: buckets } = await client.storage.listBuckets();
+      const bucketExists = buckets?.some(b => b.name === bucketName);
+      if (!bucketExists) {
+        await client.storage.createBucket(bucketName, { public: true });
+      }
+    } catch {
+      // ignore check error
+    }
+
+    const cleanName = fileName.replace(/[^a-zA-Z0-9._-]/g, '_');
+    const storagePath = `${Date.now()}_${cleanName}`;
+
+    const { error: uploadError } = await client.storage
+      .from(bucketName)
+      .upload(storagePath, fileBuffer, {
+        contentType: mimeType,
+        upsert: true
+      });
+
+    if (uploadError) {
+      console.warn('Supabase storage upload error, using local fallback:', uploadError.message);
+      return `/uploads/${fileName}`;
+    }
+
+    const { data: urlData } = client.storage
+      .from(bucketName)
+      .getPublicUrl(storagePath);
+
+    return urlData?.publicUrl || `/uploads/${fileName}`;
+  } catch (err: any) {
+    console.warn('Supabase storage exception, using local fallback:', err?.message || err);
+    return `/uploads/${fileName}`;
+  }
+}
+

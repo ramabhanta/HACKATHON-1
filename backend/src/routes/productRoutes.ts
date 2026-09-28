@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { db } from '../database/db.js';
+import { SupabaseDataService } from '../database/supabaseDataService.js';
 import { authenticate, AuthenticatedRequest, requireRole } from '../middleware/auth.js';
 import { Product } from '../models/types.js';
 import { v4 as uuidv4 } from 'uuid';
@@ -12,18 +13,14 @@ productRouter.get('/categories', (_req: Request, res: Response) => {
   return res.json(categories);
 });
 
-// GET products with search, category, crop, and stock filters
-productRouter.get('/', (req: Request, res: Response) => {
+// GET products with search, category, crop, and stock filters (queries Supabase)
+productRouter.get('/', async (req: Request, res: Response) => {
   const { search, category, crop, organic, minPrice, maxPrice, inStock, vendorId } = req.query;
 
-  let products = db.find('products', p => p.status === 'APPROVED' || !p.status);
+  let products = await SupabaseDataService.getProducts(category as string);
 
   if (vendorId) {
     products = products.filter(p => p.vendorId === vendorId);
-  }
-
-  if (category) {
-    products = products.filter(p => p.category.toLowerCase() === (category as string).toLowerCase());
   }
 
   if (organic !== undefined) {
@@ -74,9 +71,9 @@ productRouter.get('/', (req: Request, res: Response) => {
   return res.json(enriched);
 });
 
-// GET product by id
-productRouter.get('/:id', (req: Request, res: Response) => {
-  const product = db.findById('products', req.params.id);
+// GET product by id (queries Supabase)
+productRouter.get('/:id', async (req: Request, res: Response) => {
+  const product = await SupabaseDataService.getProductById(req.params.id);
   if (!product) {
     return res.status(404).json({ error: 'Product not found' });
   }
@@ -96,8 +93,8 @@ productRouter.get('/:id', (req: Request, res: Response) => {
   });
 });
 
-// POST add new product (Vendor only)
-productRouter.post('/', authenticate, requireRole(['VENDOR', 'ADMIN']), (req: AuthenticatedRequest, res: Response) => {
+// POST add new product (Vendor only - persists to Supabase)
+productRouter.post('/', authenticate, requireRole(['VENDOR', 'ADMIN']), async (req: AuthenticatedRequest, res: Response) => {
   const {
     name, brand, category, images, description, agriculturalUse,
     applicableCrops, packSize, price, mrp, stockQuantity, isOrganic,
@@ -132,51 +129,21 @@ productRouter.post('/', authenticate, requireRole(['VENDOR', 'ADMIN']), (req: Au
     createdAt: new Date().toISOString()
   };
 
-  db.insert('products', newProduct);
-  return res.status(201).json(newProduct);
+  const created = await SupabaseDataService.createProduct(newProduct);
+  return res.status(201).json(created);
 });
 
-// PATCH update product stock (Vendor / Admin)
-productRouter.patch('/:id/stock', authenticate, requireRole(['VENDOR', 'ADMIN']), (req: AuthenticatedRequest, res: Response) => {
-  const { id } = req.params;
+// PATCH update product stock (Vendor / Admin - updates in Supabase)
+productRouter.patch('/:id/stock', authenticate, requireRole(['VENDOR', 'ADMIN']), async (req: AuthenticatedRequest, res: Response) => {
   const { stockQuantity } = req.body;
-
-  const product = db.findById('products', id);
+  const product = db.findById('products', req.params.id);
+  
   if (!product) return res.status(404).json({ error: 'Product not found' });
-
   if (product.vendorId !== req.user!.id && req.user!.role !== 'ADMIN') {
-    return res.status(403).json({ error: 'Unauthorized to update this product stock' });
+    return res.status(403).json({ error: 'Unauthorized to modify this product inventory' });
   }
 
-  const updated = db.update('products', id, {
-    stockQuantity: Math.max(0, parseInt(stockQuantity, 10) || 0)
-  });
-
-  return res.json(updated);
-});
-
-// PUT edit product (Vendor / Admin)
-productRouter.put('/:id', authenticate, requireRole(['VENDOR', 'ADMIN']), (req: AuthenticatedRequest, res: Response) => {
-  const { id } = req.params;
-  const product = db.findById('products', id);
-  if (!product) return res.status(404).json({ error: 'Product not found' });
-
-  if (product.vendorId !== req.user!.id && req.user!.role !== 'ADMIN') {
-    return res.status(403).json({ error: 'Unauthorized to edit this product' });
-  }
-
-  const { name, brand, category, price, mrp, stockQuantity, packSize, description } = req.body;
-  const updated = db.update('products', id, {
-    name: name ?? product.name,
-    brand: brand ?? product.brand,
-    category: category ?? product.category,
-    price: price ? parseFloat(price) : product.price,
-    mrp: mrp ? parseFloat(mrp) : product.mrp,
-    stockQuantity: stockQuantity !== undefined ? parseInt(stockQuantity, 10) : product.stockQuantity,
-    packSize: packSize ?? product.packSize,
-    description: description ?? product.description
-  });
-
+  const updated = await SupabaseDataService.updateProductStock(req.params.id, parseInt(stockQuantity, 10));
   return res.json(updated);
 });
 

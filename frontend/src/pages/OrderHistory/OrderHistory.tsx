@@ -20,10 +20,12 @@ import {
   XCircle,
   Building2,
   Sparkles,
-  ShoppingBag
+  ShoppingBag,
+  FileDown
 } from 'lucide-react';
 import { CountdownTimer } from '../../components/CountdownTimer';
 import { subscribeToTable } from '../../services/supabaseClient';
+import { exportOrderInvoicePDF } from '../../utils/reportExport';
 
 interface OrderHistoryProps {
   setActiveTab: (tab: string) => void;
@@ -39,12 +41,47 @@ export const OrderHistory: React.FC<OrderHistoryProps> = ({ setActiveTab }) => {
   const [transferringOrderId, setTransferringOrderId] = useState<string | null>(null);
   const [selectedTransferShops, setSelectedTransferShops] = useState<Record<string, string>>({});
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [downloadingInvoiceId, setDownloadingInvoiceId] = useState<string | null>(null);
 
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
     setToast({ message, type });
     setTimeout(() => {
       setToast(null);
     }, 4500);
+  };
+
+  const handleDownloadInvoice = (order: any) => {
+    setDownloadingInvoiceId(order.id);
+    showToast('Generating official Agri Store Invoice PDF... 📄');
+    setTimeout(() => {
+      try {
+        exportOrderInvoicePDF({
+          id: order.id,
+          orderNumber: order.orderNumber,
+          createdAt: order.createdAt,
+          farmerName: order.farmerName || user?.name || 'Registered Farmer',
+          vendorName: order.shopDetails?.name || order.vendorName,
+          deliveryAddress: order.deliveryAddress,
+          items: (order.items || []).map((it: any) => ({
+            name: it.productName || it.name || 'Agri Item',
+            quantity: it.quantity || 1,
+            unitPrice: it.price || it.unitPrice || 0,
+            price: it.price || it.unitPrice || 0,
+            unit: it.packSize || 'pack'
+          })),
+          totalAmount: order.totalAmount || 0,
+          paymentMethod: order.paymentMethod || 'PAY_ON_PICKUP',
+          paymentStatus: order.paymentStatus || 'PENDING',
+          status: order.status || 'PLACED',
+          collectionOtp: order.collectionOtp
+        });
+        showToast('Invoice downloaded successfully! ✅');
+      } catch (err) {
+        showToast('Failed to generate invoice PDF', 'error');
+      } finally {
+        setDownloadingInvoiceId(null);
+      }
+    }, 350);
   };
 
   const loadOrders = async () => {
@@ -354,13 +391,30 @@ export const OrderHistory: React.FC<OrderHistoryProps> = ({ setActiveTab }) => {
                     </p>
                   </div>
 
-                  <div className="text-left sm:text-right">
-                    <span className="text-base font-black text-emerald-800">
-                      ₹{order.totalAmount?.toLocaleString('en-IN')}
-                    </span>
-                    <span className="text-[10px] text-gray-500 block uppercase font-bold">
-                      Zero Online Debit • Cash/UPI on Pickup
-                    </span>
+                  <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-2">
+                    <div>
+                      <span className="text-base font-black text-emerald-800">
+                        ₹{order.totalAmount?.toLocaleString('en-IN')}
+                      </span>
+                      <span className="text-[10px] text-gray-500 hidden sm:block uppercase font-bold">
+                        Zero Online Debit • Cash/UPI on Pickup
+                      </span>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => handleDownloadInvoice(order)}
+                      disabled={downloadingInvoiceId === order.id}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-stone-100 hover:bg-emerald-50 text-gray-700 hover:text-emerald-800 border border-gray-200 rounded-xl text-xs font-bold transition active:scale-95 disabled:opacity-50"
+                      title="Download Official Tax Invoice PDF"
+                    >
+                      {downloadingInvoiceId === order.id ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <FileDown className="w-3.5 h-3.5 text-emerald-700" />
+                      )}
+                      <span>Invoice PDF</span>
+                    </button>
                   </div>
                 </div>
 

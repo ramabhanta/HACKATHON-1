@@ -11,8 +11,11 @@ import {
   Droplet,
   Flame,
   ArrowRight,
-  Info
+  Info,
+  FileDown,
+  Loader2
 } from 'lucide-react';
+import { exportSoilHealthReportPDF } from '../../utils/reportExport';
 
 interface SoilHealthProps {
   setActiveTab: (tab: string) => void;
@@ -92,6 +95,36 @@ export const SoilHealth: React.FC<SoilHealthProps> = ({ setActiveTab }) => {
     } finally {
       setIsAnalyzing(false);
     }
+  };
+
+  const [isExportingPdf, setIsExportingPdf] = useState(false);
+
+  const handleDownloadReport = () => {
+    setIsExportingPdf(true);
+    setToast('Generating official Soil Health Card PDF... 📄');
+    setTimeout(() => {
+      try {
+        exportSoilHealthReportPDF({
+          ph,
+          nitrogenKgPerHa: result.nitrogenKgPerHa || nitrogen,
+          phosphorusKgPerHa: result.phosphorusKgPerHa || phosphorus,
+          potassiumKgPerHa: result.potassiumKgPerHa || potassium,
+          organicCarbonPct: result.organicCarbonPct || organicCarbon,
+          electricalConductivity: ec,
+          soilHealthScore: result.soilHealthScore,
+          soilType,
+          summary: result.summary,
+          recommendations: result.recommendations,
+          suitableCrops: result.suitableCrops
+        });
+        setToast('Soil Health Card downloaded successfully! ✅');
+      } catch (err) {
+        setToast('Failed to generate PDF. Please try again.');
+      } finally {
+        setIsExportingPdf(false);
+        setTimeout(() => setToast(null), 3000);
+      }
+    }, 350);
   };
 
   return (
@@ -285,13 +318,25 @@ export const SoilHealth: React.FC<SoilHealthProps> = ({ setActiveTab }) => {
               </p>
             </div>
 
-            <div className="flex items-center gap-3 bg-emerald-50 p-3 rounded-2xl border border-emerald-200">
-              <div className="w-12 h-12 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-xl font-black">
-                {result.soilHealthScore}
-              </div>
-              <div>
-                <span className="text-[10px] font-bold text-gray-500 uppercase block">Soil Health Index</span>
-                <span className="text-xs font-black text-emerald-900">Good Fertility</span>
+            <div className="flex flex-wrap items-center gap-3">
+              <button
+                type="button"
+                onClick={handleDownloadReport}
+                disabled={isExportingPdf}
+                className="inline-flex items-center gap-2 px-3.5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-xs transition active:scale-95 disabled:opacity-50"
+              >
+                {isExportingPdf ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileDown className="w-4 h-4" />}
+                <span>{isExportingPdf ? 'Generating PDF...' : 'Download Soil Card (PDF)'}</span>
+              </button>
+
+              <div className="flex items-center gap-3 bg-emerald-50 p-2.5 rounded-2xl border border-emerald-200">
+                <div className="w-11 h-11 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-lg font-black">
+                  {result.soilHealthScore}
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold text-gray-500 uppercase block">Soil Health Index</span>
+                  <span className="text-xs font-black text-emerald-900">Good Fertility</span>
+                </div>
               </div>
             </div>
           </div>

@@ -20,8 +20,11 @@ import {
   HardDrive,
   Info,
   Zap,
-  X
+  X,
+  FileDown,
+  Loader2
 } from 'lucide-react';
+import { exportDiagnosisReportPDF } from '../../utils/reportExport';
 import {
   extractPhotoTelemetry,
   createSampleTelemetry,
@@ -99,6 +102,38 @@ export const DiseaseScan: React.FC<DiseaseScanProps> = ({ setActiveTab }) => {
   const [diagnosis, setDiagnosis] = useState<any>(null);
   const [scanError, setScanError] = useState<string | null>(null);
   const [confirmedCrop, setConfirmedCrop] = useState<string>('');
+  const [isExportingPdf, setIsExportingPdf] = useState(false);
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
+
+  const handleDownloadReport = () => {
+    if (!diagnosis) return;
+    setIsExportingPdf(true);
+    setToastMsg('Compiling Pathology Diagnosis Report PDF... 📄');
+    setTimeout(() => {
+      try {
+        exportDiagnosisReportPDF({
+          detected_disease: diagnosis.suspectedIssue || diagnosis.detected_disease,
+          suspectedIssue: diagnosis.suspectedIssue,
+          cropName: diagnosis.cropName || confirmedCrop || 'Field Crop',
+          confidence: (diagnosis.confidenceScore || 90) / 100,
+          confidence_score: (diagnosis.confidenceScore || 90) / 100,
+          severity: diagnosis.severity || 'Moderate',
+          symptoms: diagnosis.symptomsEvidence || [],
+          culturalControl: diagnosis.culturalControl || [],
+          biologicalControl: diagnosis.biologicalControl || [],
+          chemicalControlSafe: diagnosis.chemicalControlSafe || [],
+          remedies: diagnosis.remedies || [],
+          photoTelemetry
+        });
+        setToastMsg('Diagnosis Report PDF downloaded successfully! ✅');
+      } catch (err) {
+        setToastMsg('Failed to generate report PDF.');
+      } finally {
+        setIsExportingPdf(false);
+        setTimeout(() => setToastMsg(null), 3000);
+      }
+    }, 350);
+  };
 
   const quickCrops = [
     { label: '🍅 Tomato', name: 'Tomato' },
@@ -267,6 +302,14 @@ export const DiseaseScan: React.FC<DiseaseScanProps> = ({ setActiveTab }) => {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 pb-20 md:pb-8">
+      {/* Toast Notification */}
+      {toastMsg && (
+        <div className="fixed top-5 right-5 z-50 px-4 py-3 rounded-2xl shadow-xl flex items-center gap-2.5 text-xs font-bold bg-emerald-800 text-white border border-emerald-600 animate-in slide-in-from-top-2 duration-300">
+          <CheckCircle2 className="w-4 h-4 text-emerald-300" />
+          <span>{toastMsg}</span>
+        </div>
+      )}
+
       {/* Title */}
       <div className="bg-white rounded-3xl p-6 shadow-sm border border-emerald-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -690,13 +733,25 @@ export const DiseaseScan: React.FC<DiseaseScanProps> = ({ setActiveTab }) => {
               </h2>
             </div>
 
-            <div className="bg-emerald-50 px-4 py-2.5 rounded-2xl border border-emerald-200 text-center sm:text-right">
-              <span className="text-[10px] font-bold text-emerald-800 uppercase block">
-                {t('confidenceScore')}
-              </span>
-              <span className="text-2xl font-black text-emerald-700">
-                {diagnosis.confidenceScore}%
-              </span>
+            <div className="flex flex-wrap items-center gap-2.5">
+              <button
+                type="button"
+                onClick={handleDownloadReport}
+                disabled={isExportingPdf}
+                className="inline-flex items-center gap-2 px-3.5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-xs transition active:scale-95 disabled:opacity-50"
+              >
+                {isExportingPdf ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileDown className="w-4 h-4" />}
+                <span>{isExportingPdf ? 'Generating PDF...' : 'Download Report (PDF)'}</span>
+              </button>
+
+              <div className="bg-emerald-50 px-4 py-2 rounded-2xl border border-emerald-200 text-center sm:text-right">
+                <span className="text-[10px] font-bold text-emerald-800 uppercase block">
+                  {t('confidenceScore')}
+                </span>
+                <span className="text-xl font-black text-emerald-700">
+                  {diagnosis.confidenceScore}%
+                </span>
+              </div>
             </div>
           </div>
 

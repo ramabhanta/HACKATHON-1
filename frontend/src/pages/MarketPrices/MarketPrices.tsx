@@ -26,8 +26,10 @@ import {
   ArrowUpDown,
   Building2,
   Share2,
-  Info
+  Info,
+  FileDown
 } from 'lucide-react';
+import { exportMandiRatesCSV } from '../../utils/reportExport';
 
 export type MandiCommodityType =
   | 'CROP'
@@ -153,6 +155,29 @@ export const MarketPrices: React.FC<MarketPricesProps> = ({ setActiveTab }) => {
   const [formSubmitting, setFormSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [successToast, setSuccessToast] = useState<string | null>(null);
+  const [isExportingCsv, setIsExportingCsv] = useState(false);
+
+  const handleExportCSV = () => {
+    const listToExport = filteredPrices && filteredPrices.length > 0 ? filteredPrices : prices;
+    if (listToExport.length === 0) {
+      setSuccessToast('No mandi prices to export under current filters.');
+      setTimeout(() => setSuccessToast(null), 3000);
+      return;
+    }
+    setIsExportingCsv(true);
+    setSuccessToast('Generating APMC Mandi Rates CSV Sheet... 📊');
+    setTimeout(() => {
+      try {
+        exportMandiRatesCSV(listToExport, selectedState, selectedDistrict);
+        setSuccessToast('Mandi Rate sheet downloaded successfully! ✅');
+      } catch (err) {
+        setSuccessToast('Failed to export CSV. Please try again.');
+      } finally {
+        setIsExportingCsv(false);
+        setTimeout(() => setSuccessToast(null), 3500);
+      }
+    }, 350);
+  };
 
   // Add Price Form Fields
   const [formState, setFormState] = useState<string>('Andhra Pradesh');
@@ -612,6 +637,21 @@ export const MarketPrices: React.FC<MarketPricesProps> = ({ setActiveTab }) => {
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              onClick={handleExportCSV}
+              disabled={isExportingCsv}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-700/80 hover:bg-emerald-600 border border-emerald-500/40 text-sm font-semibold transition text-white active:scale-95 disabled:opacity-50"
+              title="Export Filtered Mandi Rate Sheet (CSV)"
+            >
+              {isExportingCsv ? (
+                <Loader2 className="w-4 h-4 animate-spin text-emerald-200" />
+              ) : (
+                <FileDown className="w-4 h-4 text-emerald-300" />
+              )}
+              <span>{isExportingCsv ? 'Exporting...' : 'Export Mandi Rates (CSV)'}</span>
+            </button>
+
             <button
               onClick={handleRefresh}
               disabled={refreshing}

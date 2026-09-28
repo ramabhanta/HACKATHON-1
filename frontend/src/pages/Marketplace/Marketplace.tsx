@@ -29,6 +29,7 @@ import {
   Package,
   Sprout
 } from 'lucide-react';
+import { subscribeToTable } from '../../services/supabaseClient';
 
 interface MarketplaceProps {
   setActiveTab: (tab: string) => void;
@@ -80,6 +81,18 @@ export const Marketplace: React.FC<MarketplaceProps> = ({ setActiveTab }) => {
       }
     }
     fetchCatalog();
+
+    // Supabase Realtime subscription for instant product updates
+    const subProducts = subscribeToTable('marketplace_products', {
+      onChange: () => {
+        console.log('⚡ [Realtime Store] Products changed, refreshing catalog...');
+        fetchCatalog();
+      }
+    });
+
+    return () => {
+      subProducts.unsubscribe();
+    };
   }, []);
 
   const openBookingModal = (product: any) => {
@@ -377,6 +390,9 @@ export const Marketplace: React.FC<MarketplaceProps> = ({ setActiveTab }) => {
                   <img
                     src={p.images?.[0] || 'https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?w=400'}
                     alt={p.name}
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?w=400';
+                    }}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
 
@@ -784,8 +800,11 @@ export const Marketplace: React.FC<MarketplaceProps> = ({ setActiveTab }) => {
             {/* Top overview */}
             <div className="flex flex-col sm:flex-row gap-4 items-start border-b border-gray-100 pb-4">
               <img
-                src={activeProductModal.images?.[0]}
+                src={activeProductModal.images?.[0] || 'https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?w=400'}
                 alt={activeProductModal.name}
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?w=400';
+                }}
                 className="w-full sm:w-44 h-44 rounded-2xl object-cover border border-gray-100"
               />
               <div className="flex-1">

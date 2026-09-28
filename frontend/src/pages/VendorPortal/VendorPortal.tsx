@@ -32,6 +32,7 @@ import {
 } from 'lucide-react';
 
 import { CountdownTimer } from '../../components/CountdownTimer';
+import { subscribeToTable } from '../../services/supabaseClient';
 
 export const VendorPortal: React.FC = () => {
   const { user } = useAuth();
@@ -149,6 +150,37 @@ export const VendorPortal: React.FC = () => {
 
   useEffect(() => {
     loadData();
+
+    // Supabase Realtime subscriptions for sub-second updates
+    const subOrders = subscribeToTable('orders', {
+      onChange: () => {
+        console.log('⚡ [Realtime Vendor] Order updated, reloading data...');
+        loadData();
+      }
+    });
+
+    const subProducts = subscribeToTable('marketplace_products', {
+      onChange: () => {
+        console.log('⚡ [Realtime Vendor] Product updated, reloading data...');
+        loadData();
+      }
+    });
+
+    const subProduce = subscribeToTable('produce_listings', {
+      onChange: () => {
+        console.log('⚡ [Realtime Vendor] Produce listing updated, reloading data...');
+        loadData();
+      }
+    });
+
+    const interval = setInterval(loadData, 20000);
+
+    return () => {
+      subOrders.unsubscribe();
+      subProducts.unsubscribe();
+      subProduce.unsubscribe();
+      clearInterval(interval);
+    };
   }, []);
 
   const handleUpdateOrderStatus = async (orderId: string, newStatus: string) => {

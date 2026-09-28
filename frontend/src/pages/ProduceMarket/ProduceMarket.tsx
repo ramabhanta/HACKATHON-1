@@ -28,9 +28,12 @@ import {
   Users,
   Camera,
   Upload,
-  HardDrive
+  HardDrive,
+  FileDown
 } from 'lucide-react';
 import { extractPhotoTelemetry, PhotoTelemetryInfo } from '../../utils/photoTelemetry';
+import { exportProcurementVoucherPDF } from '../../utils/reportExport';
+import { subscribeToTable } from '../../services/supabaseClient';
 
 interface ProduceMarketProps {
   setActiveTab: (tab: string) => void;
@@ -152,6 +155,20 @@ export const ProduceMarket: React.FC<ProduceMarketProps> = ({ setActiveTab }) =>
 
   useEffect(() => {
     loadData();
+
+    const subProduce = subscribeToTable('produce_listings', {
+      onChange: () => {
+        console.log('⚡ [Realtime Produce] Listing changed, reloading...');
+        loadData();
+      }
+    });
+
+    const interval = setInterval(loadData, 20000);
+
+    return () => {
+      subProduce.unsubscribe();
+      clearInterval(interval);
+    };
   }, []);
 
   // Filter vendors based on selected crop & search query
@@ -1384,12 +1401,18 @@ export const ProduceMarket: React.FC<ProduceMarketProps> = ({ setActiveTab }) =>
 
             <button
               onClick={() => {
-                showToast('Procurement voucher downloaded to your device! 📄');
+                try {
+                  exportProcurementVoucherPDF(viewAgreementDeal);
+                  showToast('Procurement voucher PDF generated & downloaded! 📄');
+                } catch (err) {
+                  showToast('Failed to download voucher PDF.', 'error');
+                }
                 setViewAgreementDeal(null);
               }}
-              className="w-full py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl text-xs transition"
+              className="w-full py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl text-xs transition flex items-center justify-center gap-2 shadow-xs"
             >
-              Download PDF / Share Receipt
+              <FileDown className="w-4 h-4" />
+              <span>Download Official Gate Voucher (PDF)</span>
             </button>
           </div>
         </div>

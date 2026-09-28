@@ -30,6 +30,7 @@ import {
   Minus,
   TrendingDown
 } from 'lucide-react';
+import { subscribeToTable } from '../../services/supabaseClient';
 
 function normalizeCategory(cat?: string): string {
   if (!cat) return 'OTHER';
@@ -144,6 +145,25 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
 
   useEffect(() => {
     loadData();
+
+    const subFarms = subscribeToTable('farms', {
+      onChange: () => {
+        console.log('⚡ [Realtime Dashboard] Farm changed, reloading...');
+        loadData();
+      }
+    });
+
+    const subCrops = subscribeToTable('crops', {
+      onChange: () => {
+        console.log('⚡ [Realtime Dashboard] Crops changed, reloading...');
+        loadData();
+      }
+    });
+
+    return () => {
+      subFarms.unsubscribe();
+      subCrops.unsubscribe();
+    };
   }, []);
 
   useEffect(() => {

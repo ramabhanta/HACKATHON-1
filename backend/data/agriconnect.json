@@ -931,6 +931,760 @@
         "Have you observed any yellowing or premature defoliation of the lower leaves in the affected field?"
       ],
       "createdAt": "2026-09-28T08:53:14.697Z"
+    },
+    {
+      "id": "diag-826ecd94",
+      "userId": "usr-farmer-1",
+      "cropName": "Tomato",
+      "imageUrl": "/uploads/b9096da4-3dc3-4278-bdce-e3ef011179fc.webp",
+      "photoMetadata": {
+        "uploadedAt": "2026-09-28T09:03:58.223Z",
+        "uploadDateFormatted": "Mon, 28 Sept, 2026",
+        "uploadTimeFormatted": "02:33:58 pm",
+        "uploadedAtFormatted": "Mon, 28 Sept, 2026 at 02:33:58 pm",
+        "captureDateFormatted": "Mon, 28 Sept, 2026 at 02:33:58 pm",
+        "fileName": "tomato-leaves-late-blight-phytophthora-infestans-affected-solanum-lycopersicum-early-potato-alternamia-fungus-left-mold-431446534.webp",
+        "fileSizeBytes": 35630,
+        "fileSizeFormatted": "0.03 MB",
+        "dimensions": "1920 × 1440 px",
+        "megapixels": "2.8 MP",
+        "mimeType": "image/webp",
+        "aspectRatio": "4:3 (Field Camera)",
+        "latitude": 14.1165,
+        "longitude": 78.1634,
+        "locationName": "Kadiri, Sri Sathya Sai District, Andhra Pradesh",
+        "deviceSource": "Field Camera",
+        "verified": true
+      },
+      "suspectedIssue": "Early Blight (Alternaria solani)",
+      "confidenceScore": 95,
+      "severity": "MODERATE",
+      "symptomsEvidence": [
+        "Circular to irregular brown necrotic spots visible on older foliage",
+        "Concentric rings (target-board pattern) apparent within the leaf lesions",
+        "Yellow halo (chlorosis) surrounding the infected necrotic tissue zones"
+      ],
+      "culturalControl": [
+        "Remove and destroy heavily infected lower leaves and plant debris to reduce primary inoculum load.",
+        "Maintain adequate plant spacing (60 x 45 cm) to ensure proper air circulation and reduce canopy humidity.",
+        "Avoid overhead sprinkler irrigation; instead, adopt drip irrigation to keep foliage dry and suppress spore germination."
+      ],
+      "biologicalControl": [
+        "Pseudomonas fluorescens @ 5-10 g/L of water applied as a foliar spray for systemic acquired resistance against fungal pathogens.",
+        "Cold-pressed Neem Oil 10,000 PPM @ 4 ml/L of water mixed with a mild soap sticker to deter secondary pests and suppress fungal growth."
+      ],
+      "chemicalControlSafe": [
+        "Spray Mancozeb 75% WP @ 2 g per litre of water during early morning or late evening hours at 10-12 day intervals.",
+        "In case of severe outbreak, apply Chlorothalonil 75% WP @ 2 g per litre of water, ensuring a Pre-Harvest Interval (PHI) of 7 days before picking."
+      ],
+      "safetyWarnings": [
+        "Always wear personal protective equipment (PPE) including rubber gloves, face mask, and eye protection during chemical preparation and spraying.",
+        "Observe the mandatory Pre-Harvest Interval (PHI) of 7 to 10 days for harvested tomato fruits after chemical fungicide application.",
+        "Avoid mixing multiple copper or sulfur-based fungicides unless recommended by local KVK experts to prevent phytotoxicity."
+      ],
+      "recommendedProductIds": [
+        "prod-trichoderma",
+        "prod-neem-oil",
+        "prod-sprayer"
+      ],
+      "isExpertReviewed": false,
+      "followUpQuestions": [
+        "What is the current local weather pattern (e.g., humid, rainy, or alternating high temperatures and heavy dew)?",
+        "Are similar necrotic target-board lesions visible on the tomato stems or fruit calyxes?",
+        "Which specific fungicide or organic treatment has been applied to this plot in the last 15 days?"
+      ],
+      "createdAt": "2026-09-28T09:04:04.276Z"
+    },
+    {
+      "id": "diag-826ecd94",
+      "userId": "usr-farmer-1",
+      "cropName": "Tomato",
+      "imageUrl": "/uploads/b9096da4-3dc3-4278-bdce-e3ef011179fc.webp",
+      "photoMetadata": {
+        "uploadedAt": "2026-09-28T09:03:58.223Z",
+        "uploadDateFormatted": "Mon, 28 Sept, 2026",
+        "uploadTimeFormatted": "02:33:58 pm",
+        "uploadedAtFormatted": "Mon, 28 Sept, 2026 at 02:33:58 pm",
+        "captureDateFormatted": "Mon, 28 Sept, 2026 at 02:33:58 pm",
+        "fileName": "tomato-leaves-late-blight-phytophthora-infestans-affected-solanum-lycopersicum-early-potato-alternamia-fungus-left-mold-431446534.webp",
+        "fileSizeBytes": 35630,
+        "fileSizeFormatted": "0.03 MB",
+        "dimensions": "1920 × 1440 px",
+        "megapixels": "2.8 MP",
+        "mimeType": "image/webp",
+        "aspectRatio": "4:3 (Field Camera)",
+        "latitude": 14.1165,
+        "longitude": 78.1634,
+        "locationName": "Kadiri, Sri Sathya Sai District, Andhra Pradesh",
+        "deviceSource": "Field Camera",
+        "verified": true
+      },
+      "suspectedIssue": "Early Blight (Alternaria solani)",
+      "confidenceScore": 95,
+      "severity": "MODERATE",
+      "symptomsEvidence": [
+        "Circular to irregular brown necrotic spots visible on older foliage",
+        "Concentric rings (target-board pattern) apparent within the leaf lesions",
+        "Yellow halo (chlorosis) surrounding the infected necrotic tissue zones"
+      ],
+      "culturalControl": [
+        "Remove and destroy heavily infected lower leaves and plant debris to reduce primary inoculum load.",
+        "Maintain adequate plant spacing (60 x 45 cm) to ensure proper air circulation and reduce canopy humidity.",
+        "Avoid overhead sprinkler irrigation; instead, adopt drip irrigation to keep foliage dry and suppress spore germination."
+      ],
+      "biologicalControl": [
+        "Pseudomonas fluorescens @ 5-10 g/L of water applied as a foliar spray for systemic acquired resistance against fungal pathogens.",
+        "Cold-pressed Neem Oil 10,000 PPM @ 4 ml/L of water mixed with a mild soap sticker to deter secondary pests and suppress fungal growth."
+      ],
+      "chemicalControlSafe": [
+        "Spray Mancozeb 75% WP @ 2 g per litre of water during early morning or late evening hours at 10-12 day intervals.",
+        "In case of severe outbreak, apply Chlorothalonil 75% WP @ 2 g per litre of water, ensuring a Pre-Harvest Interval (PHI) of 7 days before picking."
+      ],
+      "safetyWarnings": [
+        "Always wear personal protective equipment (PPE) including rubber gloves, face mask, and eye protection during chemical preparation and spraying.",
+        "Observe the mandatory Pre-Harvest Interval (PHI) of 7 to 10 days for harvested tomato fruits after chemical fungicide application.",
+        "Avoid mixing multiple copper or sulfur-based fungicides unless recommended by local KVK experts to prevent phytotoxicity."
+      ],
+      "recommendedProductIds": [
+        "prod-trichoderma",
+        "prod-neem-oil",
+        "prod-sprayer"
+      ],
+      "isExpertReviewed": false,
+      "followUpQuestions": [
+        "What is the current local weather pattern (e.g., humid, rainy, or alternating high temperatures and heavy dew)?",
+        "Are similar necrotic target-board lesions visible on the tomato stems or fruit calyxes?",
+        "Which specific fungicide or organic treatment has been applied to this plot in the last 15 days?"
+      ],
+      "createdAt": "2026-09-28T09:04:04.276Z"
+    },
+    {
+      "id": "diag-7118489a",
+      "userId": "usr-farmer-1",
+      "cropName": "Tomato",
+      "imageUrl": "/uploads/eeff3357-a173-48f6-90c9-d2e0e2172f11.webp",
+      "photoMetadata": {
+        "uploadedAt": "2026-09-28T09:04:33.579Z",
+        "uploadDateFormatted": "Mon, 28 Sept, 2026",
+        "uploadTimeFormatted": "02:34:33 pm",
+        "uploadedAtFormatted": "Mon, 28 Sept, 2026 at 02:34:33 pm",
+        "captureDateFormatted": "Mon, 28 Sept, 2026 at 02:34:33 pm",
+        "fileName": "tomato-leaves-late-blight-phytophthora-infestans-affected-solanum-lycopersicum-early-potato-alternamia-fungus-left-mold-431446534.webp",
+        "fileSizeBytes": 35630,
+        "fileSizeFormatted": "0.03 MB",
+        "dimensions": "1920 × 1440 px",
+        "megapixels": "2.8 MP",
+        "mimeType": "image/webp",
+        "aspectRatio": "4:3 (Field Camera)",
+        "latitude": 14.1165,
+        "longitude": 78.1634,
+        "locationName": "Kadiri, Sri Sathya Sai District, Andhra Pradesh",
+        "deviceSource": "Field Camera",
+        "verified": true
+      },
+      "suspectedIssue": "Early Blight (Alternaria solani)",
+      "confidenceScore": 94,
+      "severity": "MODERATE",
+      "symptomsEvidence": [
+        "Brown to dark brown circular necrotic lesions visible on the tomato foliage",
+        "Concentric rings or 'target-board' pattern visible inside the leaf spots",
+        "Chlorotic yellow halo surrounding the necrotic lesions leading to leaf curling and drying"
+      ],
+      "culturalControl": [
+        "Remove and destroy severely infected lower leaves and plant debris to reduce primary inoculum buildup in the field.",
+        "Maintain proper plant spacing (45-60 cm) to ensure good aeration and lower canopy humidity.",
+        "Avoid overhead sprinkler irrigation; instead, adopt furrow or drip irrigation to keep foliage dry."
+      ],
+      "biologicalControl": [
+        "Pseudomonas fluorescens @ 5g/L or Trichoderma viride @ 5g/L of water applied as foliar spray to suppress fungal growth.",
+        "Cold-pressed Neem Oil 10,000 PPM @ 3-4 ml/L water mixed with a mild sticker for preventive management."
+      ],
+      "chemicalControlSafe": [
+        "Mancozeb 75% WP @ 2g/L water applied as a thorough foliar spray during early morning or late evening.",
+        "Chlorothalonil 75% WP @ 2g/L water; maintain a pre-harvest interval (PHI) of 7-10 days before harvesting fruits."
+      ],
+      "safetyWarnings": [
+        "Always wear protective gear including rubber gloves, face mask, and eye goggles during mixing and spraying.",
+        "Observe a strict pre-harvest interval (PHI) of 7 days before picking tomato fruits after chemical application.",
+        "Do not mix copper-based fungicides with organophosphates to avoid phytotoxicity and chemical precipitation."
+      ],
+      "recommendedProductIds": [
+        "prod-trichoderma",
+        "prod-neem-oil",
+        "prod-sprayer"
+      ],
+      "isExpertReviewed": false,
+      "followUpQuestions": [
+        "What is the current local weather pattern, specifically regarding relative humidity and rainfall in your region?",
+        "Have you observed similar circular dark spots appearing on the developing tomato fruits or stems?",
+        "What fungicide or pesticide applications have you already used in this tomato crop over the past 3 weeks?"
+      ],
+      "createdAt": "2026-09-28T09:04:44.829Z"
+    },
+    {
+      "id": "diag-7118489a",
+      "userId": "usr-farmer-1",
+      "cropName": "Tomato",
+      "imageUrl": "/uploads/eeff3357-a173-48f6-90c9-d2e0e2172f11.webp",
+      "photoMetadata": {
+        "uploadedAt": "2026-09-28T09:04:33.579Z",
+        "uploadDateFormatted": "Mon, 28 Sept, 2026",
+        "uploadTimeFormatted": "02:34:33 pm",
+        "uploadedAtFormatted": "Mon, 28 Sept, 2026 at 02:34:33 pm",
+        "captureDateFormatted": "Mon, 28 Sept, 2026 at 02:34:33 pm",
+        "fileName": "tomato-leaves-late-blight-phytophthora-infestans-affected-solanum-lycopersicum-early-potato-alternamia-fungus-left-mold-431446534.webp",
+        "fileSizeBytes": 35630,
+        "fileSizeFormatted": "0.03 MB",
+        "dimensions": "1920 × 1440 px",
+        "megapixels": "2.8 MP",
+        "mimeType": "image/webp",
+        "aspectRatio": "4:3 (Field Camera)",
+        "latitude": 14.1165,
+        "longitude": 78.1634,
+        "locationName": "Kadiri, Sri Sathya Sai District, Andhra Pradesh",
+        "deviceSource": "Field Camera",
+        "verified": true
+      },
+      "suspectedIssue": "Early Blight (Alternaria solani)",
+      "confidenceScore": 94,
+      "severity": "MODERATE",
+      "symptomsEvidence": [
+        "Brown to dark brown circular necrotic lesions visible on the tomato foliage",
+        "Concentric rings or 'target-board' pattern visible inside the leaf spots",
+        "Chlorotic yellow halo surrounding the necrotic lesions leading to leaf curling and drying"
+      ],
+      "culturalControl": [
+        "Remove and destroy severely infected lower leaves and plant debris to reduce primary inoculum buildup in the field.",
+        "Maintain proper plant spacing (45-60 cm) to ensure good aeration and lower canopy humidity.",
+        "Avoid overhead sprinkler irrigation; instead, adopt furrow or drip irrigation to keep foliage dry."
+      ],
+      "biologicalControl": [
+        "Pseudomonas fluorescens @ 5g/L or Trichoderma viride @ 5g/L of water applied as foliar spray to suppress fungal growth.",
+        "Cold-pressed Neem Oil 10,000 PPM @ 3-4 ml/L water mixed with a mild sticker for preventive management."
+      ],
+      "chemicalControlSafe": [
+        "Mancozeb 75% WP @ 2g/L water applied as a thorough foliar spray during early morning or late evening.",
+        "Chlorothalonil 75% WP @ 2g/L water; maintain a pre-harvest interval (PHI) of 7-10 days before harvesting fruits."
+      ],
+      "safetyWarnings": [
+        "Always wear protective gear including rubber gloves, face mask, and eye goggles during mixing and spraying.",
+        "Observe a strict pre-harvest interval (PHI) of 7 days before picking tomato fruits after chemical application.",
+        "Do not mix copper-based fungicides with organophosphates to avoid phytotoxicity and chemical precipitation."
+      ],
+      "recommendedProductIds": [
+        "prod-trichoderma",
+        "prod-neem-oil",
+        "prod-sprayer"
+      ],
+      "isExpertReviewed": false,
+      "followUpQuestions": [
+        "What is the current local weather pattern, specifically regarding relative humidity and rainfall in your region?",
+        "Have you observed similar circular dark spots appearing on the developing tomato fruits or stems?",
+        "What fungicide or pesticide applications have you already used in this tomato crop over the past 3 weeks?"
+      ],
+      "createdAt": "2026-09-28T09:04:44.829Z"
+    },
+    {
+      "id": "diag-df7e5c2f",
+      "userId": "usr-farmer-1",
+      "cropName": "Groundnut (Peanut)",
+      "imageUrl": "/uploads/4e16ec97-7b80-4a5b-92d8-ab326938f694.webp",
+      "photoMetadata": {
+        "uploadedAt": "2026-09-28T09:05:35.009Z",
+        "uploadDateFormatted": "Mon, 28 Sept, 2026",
+        "uploadTimeFormatted": "02:35:35 pm",
+        "uploadedAtFormatted": "Mon, 28 Sept, 2026 at 02:35:35 pm",
+        "captureDateFormatted": "Mon, 28 Sept, 2026 at 02:35:35 pm",
+        "fileName": "diseased-tomato-leaf-fungal-disease-leaves-193039824.webp",
+        "fileSizeBytes": 24346,
+        "fileSizeFormatted": "0.02 MB",
+        "dimensions": "1920 × 1440 px",
+        "megapixels": "2.8 MP",
+        "mimeType": "image/webp",
+        "aspectRatio": "4:3 (Field Camera)",
+        "latitude": 14.1165,
+        "longitude": 78.1634,
+        "locationName": "Kadiri, Sri Sathya Sai District, Andhra Pradesh",
+        "deviceSource": "Field Camera",
+        "verified": true
+      },
+      "suspectedIssue": "Early Leaf Spot / Tikka Disease (Cercospora arachidicola)",
+      "confidenceScore": 88.5,
+      "severity": "MODERATE",
+      "symptomsEvidence": [
+        "Presence of irregular chlorotic (yellow) halos surrounding developing necrotic spots on the leaflets",
+        "Dark brown to reddish-brown lesions visible primarily on the upper surface of the compound leaves",
+        "Early stages of leaf yellowing and interveinal chlorosis indicating fungal penetration and toxin action"
+      ],
+      "culturalControl": [
+        "Practice deep summer ploughing to bury crop residues and reduce primary inoculum (fungal stroma/conidia) in the soil.",
+        "Adopt proper crop rotation with non-host crops like cereals (pearl millet, sorghum, or maize) for 2 to 3 years.",
+        "Avoid excessive overhead sprinkler irrigation; opt for furrow or drip irrigation to keep canopy foliage dry."
+      ],
+      "biologicalControl": [
+        "Spray cold-pressed Neem Oil 10,000 PPM @ 4 ml/L of water during the early onset of symptoms to inhibit fungal spore germination.",
+        "Apply Trichoderma viride enriched in FYM/compost @ 2.5 kg/ha into the soil at sowing and follow up with foliar spray @ 5g/L water."
+      ],
+      "chemicalControlSafe": [
+        "Spray Mancozeb 75% WP @ 2.5g per litre of water thoroughly covering both upper and lower leaf surfaces at 10-15 day intervals.",
+        "Alternatively, spray Hexaconazole 5% EC @ 2 ml per litre of water upon moderate severity build-up, maintaining a Pre-Harvest Interval (PHI) of 30 days."
+      ],
+      "safetyWarnings": [
+        "Wear full personal protective equipment (PPE) including rubber gloves, face mask, and eye goggles during mixing and application.",
+        "Conduct spraying during early morning hours or late evening to prevent high-temperature phytotoxicity and protect foraging honeybees.",
+        "Do not mix copper-based fungicides with systemic organophosphates or fertilizers unless compatibility is verified."
+      ],
+      "recommendedProductIds": [
+        "prod-trichoderma",
+        "prod-neem-oil",
+        "prod-sprayer"
+      ],
+      "isExpertReviewed": false,
+      "followUpQuestions": [
+        "What is the current growth stage of the groundnut crop (e.g., vegetative, flowering, or pegging)?",
+        "Have you observed any dark brown lesions or elongated spots on the petioles and stems as well?",
+        "What prevailing weather conditions (e.g., continuous high humidity, rainfall, or cloudy days) have occurred over the last two weeks?"
+      ],
+      "createdAt": "2026-09-28T09:07:15.579Z"
+    },
+    {
+      "id": "diag-df7e5c2f",
+      "userId": "usr-farmer-1",
+      "cropName": "Groundnut (Peanut)",
+      "imageUrl": "/uploads/4e16ec97-7b80-4a5b-92d8-ab326938f694.webp",
+      "photoMetadata": {
+        "uploadedAt": "2026-09-28T09:05:35.009Z",
+        "uploadDateFormatted": "Mon, 28 Sept, 2026",
+        "uploadTimeFormatted": "02:35:35 pm",
+        "uploadedAtFormatted": "Mon, 28 Sept, 2026 at 02:35:35 pm",
+        "captureDateFormatted": "Mon, 28 Sept, 2026 at 02:35:35 pm",
+        "fileName": "diseased-tomato-leaf-fungal-disease-leaves-193039824.webp",
+        "fileSizeBytes": 24346,
+        "fileSizeFormatted": "0.02 MB",
+        "dimensions": "1920 × 1440 px",
+        "megapixels": "2.8 MP",
+        "mimeType": "image/webp",
+        "aspectRatio": "4:3 (Field Camera)",
+        "latitude": 14.1165,
+        "longitude": 78.1634,
+        "locationName": "Kadiri, Sri Sathya Sai District, Andhra Pradesh",
+        "deviceSource": "Field Camera",
+        "verified": true
+      },
+      "suspectedIssue": "Early Leaf Spot / Tikka Disease (Cercospora arachidicola)",
+      "confidenceScore": 88.5,
+      "severity": "MODERATE",
+      "symptomsEvidence": [
+        "Presence of irregular chlorotic (yellow) halos surrounding developing necrotic spots on the leaflets",
+        "Dark brown to reddish-brown lesions visible primarily on the upper surface of the compound leaves",
+        "Early stages of leaf yellowing and interveinal chlorosis indicating fungal penetration and toxin action"
+      ],
+      "culturalControl": [
+        "Practice deep summer ploughing to bury crop residues and reduce primary inoculum (fungal stroma/conidia) in the soil.",
+        "Adopt proper crop rotation with non-host crops like cereals (pearl millet, sorghum, or maize) for 2 to 3 years.",
+        "Avoid excessive overhead sprinkler irrigation; opt for furrow or drip irrigation to keep canopy foliage dry."
+      ],
+      "biologicalControl": [
+        "Spray cold-pressed Neem Oil 10,000 PPM @ 4 ml/L of water during the early onset of symptoms to inhibit fungal spore germination.",
+        "Apply Trichoderma viride enriched in FYM/compost @ 2.5 kg/ha into the soil at sowing and follow up with foliar spray @ 5g/L water."
+      ],
+      "chemicalControlSafe": [
+        "Spray Mancozeb 75% WP @ 2.5g per litre of water thoroughly covering both upper and lower leaf surfaces at 10-15 day intervals.",
+        "Alternatively, spray Hexaconazole 5% EC @ 2 ml per litre of water upon moderate severity build-up, maintaining a Pre-Harvest Interval (PHI) of 30 days."
+      ],
+      "safetyWarnings": [
+        "Wear full personal protective equipment (PPE) including rubber gloves, face mask, and eye goggles during mixing and application.",
+        "Conduct spraying during early morning hours or late evening to prevent high-temperature phytotoxicity and protect foraging honeybees.",
+        "Do not mix copper-based fungicides with systemic organophosphates or fertilizers unless compatibility is verified."
+      ],
+      "recommendedProductIds": [
+        "prod-trichoderma",
+        "prod-neem-oil",
+        "prod-sprayer"
+      ],
+      "isExpertReviewed": false,
+      "followUpQuestions": [
+        "What is the current growth stage of the groundnut crop (e.g., vegetative, flowering, or pegging)?",
+        "Have you observed any dark brown lesions or elongated spots on the petioles and stems as well?",
+        "What prevailing weather conditions (e.g., continuous high humidity, rainfall, or cloudy days) have occurred over the last two weeks?"
+      ],
+      "createdAt": "2026-09-28T09:07:15.579Z"
+    },
+    {
+      "id": "diag-998a166e",
+      "userId": "usr-farmer-1",
+      "cropName": "Groundnut (Arachis hypogaea)",
+      "imageUrl": "/uploads/9d1ec384-5069-4ce8-a206-9b1165b52101.webp",
+      "photoMetadata": {
+        "uploadedAt": "2026-09-28T09:07:29.089Z",
+        "uploadDateFormatted": "Mon, 28 Sept, 2026",
+        "uploadTimeFormatted": "02:37:29 pm",
+        "uploadedAtFormatted": "Mon, 28 Sept, 2026 at 02:37:29 pm",
+        "captureDateFormatted": "Mon, 28 Sept, 2026 at 02:37:29 pm",
+        "fileName": "diseased-tomato-leaf-fungal-disease-leaves-193039824.webp",
+        "fileSizeBytes": 24346,
+        "fileSizeFormatted": "0.02 MB",
+        "dimensions": "1920 × 1440 px",
+        "megapixels": "2.8 MP",
+        "mimeType": "image/webp",
+        "aspectRatio": "4:3 (Field Camera)",
+        "latitude": 14.1165,
+        "longitude": 78.1634,
+        "locationName": "Kadiri, Sri Sathya Sai District, Andhra Pradesh",
+        "deviceSource": "Field Camera",
+        "verified": true
+      },
+      "suspectedIssue": "Late Leaf Spot / Groundnut Rust (Cercosporidium personatum / Puccinia arachidis)",
+      "confidenceScore": 88,
+      "severity": "MODERATE",
+      "symptomsEvidence": [
+        "Small chlorotic spots turning into necrotic lesions on the leaf lamina",
+        "Yellowing (chlorosis) surrounding the localized necrotic tissue zones",
+        "Presence of dark specks and tiny pustules visible on the lower leaf surface"
+      ],
+      "culturalControl": [
+        "Practice deep summer ploughing to bury crop residues and destroy overwintering fungal structures in the soil.",
+        "Follow a 3-year crop rotation with non-host crops like cereals or millets to break the disease cycle.",
+        "Maintain optimum plant spacing and avoid excessive nitrogenous fertilization to reduce canopy humidity."
+      ],
+      "biologicalControl": [
+        "Pseudomonas fluorescens @ 10g/L water for foliar spray to suppress fungal pathogen growth.",
+        "Neem Oil 10,000 PPM @ 4 ml/L water mixed with a mild sticker for early-stage management."
+      ],
+      "chemicalControlSafe": [
+        "Hexaconazole 5% EC @ 2 ml/L water, applied preventatively or at early symptom appearance during early morning hours.",
+        "Mancozeb 75% WP @ 2.5g/L water, ensuring thorough under-leaf coverage with a Pre-Harvest Interval (PHI) of 30 days."
+      ],
+      "safetyWarnings": [
+        "Wear full personal protective equipment (PPE), including rubber gloves, face mask, and eye goggles during mixing and application.",
+        "Observe a strict pre-harvest interval (PHI) of 30 days before harvesting pods for human or animal consumption.",
+        "Do not mix copper-based fungicides with systemic triazoles to avoid phytotoxicity and chemical precipitation."
+      ],
+      "recommendedProductIds": [
+        "prod-trichoderma",
+        "prod-neem-oil",
+        "prod-sprayer"
+      ],
+      "isExpertReviewed": false,
+      "followUpQuestions": [
+        "Have you observed dark brown to black lesions on the lower surface of the older leaves?",
+        "What is the current local weather pattern, and is relative humidity high or experiencing frequent rainfall?",
+        "Are neighbouring groundnut fields also showing similar foliar yellowing and spot symptoms?"
+      ],
+      "createdAt": "2026-09-28T09:07:37.126Z"
+    },
+    {
+      "id": "diag-998a166e",
+      "userId": "usr-farmer-1",
+      "cropName": "Groundnut (Arachis hypogaea)",
+      "imageUrl": "/uploads/9d1ec384-5069-4ce8-a206-9b1165b52101.webp",
+      "photoMetadata": {
+        "uploadedAt": "2026-09-28T09:07:29.089Z",
+        "uploadDateFormatted": "Mon, 28 Sept, 2026",
+        "uploadTimeFormatted": "02:37:29 pm",
+        "uploadedAtFormatted": "Mon, 28 Sept, 2026 at 02:37:29 pm",
+        "captureDateFormatted": "Mon, 28 Sept, 2026 at 02:37:29 pm",
+        "fileName": "diseased-tomato-leaf-fungal-disease-leaves-193039824.webp",
+        "fileSizeBytes": 24346,
+        "fileSizeFormatted": "0.02 MB",
+        "dimensions": "1920 × 1440 px",
+        "megapixels": "2.8 MP",
+        "mimeType": "image/webp",
+        "aspectRatio": "4:3 (Field Camera)",
+        "latitude": 14.1165,
+        "longitude": 78.1634,
+        "locationName": "Kadiri, Sri Sathya Sai District, Andhra Pradesh",
+        "deviceSource": "Field Camera",
+        "verified": true
+      },
+      "suspectedIssue": "Late Leaf Spot / Groundnut Rust (Cercosporidium personatum / Puccinia arachidis)",
+      "confidenceScore": 88,
+      "severity": "MODERATE",
+      "symptomsEvidence": [
+        "Small chlorotic spots turning into necrotic lesions on the leaf lamina",
+        "Yellowing (chlorosis) surrounding the localized necrotic tissue zones",
+        "Presence of dark specks and tiny pustules visible on the lower leaf surface"
+      ],
+      "culturalControl": [
+        "Practice deep summer ploughing to bury crop residues and destroy overwintering fungal structures in the soil.",
+        "Follow a 3-year crop rotation with non-host crops like cereals or millets to break the disease cycle.",
+        "Maintain optimum plant spacing and avoid excessive nitrogenous fertilization to reduce canopy humidity."
+      ],
+      "biologicalControl": [
+        "Pseudomonas fluorescens @ 10g/L water for foliar spray to suppress fungal pathogen growth.",
+        "Neem Oil 10,000 PPM @ 4 ml/L water mixed with a mild sticker for early-stage management."
+      ],
+      "chemicalControlSafe": [
+        "Hexaconazole 5% EC @ 2 ml/L water, applied preventatively or at early symptom appearance during early morning hours.",
+        "Mancozeb 75% WP @ 2.5g/L water, ensuring thorough under-leaf coverage with a Pre-Harvest Interval (PHI) of 30 days."
+      ],
+      "safetyWarnings": [
+        "Wear full personal protective equipment (PPE), including rubber gloves, face mask, and eye goggles during mixing and application.",
+        "Observe a strict pre-harvest interval (PHI) of 30 days before harvesting pods for human or animal consumption.",
+        "Do not mix copper-based fungicides with systemic triazoles to avoid phytotoxicity and chemical precipitation."
+      ],
+      "recommendedProductIds": [
+        "prod-trichoderma",
+        "prod-neem-oil",
+        "prod-sprayer"
+      ],
+      "isExpertReviewed": false,
+      "followUpQuestions": [
+        "Have you observed dark brown to black lesions on the lower surface of the older leaves?",
+        "What is the current local weather pattern, and is relative humidity high or experiencing frequent rainfall?",
+        "Are neighbouring groundnut fields also showing similar foliar yellowing and spot symptoms?"
+      ],
+      "createdAt": "2026-09-28T09:07:37.126Z"
+    },
+    {
+      "id": "diag-662f98c5",
+      "userId": "usr-farmer-1",
+      "cropName": "Tomato",
+      "imageUrl": "/uploads/bc1173cf-8ab3-44b2-a772-51f7783a4057.webp",
+      "photoMetadata": {
+        "uploadedAt": "2026-09-28T09:08:06.680Z",
+        "uploadDateFormatted": "Mon, 28 Sept, 2026",
+        "uploadTimeFormatted": "02:38:06 pm",
+        "uploadedAtFormatted": "Mon, 28 Sept, 2026 at 02:38:06 pm",
+        "captureDateFormatted": "Mon, 28 Sept, 2026 at 02:38:06 pm",
+        "fileName": "diseased-tomato-leaf-fungal-disease-leaves-193039824.webp",
+        "fileSizeBytes": 24346,
+        "fileSizeFormatted": "0.02 MB",
+        "dimensions": "1920 × 1440 px",
+        "megapixels": "2.8 MP",
+        "mimeType": "image/webp",
+        "aspectRatio": "4:3 (Field Camera)",
+        "latitude": 14.1165,
+        "longitude": 78.1634,
+        "locationName": "Kadiri, Sri Sathya Sai District, Andhra Pradesh",
+        "deviceSource": "Field Camera",
+        "verified": true
+      },
+      "suspectedIssue": "Tomato Yellow Leaf Curl Virus (TYLCV) / Whitefly infestation vector",
+      "confidenceScore": 90,
+      "severity": "MODERATE",
+      "symptomsEvidence": [
+        "Interveinal chlorosis and yellowing on the leaflet margins",
+        "Upward cupping and curling of the tomato leaves",
+        "Presence of tiny dark insect vectors (whiteflies / nymphs) feeding on the lower leaf surface"
+      ],
+      "culturalControl": [
+        "Install yellow sticky traps @ 10-15 traps per acre to monitor and capture adult whiteflies early.",
+        "Remove and destroy severely virus-infected tomato plants immediately to prevent further vector transmission.",
+        "Maintain clean field borders by clearing weed hosts like Solanum nigrum that harbor whiteflies."
+      ],
+      "biologicalControl": [
+        "Spray cold-pressed Neem Oil 10,000 PPM @ 4 ml/L of water targeting the lower leaf surfaces.",
+        "Release natural predators such as ladybird beetles or use entomopathogenic fungi like Lecanicillium lecanii @ 5g/L water."
+      ],
+      "chemicalControlSafe": [
+        "Spray Imidacloprid 17.8% SL @ 0.5 ml/L of water during early morning or late evening to control the whitefly vector.",
+        "Alternatively, apply Thiamethoxam 25% WG @ 0.3g/L of water ensuring a safe Pre-Harvest Interval (PHI) of 5 days."
+      ],
+      "safetyWarnings": [
+        "Wear full personal protective equipment (PPE), including rubber gloves, face mask, and eye goggles during preparation and spraying.",
+        "Observe a strict pre-harvest safety interval (PHI) of 5 to 7 days before harvesting tomato fruits.",
+        "Do not mix systemic insecticides with strong alkaline copper fungicides."
+      ],
+      "recommendedProductIds": [
+        "prod-trichoderma",
+        "prod-neem-oil",
+        "prod-sprayer"
+      ],
+      "isExpertReviewed": false,
+      "followUpQuestions": [
+        "Are you noticing similar curling symptoms across the entire field or only on isolated plants?",
+        "What is the current crop age and stage of growth (vegetative vs. flowering/fruiting)?",
+        "Have you observed high populations of tiny white flying insects under the leaves?"
+      ],
+      "createdAt": "2026-09-28T09:08:10.659Z"
+    },
+    {
+      "id": "diag-662f98c5",
+      "userId": "usr-farmer-1",
+      "cropName": "Tomato",
+      "imageUrl": "/uploads/bc1173cf-8ab3-44b2-a772-51f7783a4057.webp",
+      "photoMetadata": {
+        "uploadedAt": "2026-09-28T09:08:06.680Z",
+        "uploadDateFormatted": "Mon, 28 Sept, 2026",
+        "uploadTimeFormatted": "02:38:06 pm",
+        "uploadedAtFormatted": "Mon, 28 Sept, 2026 at 02:38:06 pm",
+        "captureDateFormatted": "Mon, 28 Sept, 2026 at 02:38:06 pm",
+        "fileName": "diseased-tomato-leaf-fungal-disease-leaves-193039824.webp",
+        "fileSizeBytes": 24346,
+        "fileSizeFormatted": "0.02 MB",
+        "dimensions": "1920 × 1440 px",
+        "megapixels": "2.8 MP",
+        "mimeType": "image/webp",
+        "aspectRatio": "4:3 (Field Camera)",
+        "latitude": 14.1165,
+        "longitude": 78.1634,
+        "locationName": "Kadiri, Sri Sathya Sai District, Andhra Pradesh",
+        "deviceSource": "Field Camera",
+        "verified": true
+      },
+      "suspectedIssue": "Tomato Yellow Leaf Curl Virus (TYLCV) / Whitefly infestation vector",
+      "confidenceScore": 90,
+      "severity": "MODERATE",
+      "symptomsEvidence": [
+        "Interveinal chlorosis and yellowing on the leaflet margins",
+        "Upward cupping and curling of the tomato leaves",
+        "Presence of tiny dark insect vectors (whiteflies / nymphs) feeding on the lower leaf surface"
+      ],
+      "culturalControl": [
+        "Install yellow sticky traps @ 10-15 traps per acre to monitor and capture adult whiteflies early.",
+        "Remove and destroy severely virus-infected tomato plants immediately to prevent further vector transmission.",
+        "Maintain clean field borders by clearing weed hosts like Solanum nigrum that harbor whiteflies."
+      ],
+      "biologicalControl": [
+        "Spray cold-pressed Neem Oil 10,000 PPM @ 4 ml/L of water targeting the lower leaf surfaces.",
+        "Release natural predators such as ladybird beetles or use entomopathogenic fungi like Lecanicillium lecanii @ 5g/L water."
+      ],
+      "chemicalControlSafe": [
+        "Spray Imidacloprid 17.8% SL @ 0.5 ml/L of water during early morning or late evening to control the whitefly vector.",
+        "Alternatively, apply Thiamethoxam 25% WG @ 0.3g/L of water ensuring a safe Pre-Harvest Interval (PHI) of 5 days."
+      ],
+      "safetyWarnings": [
+        "Wear full personal protective equipment (PPE), including rubber gloves, face mask, and eye goggles during preparation and spraying.",
+        "Observe a strict pre-harvest safety interval (PHI) of 5 to 7 days before harvesting tomato fruits.",
+        "Do not mix systemic insecticides with strong alkaline copper fungicides."
+      ],
+      "recommendedProductIds": [
+        "prod-trichoderma",
+        "prod-neem-oil",
+        "prod-sprayer"
+      ],
+      "isExpertReviewed": false,
+      "followUpQuestions": [
+        "Are you noticing similar curling symptoms across the entire field or only on isolated plants?",
+        "What is the current crop age and stage of growth (vegetative vs. flowering/fruiting)?",
+        "Have you observed high populations of tiny white flying insects under the leaves?"
+      ],
+      "createdAt": "2026-09-28T09:08:10.659Z"
+    },
+    {
+      "id": "diag-7bfe01ae",
+      "userId": "usr-farmer-1",
+      "cropName": "Groundnut (Peanut / Arachis hypogaea)",
+      "imageUrl": "/uploads/2990d57c-823b-4b52-a838-6b35b76eff59.png",
+      "photoMetadata": {
+        "uploadedAt": "2026-09-28T09:15:21.195Z",
+        "uploadDateFormatted": "Mon, 28 Sept, 2026",
+        "uploadTimeFormatted": "02:45:21 pm",
+        "uploadedAtFormatted": "Mon, 28 Sept, 2026 at 02:45:21 pm",
+        "captureDateFormatted": "Mon, 28 Sept, 2026 at 02:45:21 pm",
+        "fileName": "sample_groundnut_leaf.png",
+        "fileSizeBytes": 68,
+        "fileSizeFormatted": "0.00 MB",
+        "dimensions": "1920 × 1440 px",
+        "megapixels": "2.8 MP",
+        "mimeType": "image/png",
+        "aspectRatio": "4:3 (Field Camera)",
+        "latitude": 14.1165,
+        "longitude": 78.1634,
+        "locationName": "Kadiri, Sri Sathya Sai District, Andhra Pradesh",
+        "deviceSource": "Field Camera",
+        "verified": true
+      },
+      "suspectedIssue": "Early Leaf Spot / Tikka Disease (Cercospora arachidicola)",
+      "confidenceScore": 92,
+      "severity": "MODERATE",
+      "symptomsEvidence": [
+        "Presence of dark brown to black circular lesions on the upper leaf lamina surrounded by distinct chlorotic yellow halos",
+        "Coalescing necrotic spots on older leaves leading to premature leaf drying and defoliation",
+        "Fungal fructification (conidiophores and conidia) visible as dark spots predominantly on the lower leaf surface under humid conditions"
+      ],
+      "culturalControl": [
+        "Collect and destroy infected crop stubble and plant debris after harvest through deep summer ploughing to bury fungal inoculum",
+        "Adopt a 2 to 3-year crop rotation with non-host crops like cereals or millets, and maintain proper plant spacing to ensure canopy aeration"
+      ],
+      "biologicalControl": [
+        "Multiplex Bio-Tech Trichoderma Viride 1% WP @ 2.5 kg mixed in 100 kg Farm Yard Manure (FYM) applied to soil per acre OR 5g per litre of water for foliar application",
+        "GreenAgri Pure Cold Pressed Neem Oil 10,000 PPM @ 600-800 ml mixed in 200 litres of water per acre (3-4 ml per litre of water) as a protective organic spray"
+      ],
+      "chemicalControlSafe": [
+        "Dhanuka M-45 (Mancozeb 75% WP) @ 400-500g mixed in 200 litres of water per acre (2-2.5g per litre of water) as a broad-spectrum protective fungicide",
+        "Tata Rallis Contaf Plus (Hexaconazole 5% SC) @ 400 ml mixed in 200 litres of water per acre (2 ml per litre of water) with a Pre-Harvest Interval (PHI) of 30 days"
+      ],
+      "safetyWarnings": [
+        "Wear personal protective equipment including rubber gloves, face mask, and eye goggles during mixing and application",
+        "Spray during early morning before 9:00 AM or late evening after 4:30 PM; avoid spraying during high winds or bee foraging times to protect pollinators",
+        "Observe the prescribed Pre-Harvest Interval (PHI) and safely dispose of empty pesticide containers by crushing and burying them away from water sources"
+      ],
+      "recommendedProductIds": [
+        "prod-trichoderma",
+        "prod-neem-oil",
+        "prod-sprayer"
+      ],
+      "isExpertReviewed": true,
+      "expertNotes": "Fungal spores of Cercospora arachidicola persist on infected crop debris and stubble in the soil. Under high relative humidity (>85%), frequent summer showers or overhead irrigation, and optimum temperatures ranging between 25°C to 30°C, conidia germinate and penetrate leaf cuticles directly or through stomata, resulting in characteristic necrotic lesions.",
+      "followUpQuestions": [
+        "What is the current growth stage of the groundnut crop (e.g., flowering, pegging, or pod development)?",
+        "Have you noticed similar spotting or chlorosis on adjacent fields or earlier plantings in your region?"
+      ],
+      "createdAt": "2026-09-28T09:15:32.456Z"
+    },
+    {
+      "id": "diag-7bfe01ae",
+      "userId": "usr-farmer-1",
+      "cropName": "Groundnut (Peanut / Arachis hypogaea)",
+      "imageUrl": "/uploads/2990d57c-823b-4b52-a838-6b35b76eff59.png",
+      "photoMetadata": {
+        "uploadedAt": "2026-09-28T09:15:21.195Z",
+        "uploadDateFormatted": "Mon, 28 Sept, 2026",
+        "uploadTimeFormatted": "02:45:21 pm",
+        "uploadedAtFormatted": "Mon, 28 Sept, 2026 at 02:45:21 pm",
+        "captureDateFormatted": "Mon, 28 Sept, 2026 at 02:45:21 pm",
+        "fileName": "sample_groundnut_leaf.png",
+        "fileSizeBytes": 68,
+        "fileSizeFormatted": "0.00 MB",
+        "dimensions": "1920 × 1440 px",
+        "megapixels": "2.8 MP",
+        "mimeType": "image/png",
+        "aspectRatio": "4:3 (Field Camera)",
+        "latitude": 14.1165,
+        "longitude": 78.1634,
+        "locationName": "Kadiri, Sri Sathya Sai District, Andhra Pradesh",
+        "deviceSource": "Field Camera",
+        "verified": true
+      },
+      "suspectedIssue": "Early Leaf Spot / Tikka Disease (Cercospora arachidicola)",
+      "confidenceScore": 92,
+      "severity": "MODERATE",
+      "symptomsEvidence": [
+        "Presence of dark brown to black circular lesions on the upper leaf lamina surrounded by distinct chlorotic yellow halos",
+        "Coalescing necrotic spots on older leaves leading to premature leaf drying and defoliation",
+        "Fungal fructification (conidiophores and conidia) visible as dark spots predominantly on the lower leaf surface under humid conditions"
+      ],
+      "culturalControl": [
+        "Collect and destroy infected crop stubble and plant debris after harvest through deep summer ploughing to bury fungal inoculum",
+        "Adopt a 2 to 3-year crop rotation with non-host crops like cereals or millets, and maintain proper plant spacing to ensure canopy aeration"
+      ],
+      "biologicalControl": [
+        "Multiplex Bio-Tech Trichoderma Viride 1% WP @ 2.5 kg mixed in 100 kg Farm Yard Manure (FYM) applied to soil per acre OR 5g per litre of water for foliar application",
+        "GreenAgri Pure Cold Pressed Neem Oil 10,000 PPM @ 600-800 ml mixed in 200 litres of water per acre (3-4 ml per litre of water) as a protective organic spray"
+      ],
+      "chemicalControlSafe": [
+        "Dhanuka M-45 (Mancozeb 75% WP) @ 400-500g mixed in 200 litres of water per acre (2-2.5g per litre of water) as a broad-spectrum protective fungicide",
+        "Tata Rallis Contaf Plus (Hexaconazole 5% SC) @ 400 ml mixed in 200 litres of water per acre (2 ml per litre of water) with a Pre-Harvest Interval (PHI) of 30 days"
+      ],
+      "safetyWarnings": [
+        "Wear personal protective equipment including rubber gloves, face mask, and eye goggles during mixing and application",
+        "Spray during early morning before 9:00 AM or late evening after 4:30 PM; avoid spraying during high winds or bee foraging times to protect pollinators",
+        "Observe the prescribed Pre-Harvest Interval (PHI) and safely dispose of empty pesticide containers by crushing and burying them away from water sources"
+      ],
+      "recommendedProductIds": [
+        "prod-trichoderma",
+        "prod-neem-oil",
+        "prod-sprayer"
+      ],
+      "isExpertReviewed": true,
+      "expertNotes": "Fungal spores of Cercospora arachidicola persist on infected crop debris and stubble in the soil. Under high relative humidity (>85%), frequent summer showers or overhead irrigation, and optimum temperatures ranging between 25°C to 30°C, conidia germinate and penetrate leaf cuticles directly or through stomata, resulting in characteristic necrotic lesions.",
+      "followUpQuestions": [
+        "What is the current growth stage of the groundnut crop (e.g., flowering, pegging, or pod development)?",
+        "Have you noticed similar spotting or chlorosis on adjacent fields or earlier plantings in your region?"
+      ],
+      "createdAt": "2026-09-28T09:15:32.456Z"
     }
   ],
   "product_categories": [

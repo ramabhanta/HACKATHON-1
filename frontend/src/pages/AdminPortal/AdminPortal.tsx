@@ -135,7 +135,7 @@ export const AdminPortal: React.FC = () => {
                 <h3 className="font-extrabold text-sm text-gray-900">Google Gemini AI Engine</h3>
               </div>
               <span className="px-2 py-0.5 rounded-full text-[10px] font-black border bg-amber-50 text-amber-900 border-amber-300">
-                ⚡ Gemini 1.5 Flash
+                ⚡ Gemini 3.5 Flash
               </span>
             </div>
             <p className="text-xs text-gray-500 mb-4">

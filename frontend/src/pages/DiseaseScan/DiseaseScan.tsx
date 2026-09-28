@@ -152,7 +152,7 @@ export const DiseaseScan: React.FC<DiseaseScanProps> = ({ setActiveTab }) => {
           <div className="flex items-center gap-2 mb-2">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border bg-amber-50 text-amber-900 border-amber-300 shadow-2xs">
               <Zap className="w-3.5 h-3.5 fill-amber-500 text-amber-600" />
-              <span>Google Gemini 1.5 Flash Vision Multimodal</span>
+              <span>Google Gemini 3.5 Flash Vision Multimodal</span>
             </div>
           </div>
           <h1 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">
@@ -471,6 +471,18 @@ export const DiseaseScan: React.FC<DiseaseScanProps> = ({ setActiveTab }) => {
                 <p className="font-bold">Low AI Confidence Advisory:</p>
                 <p>The AI is not confident enough to identify this problem with certainty. Please upload a clearer photo or consult your local Krishi Vigyan Kendra (KVK) / AgriDex AI Assistant before spraying chemicals.</p>
               </div>
+            </div>
+          )}
+
+          {/* Pathogen Root Cause & Biological Etiology */}
+          {diagnosis.expertNotes && (
+            <div className="p-4 rounded-2xl bg-indigo-50/70 border border-indigo-200 text-xs">
+              <h3 className="font-extrabold text-indigo-950 flex items-center gap-2 mb-1.5 text-xs uppercase tracking-wide">
+                <span>🔬</span> Pathogen Etiology & Biological Root Cause
+              </h3>
+              <p className="text-indigo-900 leading-relaxed font-medium">
+                {diagnosis.expertNotes}
+              </p>
             </div>
           )}
 

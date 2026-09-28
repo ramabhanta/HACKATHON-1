@@ -145,7 +145,7 @@ export const AiAssistant: React.FC<AiAssistantProps> = ({ onOpenVoice, setActive
               <h2 className="font-extrabold text-sm sm:text-base tracking-tight">AI Farming Assistant</h2>
               <span className="text-[10px] font-black px-2 py-0.5 rounded-full flex items-center gap-1 bg-amber-400 text-amber-950 shadow-xs">
                 <Zap className="w-3 h-3 fill-amber-950" />
-                <span>Google Gemini 1.5 Flash</span>
+                <span>Google Gemini 3.5 Flash</span>
               </span>
             </div>
             <p className="text-[11px] text-emerald-200 truncate max-w-xs sm:max-w-md">
@@ -208,7 +208,7 @@ export const AiAssistant: React.FC<AiAssistantProps> = ({ onOpenVoice, setActive
                       ? 'bg-amber-100 text-amber-900 border-amber-300'
                       : 'bg-emerald-100 text-emerald-800 border-emerald-200'
                   }`}>
-                    {msg.source === 'GEMINI_AI' ? '⚡ Google Gemini 1.5 Flash' : '🌐 Live Agricultural Engine'}
+                    {msg.source === 'GEMINI_AI' ? '⚡ Google Gemini 3.5 Flash' : '🌐 Live Agricultural Engine'}
                   </span>
                 </div>
               )}

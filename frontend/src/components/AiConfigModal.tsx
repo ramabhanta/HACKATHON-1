@@ -77,7 +77,7 @@ export const AiConfigModal: React.FC<AiConfigModalProps> = ({ isOpen, onClose, o
         const data = await res.json();
         if (data.source === 'GEMINI_AI') {
           setTestStatus('SUCCESS');
-          setStatusMessage('Verified! Connected directly to Google Gemini 1.5 Flash.');
+          setStatusMessage('Verified! Connected directly to Google Gemini 3.5 Flash.');
         } else {
           setTestStatus('ERROR');
           setStatusMessage('Key accepted by gateway, but Gemini did not return a valid candidate.');
@@ -153,7 +153,7 @@ export const AiConfigModal: React.FC<AiConfigModalProps> = ({ isOpen, onClose, o
             <div>
               <h3 className="font-extrabold text-base tracking-tight">AI Engine & API Key Settings</h3>
               <p className="text-xs text-emerald-200">
-                Configure Google Gemini 1.5 Flash for Real AI Answers & Vision
+                Configure Google Gemini 3.5 Flash for Real AI Answers & Vision
               </p>
             </div>
           </div>
@@ -180,7 +180,7 @@ export const AiConfigModal: React.FC<AiConfigModalProps> = ({ isOpen, onClose, o
                   Active Intelligence Mode
                 </span>
                 <span className="font-extrabold text-xs text-gray-900">
-                  {hasAnyKey ? 'Google Gemini 1.5 Flash (Deep Neural AI)' : 'AgriDex Live Knowledge Engine (Live Wikipedia & Mandi Data)'}
+                  {hasAnyKey ? 'Google Gemini 3.5 Flash (Deep Neural AI)' : 'AgriDex Live Knowledge Engine (Live Wikipedia & Mandi Data)'}
                 </span>
               </div>
             </div>

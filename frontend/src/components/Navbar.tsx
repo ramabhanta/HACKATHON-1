@@ -548,7 +548,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenV
                 <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl p-3 text-gray-800 border border-gray-100 z-50 space-y-2">
                   <div className="border-b border-gray-100 pb-2">
                     <p className="font-extrabold text-xs text-gray-900">{user.name}</p>
-                    <p className="text-[11px] text-gray-500 truncate">{user.email}</p>
+                    <p className="text-[11px] font-mono font-bold text-emerald-800 truncate">{user.phone}</p>
                     <div className="flex items-center gap-1.5 mt-1">
                       <span className="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-100 text-emerald-800">
                         {user.role}

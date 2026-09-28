@@ -1,20 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useAuth, UserRole } from '../context/AuthContext';
-import { useLanguage } from '../context/LanguageContext';
 import {
   X,
   Lock,
-  Mail,
   Phone,
   User,
-  MapPin,
   Sprout,
   Store,
-  Briefcase,
   AlertCircle,
   CheckCircle2,
   ArrowRight,
-  ShieldCheck
+  Eye,
+  EyeOff,
+  Building2,
+  Clock,
+  RefreshCw,
+  KeyRound,
+  Check,
+  Loader2
 } from 'lucide-react';
 
 interface AuthModalProps {
@@ -24,99 +27,238 @@ interface AuthModalProps {
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialTab = 'LOGIN' }) => {
-  const { login, register, switchRole } = useAuth();
-  const { language } = useLanguage();
+  const { loginWithPassword, loginWithOtp, sendOtp, verifyOtp, register } = useAuth();
 
   const [tab, setTab] = useState<'LOGIN' | 'REGISTER'>(initialTab);
+  const [signInMethod, setSignInMethod] = useState<'PASSWORD' | 'OTP'>('PASSWORD');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [devOtpToast, setDevOtpToast] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Login form state
-  const [loginIdentifier, setLoginIdentifier] = useState('');
-  const [loginPassword, setLoginPassword] = useState('');
+  // Sign In State
+  const [loginPhone, setLoginPhone] = useState('9848012345');
+  const [loginPassword, setLoginPassword] = useState('password123');
+  const [loginOtpSent, setLoginOtpSent] = useState(false);
+  const [loginOtpDigits, setLoginOtpDigits] = useState(['', '', '', '', '', '']);
 
-  // Register form state
-  const [role, setRole] = useState<UserRole>('FARMER');
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [village, setVillage] = useState('');
-  const [district, setDistrict] = useState('Sri Sathya Sai');
-  const [state, setState] = useState('Andhra Pradesh');
-  const [pincode, setPincode] = useState('515591');
+  // Progressive Registration State
+  const [regStep, setRegStep] = useState<1 | 2 | 3 | 4>(1);
+  const [selectedRole, setSelectedRole] = useState<UserRole>('FARMER');
+  const [regPhone, setRegPhone] = useState('');
+  const [otpDigits, setOtpDigits] = useState(['', '', '', '', '', '']);
+  const [countdown, setCountdown] = useState(60);
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
 
-  // Farmer specific
-  const [acreage, setAcreage] = useState('4.0');
-  const [primaryCrop, setPrimaryCrop] = useState('Groundnut');
-  const [farmingType, setFarmingType] = useState<'ORGANIC' | 'INTEGRATED' | 'CONVENTIONAL'>('INTEGRATED');
-
-  // Vendor specific
+  // Profile fields
+  const [regName, setRegName] = useState('');
+  const [regPassword, setRegPassword] = useState('');
+  const [regVillage, setRegVillage] = useState('Kadiri Rural');
+  const [regDistrict, setRegDistrict] = useState('Sri Sathya Sai');
+  const [regState, setRegState] = useState('Andhra Pradesh');
+  const [regPincode, setRegPincode] = useState('515591');
+  const [regAcreage, setRegAcreage] = useState('5.0');
+  const [selectedCrops, setSelectedCrops] = useState<string[]>(['Groundnut', 'Tomato']);
+  const [buyerCompany, setBuyerCompany] = useState('');
   const [shopName, setShopName] = useState('');
+  const [shopLicense, setShopLicense] = useState('');
+  const [shopAddress, setShopAddress] = useState('Main Bazaar, Kadiri');
+
+  const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const loginOtpRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  useEffect(() => {
+    let timer: any;
+    if (isTimerRunning && countdown > 0) {
+      timer = setInterval(() => setCountdown(c => c - 1), 1000);
+    } else if (countdown === 0) {
+      setIsTimerRunning(false);
+    }
+    return () => clearInterval(timer);
+  }, [isTimerRunning, countdown]);
 
   if (!isOpen) return null;
 
-  const handleLoginSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setIsSubmitting(true);
+  const handlePhoneInputChange = (
+    val: string,
+    setter: React.Dispatch<React.SetStateAction<string>>
+  ) => {
+    const raw = val.replace(/[^0-9]/g, '');
+    setter(raw.slice(0, 10));
+  };
 
-    const res = await login(loginIdentifier, loginPassword);
-    setIsSubmitting(false);
+  const handleOtpBoxChange = (
+    index: number,
+    value: string,
+    digitsArr: string[],
+    setDigits: React.Dispatch<React.SetStateAction<string[]>>,
+    refs: React.MutableRefObject<(HTMLInputElement | null)[]>
+  ) => {
+    const char = value.slice(-1).replace(/[^0-9]/g, '');
+    const nextArr = [...digitsArr];
+    nextArr[index] = char;
+    setDigits(nextArr);
 
-    if (res.success) {
-      onClose();
-    } else {
-      setError(res.error || 'Invalid credentials. Please verify email/phone and password.');
+    if (char && index < 5) {
+      refs.current[index + 1]?.focus();
     }
   };
 
-  const handleRegisterSubmit = async (e: React.FormEvent) => {
+  const handleOtpKeyDown = (
+    index: number,
+    e: React.KeyboardEvent<HTMLInputElement>,
+    digitsArr: string[],
+    refs: React.MutableRefObject<(HTMLInputElement | null)[]>
+  ) => {
+    if (e.key === 'Backspace' && !digitsArr[index] && index > 0) {
+      refs.current[index - 1]?.focus();
+    }
+  };
+
+  // Sign In with Password
+  const handlePasswordLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    if (!loginPhone || loginPhone.length < 10) {
+      setError('Please enter a valid 10-digit mobile number.');
+      return;
+    }
+    setIsSubmitting(true);
+    const res = await loginWithPassword(loginPhone, loginPassword);
+    setIsSubmitting(false);
+    if (res.success) {
+      onClose();
+    } else {
+      setError(res.error || 'Incorrect mobile number or password.');
+    }
+  };
 
-    if (!name || !email || !password || !phone) {
-      setError('Please provide all mandatory fields (Name, Phone, Email, Password)');
+  // Request Sign-In OTP
+  const handleRequestLoginOtp = async () => {
+    setError(null);
+    if (!loginPhone || loginPhone.length < 10) {
+      setError('Please enter a 10-digit mobile number.');
+      return;
+    }
+    setIsSubmitting(true);
+    const res = await sendOtp(loginPhone);
+    setIsSubmitting(false);
+    if (res.success) {
+      setLoginOtpSent(true);
+      setDevOtpToast(`OTP Sent! Code: ${res.devOtp || '123456'} (Master: 123456)`);
+      setCountdown(60);
+      setIsTimerRunning(true);
+      setTimeout(() => loginOtpRefs.current[0]?.focus(), 100);
+    } else {
+      setError(res.error || 'Failed to send OTP.');
+    }
+  };
+
+  // Verify Sign-In OTP
+  const handleVerifyLoginOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    const code = loginOtpDigits.join('');
+    if (code.length < 6) {
+      setError('Please enter the complete 6-digit OTP.');
+      return;
+    }
+    setIsSubmitting(true);
+    const res = await loginWithOtp(loginPhone, code);
+    setIsSubmitting(false);
+    if (res.success) {
+      onClose();
+    } else {
+      setError(res.error || 'Invalid OTP code.');
+    }
+  };
+
+  // Registration: Send OTP
+  const handleRegSendOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    if (!regPhone || regPhone.length < 10) {
+      setError('Please enter a valid 10-digit mobile number.');
+      return;
+    }
+    setIsSubmitting(true);
+    const res = await sendOtp(regPhone);
+    setIsSubmitting(false);
+    if (res.success) {
+      setDevOtpToast(`OTP sent to +91 ${regPhone}! Code: ${res.devOtp || '123456'} (Master: 123456)`);
+      setRegStep(2);
+      setCountdown(60);
+      setIsTimerRunning(true);
+      setTimeout(() => otpInputRefs.current[0]?.focus(), 150);
+    } else {
+      setError(res.error || 'Failed to send OTP.');
+    }
+  };
+
+  // Registration: Verify OTP
+  const handleRegVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    const code = otpDigits.join('');
+    if (code.length < 6) {
+      setError('Please enter 6 digits.');
+      return;
+    }
+    setIsSubmitting(true);
+    const res = await verifyOtp(regPhone, code);
+    setIsSubmitting(false);
+    if (res.success) {
+      setRegStep(3);
+    } else {
+      setError(res.error || 'Invalid OTP.');
+    }
+  };
+
+  // Registration: Final Submission
+  const handleRegFinalSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    if (!regName.trim() || !regPassword) {
+      setError('Please provide your name and password/PIN.');
       return;
     }
 
     setIsSubmitting(true);
-    const res = await register({
-      name,
-      phone,
-      email,
-      password,
-      role,
-      village,
-      district,
-      state,
-      pincode,
-      totalAcreage: parseFloat(acreage) || 3.0,
-      primaryCrops: [primaryCrop],
-      farmingType,
-      shopName
-    });
-    setIsSubmitting(false);
+    const payload: any = {
+      name: regName.trim(),
+      phone: regPhone,
+      password: regPassword,
+      role: selectedRole,
+      village: regVillage,
+      district: regDistrict,
+      state: regState,
+      pincode: regPincode
+    };
 
+    if (selectedRole === 'FARMER') {
+      payload.totalAcreage = parseFloat(regAcreage) || 3.0;
+      payload.primaryCrops = selectedCrops;
+    } else if (selectedRole === 'BUYER') {
+      payload.companyName = buyerCompany || `${regName} Wholesale Mandi`;
+      payload.preferredCrops = selectedCrops;
+    } else if (selectedRole === 'VENDOR') {
+      payload.shopName = shopName || `${regName}'s Agro Hub`;
+      payload.licenseNumber = shopLicense || `AP/AGRI/${Math.floor(10000 + Math.random() * 90000)}`;
+      payload.address = shopAddress;
+    }
+
+    const res = await register(payload);
+    setIsSubmitting(false);
     if (res.success) {
       onClose();
     } else {
-      setError(res.error || 'Registration failed. Please check inputs.');
+      setError(res.error || 'Registration failed.');
     }
-  };
-
-  const handleQuickDemo = async (demoRole: UserRole) => {
-    if (demoRole === 'FARMER') {
-      await login('yugandharreddy350@gmail.com', 'password123');
-    } else {
-      await switchRole(demoRole);
-    }
-    onClose();
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in">
-      <div className="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl border border-emerald-100 relative space-y-4">
+      <div className="bg-white rounded-3xl max-w-lg w-full max-h-[92vh] overflow-y-auto p-5 sm:p-6 shadow-2xl border border-emerald-100 relative space-y-4">
         <button
           onClick={onClose}
           className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition"
@@ -127,304 +269,388 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialTa
         {/* Modal Header */}
         <div className="text-center pt-2">
           <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-800 text-2xl mb-2">
-            🌾
+            📱
           </div>
           <h2 className="text-xl font-black text-gray-900 tracking-tight">
-            {tab === 'LOGIN' ? 'Welcome Back to AgroDex' : 'Create Your Agriculture Account'}
+            {tab === 'LOGIN' ? 'Sign In with Mobile' : 'Register with Mobile Number'}
           </h2>
           <p className="text-xs text-gray-500 mt-0.5">
-            {tab === 'LOGIN' ? 'Sign in to access your farm, marketplace & AI assistant' : 'Connect with farmers, shops, and agricultural experts'}
+            100% Mobile Phone & SMS OTP progressive authentication
           </p>
         </div>
+
+        {/* Testing Master OTP Banner */}
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-2.5 text-xs text-amber-900 flex items-center justify-between">
+          <span>Master Testing OTP: <strong className="font-mono bg-amber-100 px-1 py-0.5 rounded">123456</strong></span>
+          <span className="text-[10px] font-black uppercase text-amber-800 bg-amber-200 px-2 py-0.5 rounded">Dev Mode</span>
+        </div>
+
+        {devOtpToast && (
+          <div className="p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl text-xs font-bold text-emerald-900 flex items-center justify-between">
+            <span>{devOtpToast}</span>
+            <button onClick={() => setDevOtpToast(null)} className="text-emerald-700 hover:underline">Dismiss</button>
+          </div>
+        )}
 
         {/* Tab switch */}
         <div className="flex bg-gray-100 p-1 rounded-2xl text-xs font-bold">
           <button
             onClick={() => { setTab('LOGIN'); setError(null); }}
-            className={`flex-1 py-2 rounded-xl transition ${tab === 'LOGIN' ? 'bg-white text-emerald-800 shadow-sm' : 'text-gray-500'}`}
+            className={`flex-1 py-2 rounded-xl transition ${tab === 'LOGIN' ? 'bg-white text-emerald-800 shadow-sm font-black' : 'text-gray-500'}`}
           >
             Sign In
           </button>
           <button
-            onClick={() => { setTab('REGISTER'); setError(null); }}
-            className={`flex-1 py-2 rounded-xl transition ${tab === 'REGISTER' ? 'bg-white text-emerald-800 shadow-sm' : 'text-gray-500'}`}
+            onClick={() => { setTab('REGISTER'); setRegStep(1); setError(null); }}
+            className={`flex-1 py-2 rounded-xl transition ${tab === 'REGISTER' ? 'bg-white text-emerald-800 shadow-sm font-black' : 'text-gray-500'}`}
           >
-            Register / Onboard
+            New Registration
           </button>
         </div>
 
-        {/* Error Alert */}
         {error && (
-          <div className="p-3 bg-red-50 border border-red-200 rounded-2xl flex items-start gap-2 text-xs text-red-900">
+          <div className="p-3 bg-red-50 border border-red-200 rounded-2xl flex items-start gap-2 text-xs text-red-900 font-bold">
             <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
             <span>{error}</span>
           </div>
         )}
 
-        {/* LOGIN FORM */}
+        {/* ======================================================== */}
+        {/* RETURNING USER SIGN-IN                                   */}
+        {/* ======================================================== */}
         {tab === 'LOGIN' && (
-          <form onSubmit={handleLoginSubmit} className="space-y-3.5 text-xs">
-            <div>
-              <label className="font-bold text-gray-700 block mb-1">Email Address or Mobile Phone</label>
-              <div className="relative">
-                <Mail className="w-4 h-4 text-gray-400 absolute left-3.5 top-3.5" />
-                <input
-                  type="text"
-                  value={loginIdentifier}
-                  onChange={e => setLoginIdentifier(e.target.value)}
-                  placeholder="farmer@agrodex.com or 9848012345"
-                  className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none"
-                  required
-                />
-              </div>
+          <div className="space-y-3.5 text-xs">
+            {/* Password vs OTP Switcher */}
+            <div className="flex bg-stone-100 p-1 rounded-xl text-[11px] font-bold">
+              <button
+                type="button"
+                onClick={() => setSignInMethod('PASSWORD')}
+                className={`flex-1 py-1.5 rounded-lg text-center transition ${signInMethod === 'PASSWORD' ? 'bg-white text-gray-900 shadow-sm' : 'text-stone-500'}`}
+              >
+                Mobile + Password
+              </button>
+              <button
+                type="button"
+                onClick={() => setSignInMethod('OTP')}
+                className={`flex-1 py-1.5 rounded-lg text-center transition flex items-center justify-center gap-1 ${signInMethod === 'OTP' ? 'bg-white text-emerald-900 font-black shadow-sm' : 'text-stone-500'}`}
+              >
+                <KeyRound className="w-3 h-3 text-emerald-700" />
+                <span>Login via SMS OTP</span>
+              </button>
             </div>
 
-            <div>
-              <label className="font-bold text-gray-700 block mb-1">Password</label>
-              <div className="relative">
-                <Lock className="w-4 h-4 text-gray-400 absolute left-3.5 top-3.5" />
-                <input
-                  type="password"
-                  value={loginPassword}
-                  onChange={e => setLoginPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none"
-                  required
-                />
-              </div>
-            </div>
+            {signInMethod === 'PASSWORD' ? (
+              <form onSubmit={handlePasswordLogin} className="space-y-3">
+                <div>
+                  <label className="font-bold text-gray-700 block mb-1">10-Digit Mobile Number</label>
+                  <div className="relative flex rounded-xl border border-gray-200 overflow-hidden focus-within:border-emerald-600">
+                    <span className="bg-stone-100 px-3 py-2 text-xs font-bold text-gray-700 border-r border-gray-200">🇮🇳 +91</span>
+                    <input
+                      type="tel"
+                      maxLength={10}
+                      value={loginPhone}
+                      onChange={e => handlePhoneInputChange(e.target.value, setLoginPhone)}
+                      placeholder="98480 12345"
+                      className="w-full px-3 py-2 font-bold text-gray-900 outline-none"
+                      required
+                    />
+                  </div>
+                </div>
 
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full py-3 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-extrabold rounded-2xl shadow transition active:scale-95 text-xs flex items-center justify-center gap-2"
-            >
-              {isSubmitting ? 'Authenticating...' : 'Sign In to My Farm'}
-            </button>
+                <div>
+                  <label className="font-bold text-gray-700 block mb-1">Password / PIN</label>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      value={loginPassword}
+                      onChange={e => setLoginPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="w-full px-3 py-2 rounded-xl border border-gray-200 outline-none pr-9 font-bold"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-2.5 text-gray-400"
+                    >
+                      {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                    </button>
+                  </div>
+                </div>
 
-            {/* Quick 1-Click Demo Accounts */}
-            <div className="pt-2 border-t border-gray-100">
-              <span className="text-[10px] font-extrabold text-gray-400 uppercase tracking-wider block text-center mb-2">
-                — Or 1-Click Instant Demo Login —
-              </span>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 <button
-                  type="button"
-                  onClick={() => handleQuickDemo('FARMER')}
-                  className="p-2 rounded-xl border border-gray-200 hover:border-emerald-500 hover:bg-emerald-50 text-left transition flex items-center gap-2"
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full py-3 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-black rounded-2xl shadow transition text-xs flex items-center justify-center gap-2"
                 >
-                  <span className="text-base">🌾</span>
-                  <div>
-                    <p className="font-bold text-[11px] text-gray-900 leading-tight">Farmer</p>
-                    <p className="text-[9px] text-gray-500">nani</p>
-                  </div>
+                  {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <span>Sign In to Agri Account</span>}
                 </button>
-                <button
-                  type="button"
-                  onClick={() => handleQuickDemo('VENDOR')}
-                  className="p-2 rounded-xl border border-gray-200 hover:border-emerald-500 hover:bg-emerald-50 text-left transition flex items-center gap-2"
-                >
-                  <span className="text-base">🏪</span>
-                  <div>
-                    <p className="font-bold text-[11px] text-gray-900 leading-tight">Agri Vendor</p>
-                    <p className="text-[9px] text-gray-500">Kadiri Depot</p>
+              </form>
+            ) : (
+              <div className="space-y-3">
+                <div>
+                  <label className="font-bold text-gray-700 block mb-1">10-Digit Mobile Number</label>
+                  <div className="relative flex rounded-xl border border-gray-200 overflow-hidden focus-within:border-emerald-600">
+                    <span className="bg-stone-100 px-3 py-2 text-xs font-bold text-gray-700 border-r border-gray-200">🇮🇳 +91</span>
+                    <input
+                      type="tel"
+                      maxLength={10}
+                      value={loginPhone}
+                      onChange={e => handlePhoneInputChange(e.target.value, setLoginPhone)}
+                      disabled={loginOtpSent}
+                      placeholder="98480 12345"
+                      className="w-full px-3 py-2 font-bold text-gray-900 outline-none disabled:bg-stone-50"
+                    />
                   </div>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleQuickDemo('BUYER')}
-                  className="p-2 rounded-xl border border-gray-200 hover:border-emerald-500 hover:bg-emerald-50 text-left transition flex items-center gap-2"
-                >
-                  <span className="text-base">📦</span>
-                  <div>
-                    <p className="font-bold text-[11px] text-gray-900 leading-tight">Mandi Buyer</p>
-                    <p className="text-[9px] text-gray-500">Wholesaler</p>
-                  </div>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleQuickDemo('ADMIN')}
-                  className="p-2 rounded-xl border border-gray-200 hover:border-emerald-500 hover:bg-emerald-50 text-left transition flex items-center gap-2"
-                >
-                  <span className="text-base">⚙️</span>
-                  <div>
-                    <p className="font-bold text-[11px] text-gray-900 leading-tight">Administrator</p>
-                    <p className="text-[9px] text-gray-500">Platform Admin</p>
-                  </div>
-                </button>
+                </div>
+
+                {!loginOtpSent ? (
+                  <button
+                    type="button"
+                    onClick={handleRequestLoginOtp}
+                    disabled={isSubmitting || loginPhone.length < 10}
+                    className="w-full py-3 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-black rounded-2xl shadow text-xs flex items-center justify-center gap-2"
+                  >
+                    {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <span>Send 6-Digit OTP via SMS</span>}
+                  </button>
+                ) : (
+                  <form onSubmit={handleVerifyLoginOtp} className="space-y-3 animate-in fade-in">
+                    <div className="grid grid-cols-6 gap-1.5">
+                      {loginOtpDigits.map((digit, idx) => (
+                        <input
+                          key={idx}
+                          ref={el => (loginOtpRefs.current[idx] = el)}
+                          type="text"
+                          maxLength={1}
+                          inputMode="numeric"
+                          value={digit}
+                          onChange={e => handleOtpBoxChange(idx, e.target.value, loginOtpDigits, setLoginOtpDigits, loginOtpRefs)}
+                          onKeyDown={e => handleOtpKeyDown(idx, e, loginOtpDigits, loginOtpRefs)}
+                          className="w-full h-11 text-center font-black text-base rounded-xl border border-gray-300 focus:border-emerald-600 outline-none"
+                        />
+                      ))}
+                    </div>
+
+                    <div className="flex items-center justify-between text-[11px] text-gray-500 font-bold">
+                      {isTimerRunning ? (
+                        <span>Resend in {countdown}s</span>
+                      ) : (
+                        <button type="button" onClick={handleRequestLoginOtp} className="text-emerald-700 hover:underline">
+                          Resend OTP
+                        </button>
+                      )}
+                      <span className="text-amber-700">Master: 123456</span>
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={isSubmitting || loginOtpDigits.join('').length < 6}
+                      className="w-full py-3 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-black rounded-2xl shadow text-xs flex items-center justify-center gap-2"
+                    >
+                      {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <span>Verify & Sign In</span>}
+                    </button>
+                  </form>
+                )}
               </div>
-            </div>
-          </form>
+            )}
+          </div>
         )}
 
-        {/* REGISTER / ONBOARDING FORM */}
+        {/* ======================================================== */}
+        {/* PROGRESSIVE MULTI-STEP REGISTRATION                      */}
+        {/* ======================================================== */}
         {tab === 'REGISTER' && (
-          <form onSubmit={handleRegisterSubmit} className="space-y-3 text-xs">
-            {/* Role Picker */}
-            <div>
-              <label className="font-bold text-gray-700 block mb-1">Select Your Primary Role:</label>
-              <div className="grid grid-cols-3 gap-1.5">
-                {[
-                  { id: 'FARMER', label: 'Farmer (రైతు)', icon: '🌾' },
-                  { id: 'VENDOR', label: 'Vendor (Shop)', icon: '🏪' },
-                  { id: 'BUYER', label: 'Produce Buyer', icon: '📦' }
-                ].map(r => (
-                  <button
-                    key={r.id}
-                    type="button"
-                    onClick={() => setRole(r.id as UserRole)}
-                    className={`p-2 rounded-xl text-center border transition ${
-                      role === r.id
-                        ? 'border-emerald-600 bg-emerald-50 text-emerald-900 font-extrabold shadow-2xs'
-                        : 'border-gray-200 bg-gray-50/50 text-gray-700 hover:bg-gray-100'
-                    }`}
-                  >
-                    <span className="text-base block">{r.icon}</span>
-                    <span className="text-[10px] mt-0.5 block">{r.label}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Personal Details */}
-            <div className="grid grid-cols-2 gap-2.5">
-              <div>
-                <label className="font-bold text-gray-700 block mb-1">Full Name</label>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={e => setName(e.target.value)}
-                  placeholder="e.g. nani"
-                  className="w-full p-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none"
-                  required
-                />
-              </div>
-              <div>
-                <label className="font-bold text-gray-700 block mb-1">Phone Number (+91)</label>
-                <input
-                  type="text"
-                  value={phone}
-                  onChange={e => setPhone(e.target.value)}
-                  placeholder="+91 99515 18699"
-                  className="w-full p-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none"
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2.5">
-              <div>
-                <label className="font-bold text-gray-700 block mb-1">Email Address</label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  placeholder="yugandharreddy350@gmail.com"
-                  className="w-full p-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none"
-                  required
-                />
-              </div>
-              <div>
-                <label className="font-bold text-gray-700 block mb-1">Create Password</label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full p-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none"
-                  required
-                />
-              </div>
-            </div>
-
-            {/* Location */}
-            <div className="grid grid-cols-2 gap-2.5">
-              <div>
-                <label className="font-bold text-gray-700 block mb-1">Village / Mandal</label>
-                <input
-                  type="text"
-                  value={village}
-                  onChange={e => setVillage(e.target.value)}
-                  placeholder="Kadiri Rural"
-                  className="w-full p-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none"
-                />
-              </div>
-              <div>
-                <label className="font-bold text-gray-700 block mb-1">District</label>
-                <input
-                  type="text"
-                  value={district}
-                  onChange={e => setDistrict(e.target.value)}
-                  placeholder="Sri Sathya Sai"
-                  className="w-full p-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none"
-                />
-              </div>
-            </div>
-
-            {/* Role Conditional Fields */}
-            {role === 'FARMER' && (
-              <div className="p-3 bg-emerald-50/50 rounded-2xl border border-emerald-100 space-y-2">
-                <span className="font-bold text-[11px] text-emerald-950 block">Farm Details:</span>
-                <div className="grid grid-cols-3 gap-2">
-                  <div>
-                    <label className="text-[10px] text-gray-500 font-semibold block">Total Acres</label>
-                    <input
-                      type="number"
-                      step="0.5"
-                      value={acreage}
-                      onChange={e => setAcreage(e.target.value)}
-                      className="w-full p-2 rounded-lg bg-white border border-gray-200"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[10px] text-gray-500 font-semibold block">Primary Crop</label>
-                    <input
-                      type="text"
-                      value={primaryCrop}
-                      onChange={e => setPrimaryCrop(e.target.value)}
-                      className="w-full p-2 rounded-lg bg-white border border-gray-200"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[10px] text-gray-500 font-semibold block">Farming Type</label>
-                    <select
-                      value={farmingType}
-                      onChange={e => setFarmingType(e.target.value as any)}
-                      className="w-full p-2 rounded-lg bg-white border border-gray-200 text-xs"
+          <div className="space-y-3.5 text-xs">
+            {/* Step 1: Role & Phone */}
+            {regStep === 1 && (
+              <form onSubmit={handleRegSendOtp} className="space-y-3 animate-in fade-in">
+                <div>
+                  <label className="font-black text-gray-800 block mb-1.5 uppercase tracking-wider text-[11px]">
+                    1. Choose Role:
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedRole('FARMER')}
+                      className={`p-2.5 rounded-xl border text-center transition ${selectedRole === 'FARMER' ? 'border-emerald-600 bg-emerald-50 text-emerald-900 font-black' : 'border-gray-200 text-gray-600'}`}
                     >
-                      <option value="INTEGRATED">Integrated</option>
-                      <option value="ORGANIC">Organic</option>
-                      <option value="CONVENTIONAL">Conventional</option>
-                    </select>
+                      <Sprout className="w-5 h-5 mx-auto mb-1 text-emerald-700" />
+                      <span className="block text-[11px]">Farmer</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedRole('BUYER')}
+                      className={`p-2.5 rounded-xl border text-center transition ${selectedRole === 'BUYER' ? 'border-emerald-600 bg-emerald-50 text-emerald-900 font-black' : 'border-gray-200 text-gray-600'}`}
+                    >
+                      <Building2 className="w-5 h-5 mx-auto mb-1 text-blue-700" />
+                      <span className="block text-[11px]">Buyer</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedRole('VENDOR')}
+                      className={`p-2.5 rounded-xl border text-center transition ${selectedRole === 'VENDOR' ? 'border-emerald-600 bg-emerald-50 text-emerald-900 font-black' : 'border-gray-200 text-gray-600'}`}
+                    >
+                      <Store className="w-5 h-5 mx-auto mb-1 text-amber-700" />
+                      <span className="block text-[11px]">Agro Shop</span>
+                    </button>
                   </div>
                 </div>
-              </div>
+
+                <div>
+                  <label className="font-bold text-gray-700 block mb-1">2. 10-Digit Mobile Number</label>
+                  <div className="relative flex rounded-xl border border-gray-200 overflow-hidden focus-within:border-emerald-600">
+                    <span className="bg-stone-100 px-3 py-2 text-xs font-bold text-gray-700 border-r border-gray-200">🇮🇳 +91</span>
+                    <input
+                      type="tel"
+                      maxLength={10}
+                      value={regPhone}
+                      onChange={e => handlePhoneInputChange(e.target.value, setRegPhone)}
+                      placeholder="98480 12345"
+                      className="w-full px-3 py-2 font-bold text-gray-900 outline-none"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting || regPhone.length < 10}
+                  className="w-full py-3 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-black rounded-2xl shadow text-xs flex items-center justify-center gap-2"
+                >
+                  {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <span>Get OTP to Verify Mobile →</span>}
+                </button>
+              </form>
             )}
 
-            {role === 'VENDOR' && (
-              <div className="p-3 bg-amber-50/50 rounded-2xl border border-amber-100 space-y-2">
-                <span className="font-bold text-[11px] text-amber-950 block">Shop / Business Profile:</span>
+            {/* Step 2: OTP Verification */}
+            {regStep === 2 && (
+              <form onSubmit={handleRegVerifyOtp} className="space-y-3 animate-in fade-in">
+                <div className="flex items-center justify-between text-xs">
+                  <span>Enter OTP sent to +91 {regPhone}</span>
+                  <button type="button" onClick={() => setRegStep(1)} className="text-emerald-700 font-bold hover:underline">
+                    Edit Number
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-6 gap-1.5">
+                  {otpDigits.map((digit, idx) => (
+                    <input
+                      key={idx}
+                      ref={el => (otpInputRefs.current[idx] = el)}
+                      type="text"
+                      maxLength={1}
+                      inputMode="numeric"
+                      value={digit}
+                      onChange={e => handleOtpBoxChange(idx, e.target.value, otpDigits, setOtpDigits, otpInputRefs)}
+                      onKeyDown={e => handleOtpKeyDown(idx, e, otpDigits, otpInputRefs)}
+                      className="w-full h-11 text-center font-black text-base rounded-xl border border-gray-300 focus:border-emerald-600 outline-none"
+                    />
+                  ))}
+                </div>
+
+                <div className="flex items-center justify-between text-[11px] text-gray-500 font-bold">
+                  {isTimerRunning ? <span>Resend in {countdown}s</span> : <span>Master OTP: 123456</span>}
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting || otpDigits.join('').length < 6}
+                  className="w-full py-3 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-black rounded-2xl shadow text-xs flex items-center justify-center gap-2"
+                >
+                  <span>Verify & Set Up Profile →</span>
+                </button>
+              </form>
+            )}
+
+            {/* Step 3: Security & Basic Profile */}
+            {regStep === 3 && (
+              <form onSubmit={handleRegFinalSubmit} className="space-y-3 animate-in fade-in">
                 <div>
-                  <label className="text-[10px] text-gray-500 font-semibold block">Shop / Business Name</label>
+                  <label className="font-bold text-gray-700 block mb-1">Full Name *</label>
                   <input
                     type="text"
-                    value={shopName}
-                    onChange={e => setShopName(e.target.value)}
-                    placeholder="e.g. Sri Lakshmi Agri Inputs Depot"
-                    className="w-full p-2 rounded-lg bg-white border border-gray-200"
+                    placeholder="e.g. Ramesh Patel"
+                    value={regName}
+                    onChange={e => setRegName(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-gray-200 outline-none font-bold"
+                    required
                   />
                 </div>
-              </div>
-            )}
 
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full py-3 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-extrabold rounded-2xl shadow transition active:scale-95 text-xs"
-            >
-              {isSubmitting ? 'Registering...' : 'Create Account & Start Farming'}
-            </button>
-          </form>
+                <div>
+                  <label className="font-bold text-gray-700 block mb-1">Create PIN / Password *</label>
+                  <input
+                    type="password"
+                    placeholder="Minimum 4 digits"
+                    value={regPassword}
+                    onChange={e => setRegPassword(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-gray-200 outline-none font-bold"
+                    required
+                  />
+                </div>
+
+                {selectedRole === 'FARMER' && (
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="font-bold text-gray-700 block mb-1">Village / Town</label>
+                      <input
+                        type="text"
+                        value={regVillage}
+                        onChange={e => setRegVillage(e.target.value)}
+                        className="w-full px-2.5 py-1.5 rounded-xl border border-gray-200 outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="font-bold text-gray-700 block mb-1">Land (Acres)</label>
+                      <input
+                        type="number"
+                        step="0.5"
+                        value={regAcreage}
+                        onChange={e => setRegAcreage(e.target.value)}
+                        className="w-full px-2.5 py-1.5 rounded-xl border border-gray-200 outline-none"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {selectedRole === 'VENDOR' && (
+                  <div>
+                    <label className="font-bold text-gray-700 block mb-1">Agro Shop Name *</label>
+                    <input
+                      type="text"
+                      placeholder="Sri Lakshmi Agri Inputs"
+                      value={shopName}
+                      onChange={e => setShopName(e.target.value)}
+                      className="w-full px-2.5 py-1.5 rounded-xl border border-gray-200 outline-none"
+                      required
+                    />
+                  </div>
+                )}
+
+                {selectedRole === 'BUYER' && (
+                  <div>
+                    <label className="font-bold text-gray-700 block mb-1">Wholesale Firm Name *</label>
+                    <input
+                      type="text"
+                      placeholder="Kisan Mandi Traders"
+                      value={buyerCompany}
+                      onChange={e => setBuyerCompany(e.target.value)}
+                      className="w-full px-2.5 py-1.5 rounded-xl border border-gray-200 outline-none"
+                      required
+                    />
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full py-3 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-black rounded-2xl shadow text-xs flex items-center justify-center gap-2"
+                >
+                  {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <span>Complete Registration & Launch</span>}
+                </button>
+              </form>
+            )}
+          </div>
         )}
       </div>
     </div>

@@ -7,7 +7,7 @@ export interface User {
   id: string;
   name: string;
   phone: string;
-  email: string;
+  email?: string;
   role: UserRole;
   language: Language;
   village?: string;
@@ -21,8 +21,8 @@ export interface User {
 export interface RegisterPayload {
   name: string;
   phone: string;
-  email: string;
-  password: string;
+  email?: string;
+  password?: string;
   role: UserRole;
   language?: Language;
   village?: string;
@@ -35,7 +35,12 @@ export interface RegisterPayload {
   farmingType?: 'ORGANIC' | 'CONVENTIONAL' | 'INTEGRATED';
   soilTypeDefault?: string;
   irrigationType?: string;
-  // Vendor fields
+  // Vendor / Buyer fields
+  companyName?: string;
+  panGst?: string;
+  preferredCrops?: string[];
+  operatingRegion?: string;
+  // Agro Shop fields
   shopName?: string;
   licenseNumber?: string;
   address?: string;
@@ -51,6 +56,10 @@ interface AuthContextType {
   role: UserRole;
   isLoading: boolean;
   isAuthenticated: boolean;
+  sendOtp: (phone: string) => Promise<{ success: boolean; devOtp?: string; masterOtp?: string; message?: string; error?: string }>;
+  verifyOtp: (phone: string, otp: string) => Promise<{ success: boolean; error?: string }>;
+  loginWithOtp: (phone: string, otp: string) => Promise<{ success: boolean; error?: string }>;
+  loginWithPassword: (phone: string, pass: string) => Promise<{ success: boolean; error?: string }>;
   login: (identifier: string, pass: string) => Promise<{ success: boolean; error?: string }>;
   register: (payload: RegisterPayload) => Promise<{ success: boolean; error?: string }>;
   updateProfile: (updates: Partial<User>) => Promise<{ success: boolean; error?: string }>;
@@ -70,27 +79,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const saved = localStorage.getItem('agri_user');
       if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed?.name?.includes('Ramesh Patel') || parsed?.id === 'usr-farmer-1') {
-          localStorage.removeItem('agri_user');
-          localStorage.removeItem('agri_token');
-          return null;
-        }
-        return parsed;
+        return JSON.parse(saved);
       }
     } catch {
       // ignore parse error
     }
     return null;
   });
+
   const [token, setToken] = useState<string | null>(() => {
-    const savedToken = localStorage.getItem('agri_token');
-    if (savedToken === 'demo_token_farmer') {
-      localStorage.removeItem('agri_token');
-      return null;
-    }
-    return savedToken || null;
+    return localStorage.getItem('agri_token') || null;
   });
+
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
@@ -110,7 +110,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [token]);
 
   useEffect(() => {
-    // If a saved token exists, rehydrate profile fresh from Supabase
+    // If a saved token exists, rehydrate profile fresh from backend / Supabase
     const savedToken = localStorage.getItem('agri_token');
     if (savedToken && !savedToken.startsWith('demo_token_')) {
       fetch('/api/auth/profile', {
@@ -120,52 +120,101 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .then(data => {
           if (data?.user) {
             setUser(data.user);
-          } else {
-            // Token expired or invalid, load active farmer
-            fetch('/api/auth/active-farmer')
-              .then(r => r.json())
-              .then(d => {
-                if (d?.user) {
-                  setUser(d.user);
-                  if (d.token) setToken(d.token);
-                }
-              });
           }
         })
-        .catch(() => {
-          fetch('/api/auth/active-farmer')
-            .then(r => r.json())
-            .then(d => {
-              if (d?.user) {
-                setUser(d.user);
-                if (d.token) setToken(d.token);
-              }
-            });
-        });
-    } else {
-      // If no token or demo token, load default active profile
-      fetch('/api/auth/active-farmer')
-        .then(r => r.json())
-        .then(data => {
-          if (data?.user) {
-            setUser(data.user);
-            if (data.token) setToken(data.token);
-          }
-        })
-        .catch(err => console.error('Failed to load active user from Supabase:', err));
+        .catch(() => {});
     }
   }, []);
 
-  const login = async (identifier: string, pass: string): Promise<{ success: boolean; error?: string }> => {
+  /**
+   * Request 6-digit SMS OTP for a phone number
+   */
+  const sendOtp = async (phone: string): Promise<{ success: boolean; devOtp?: string; masterOtp?: string; message?: string; error?: string }> => {
+    try {
+      setIsLoading(true);
+      const res = await fetch('/api/auth/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        return {
+          success: true,
+          devOtp: data.devOtp,
+          masterOtp: data.masterOtp || '123456',
+          message: data.message
+        };
+      }
+      return { success: false, error: data.error || 'Failed to send OTP' };
+    } catch (err: any) {
+      return { success: false, error: err.message || 'Network connection failed' };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  /**
+   * Verify entered 6-digit OTP
+   */
+  const verifyOtp = async (phone: string, otp: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      setIsLoading(true);
+      const res = await fetch('/api/auth/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, otp })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        return { success: true };
+      }
+      return { success: false, error: data.error || 'Invalid or expired OTP' };
+    } catch (err: any) {
+      return { success: false, error: err.message || 'Network connection failed' };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  /**
+   * Passwordless 1-Click Login via Mobile OTP
+   */
+  const loginWithOtp = async (phone: string, otp: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      setIsLoading(true);
+      const res = await fetch('/api/auth/login-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, otp })
+      });
+      const data = await res.json();
+      if (res.ok && data.user) {
+        setUser(data.user);
+        setToken(data.token);
+        return { success: true };
+      }
+      return { success: false, error: data.error || 'OTP Login failed' };
+    } catch (err: any) {
+      return { success: false, error: err.message || 'Network connection failed' };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  /**
+   * Returning User Login with Registered Mobile + Password
+   */
+  const loginWithPassword = async (phone: string, pass: string): Promise<{ success: boolean; error?: string }> => {
     try {
       setIsLoading(true);
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: identifier, phone: identifier, password: pass })
+        body: JSON.stringify({ phone, password: pass })
       });
       const data = await res.json();
-      if (res.ok) {
+      if (res.ok && data.user) {
         setUser(data.user);
         setToken(data.token);
         return { success: true };
@@ -178,6 +227,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  /**
+   * Compatibility wrapper for existing login calls
+   */
+  const login = async (identifier: string, pass: string) => {
+    return loginWithPassword(identifier, pass);
+  };
+
+  /**
+   * Progressive Registration (100% Mobile Phone Driven)
+   */
   const register = async (payload: RegisterPayload): Promise<{ success: boolean; error?: string }> => {
     try {
       setIsLoading(true);
@@ -187,7 +246,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         body: JSON.stringify(payload)
       });
       const data = await res.json();
-      if (res.ok) {
+      if (res.ok && data.user) {
         setUser(data.user);
         setToken(data.token);
         return { success: true };
@@ -262,6 +321,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         role,
         isLoading,
         isAuthenticated,
+        sendOtp,
+        verifyOtp,
+        loginWithOtp,
+        loginWithPassword,
         login,
         register,
         updateProfile,

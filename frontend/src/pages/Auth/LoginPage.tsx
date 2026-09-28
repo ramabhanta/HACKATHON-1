@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth, UserRole } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import {
   Lock,
-  Mail,
   Phone,
   User,
   MapPin,
@@ -13,11 +12,18 @@ import {
   AlertCircle,
   CheckCircle2,
   ArrowRight,
+  ArrowLeft,
   Eye,
   EyeOff,
   ShieldCheck,
   Check,
-  Loader2
+  Loader2,
+  Clock,
+  Sparkles,
+  Wheat,
+  Building2,
+  RefreshCw,
+  KeyRound
 } from 'lucide-react';
 
 interface LoginPageProps {
@@ -25,560 +31,1390 @@ interface LoginPageProps {
 }
 
 export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
-  const { login, register, switchRole, user, isAuthenticated, logout } = useAuth();
+  const {
+    loginWithPassword,
+    loginWithOtp,
+    sendOtp,
+    verifyOtp,
+    register,
+    user,
+    isAuthenticated,
+    logout
+  } = useAuth();
   const { t, language } = useLanguage();
 
-  const [mode, setMode] = useState<'LOGIN' | 'REGISTER'>('LOGIN');
+  // Primary mode: SIGN_IN or REGISTER
+  const [authMode, setAuthMode] = useState<'SIGN_IN' | 'REGISTER'>('SIGN_IN');
+
+  // Sign-in sub-mode: PASSWORD or OTP
+  const [signInMethod, setSignInMethod] = useState<'PASSWORD' | 'OTP'>('PASSWORD');
   const [showPassword, setShowPassword] = useState(false);
+
+  // Status & Feedback
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [devOtpToast, setDevOtpToast] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Login form state
-  const [loginIdentifier, setLoginIdentifier] = useState('yugandharreddy350@gmail.com');
+  // -------------------------------------------------------------
+  // Returning User Sign-In State
+  // -------------------------------------------------------------
+  const [loginPhone, setLoginPhone] = useState('9848012345');
   const [loginPassword, setLoginPassword] = useState('password123');
-  const [rememberMe, setRememberMe] = useState(true);
+  const [loginOtpSent, setLoginOtpSent] = useState(false);
+  const [loginOtpDigits, setLoginOtpDigits] = useState(['', '', '', '', '', '']);
 
-  // Register form state
-  const [role, setRole] = useState<UserRole>('FARMER');
+  // -------------------------------------------------------------
+  // Progressive Multi-Step Registration State
+  // Step 1: Role & Mobile -> Step 2: OTP -> Step 3: Security & Name -> Step 4: Role Profile -> Step 5: Complete
+  // -------------------------------------------------------------
+  const [regStep, setRegStep] = useState<1 | 2 | 3 | 4 | 5>(1);
+  const [selectedRole, setSelectedRole] = useState<UserRole>('FARMER');
+  const [regPhone, setRegPhone] = useState('');
+  const [otpDigits, setOtpDigits] = useState(['', '', '', '', '', '']);
+  const [countdown, setCountdown] = useState(60);
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
+
+  // Step 3: Profile & Security
   const [regName, setRegName] = useState('');
-  const [regPhone, setRegPhone] = useState('+91 ');
-  const [regEmail, setRegEmail] = useState('');
   const [regPassword, setRegPassword] = useState('');
-  const [regVillage, setRegVillage] = useState('');
+  const [showRegPassword, setShowRegPassword] = useState(false);
+
+  // Step 4: Role specifics
+  // Farmer fields
+  const [regVillage, setRegVillage] = useState('Kadiri Rural');
   const [regDistrict, setRegDistrict] = useState('Sri Sathya Sai');
   const [regState, setRegState] = useState('Andhra Pradesh');
   const [regPincode, setRegPincode] = useState('515591');
-
-  // Role specifics
   const [regAcreage, setRegAcreage] = useState('5.0');
-  const [regPrimaryCrop, setRegPrimaryCrop] = useState('Groundnut');
-  const [regFarmingType, setRegFarmingType] = useState<'ORGANIC' | 'INTEGRATED' | 'CONVENTIONAL'>('INTEGRATED');
-  const [regShopName, setRegShopName] = useState('');
-  const [regLicense, setRegLicense] = useState('');
+  const [selectedCrops, setSelectedCrops] = useState<string[]>(['Groundnut', 'Tomato']);
 
-  const handleLoginSubmit = async (e: React.FormEvent) => {
+  // Vendor / Buyer fields (Produce Wholesaler)
+  const [buyerCompany, setBuyerCompany] = useState('');
+  const [buyerPanGst, setBuyerPanGst] = useState('');
+  const [buyerRegion, setBuyerRegion] = useState('Rayalaseema / Kadiri AP');
+
+  // Agro Shop fields (Inputs dealer)
+  const [shopName, setShopName] = useState('');
+  const [shopLicense, setShopLicense] = useState('');
+  const [shopAddress, setShopAddress] = useState('Shop #14, Main Bazaar, Kadiri');
+
+  // OTP inputs refs
+  const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const loginOtpRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  // 60-second countdown effect
+  useEffect(() => {
+    let timer: any;
+    if (isTimerRunning && countdown > 0) {
+      timer = setInterval(() => setCountdown(c => c - 1), 1000);
+    } else if (countdown === 0) {
+      setIsTimerRunning(false);
+    }
+    return () => clearInterval(timer);
+  }, [isTimerRunning, countdown]);
+
+  // Clean 10-digit input handler
+  const handlePhoneInputChange = (
+    val: string,
+    setter: React.Dispatch<React.SetStateAction<string>>
+  ) => {
+    const raw = val.replace(/[^0-9]/g, '');
+    const clean10 = raw.slice(0, 10);
+    setter(clean10);
+  };
+
+  // OTP Digit Handler
+  const handleOtpBoxChange = (
+    index: number,
+    value: string,
+    digitsArr: string[],
+    setDigits: React.Dispatch<React.SetStateAction<string[]>>,
+    refs: React.MutableRefObject<(HTMLInputElement | null)[]>
+  ) => {
+    const char = value.slice(-1).replace(/[^0-9]/g, '');
+    const nextArr = [...digitsArr];
+    nextArr[index] = char;
+    setDigits(nextArr);
+
+    if (char && index < 5) {
+      refs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleOtpKeyDown = (
+    index: number,
+    e: React.KeyboardEvent<HTMLInputElement>,
+    digitsArr: string[],
+    refs: React.MutableRefObject<(HTMLInputElement | null)[]>
+  ) => {
+    if (e.key === 'Backspace' && !digitsArr[index] && index > 0) {
+      refs.current[index - 1]?.focus();
+    }
+  };
+
+  const handleOtpPaste = (
+    e: React.ClipboardEvent<HTMLInputElement>,
+    setDigits: React.Dispatch<React.SetStateAction<string[]>>,
+    refs: React.MutableRefObject<(HTMLInputElement | null)[]>
+  ) => {
+    e.preventDefault();
+    const paste = e.clipboardData.getData('text').replace(/[^0-9]/g, '').slice(0, 6);
+    if (!paste) return;
+    const nextArr = ['', '', '', '', '', ''];
+    for (let i = 0; i < paste.length; i++) {
+      nextArr[i] = paste[i];
+    }
+    setDigits(nextArr);
+    const nextFocus = Math.min(paste.length, 5);
+    refs.current[nextFocus]?.focus();
+  };
+
+  // -------------------------------------------------------------
+  // Returning User Login Actions
+  // -------------------------------------------------------------
+  const handlePasswordLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setSuccessMsg(null);
 
-    if (!loginIdentifier.trim() || !loginPassword.trim()) {
-      setError('Please enter your email/phone and password.');
+    if (!loginPhone || loginPhone.length < 10) {
+      setError('Please enter a valid 10-digit registered mobile number.');
+      return;
+    }
+    if (!loginPassword) {
+      setError('Please enter your password.');
       return;
     }
 
     setIsSubmitting(true);
     try {
-      const res = await login(loginIdentifier.trim(), loginPassword);
+      const res = await loginWithPassword(loginPhone, loginPassword);
       if (res.success) {
-        setSuccessMsg('Successfully signed in! Redirecting to dashboard...');
+        setSuccessMsg('Signed in successfully! Redirecting...');
+        setTimeout(() => setActiveTab('home'), 600);
+      } else {
+        setError(res.error || 'Incorrect mobile number or password.');
+      }
+    } catch (err: any) {
+      setError(err.message || 'Login failed.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleRequestLoginOtp = async () => {
+    setError(null);
+    if (!loginPhone || loginPhone.length < 10) {
+      setError('Please enter your 10-digit mobile number first.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const res = await sendOtp(loginPhone);
+      if (res.success) {
+        setLoginOtpSent(true);
+        setDevOtpToast(`OTP Sent! Code: ${res.devOtp || '123456'} (Master: 123456)`);
+        setCountdown(60);
+        setIsTimerRunning(true);
+        setTimeout(() => loginOtpRefs.current[0]?.focus(), 100);
+      } else {
+        setError(res.error || 'Failed to send OTP.');
+      }
+    } catch (err: any) {
+      setError(err.message || 'Failed to send OTP.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleVerifyLoginOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    const otpCode = loginOtpDigits.join('');
+
+    if (otpCode.length < 6) {
+      setError('Please enter the complete 6-digit OTP.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const res = await loginWithOtp(loginPhone, otpCode);
+      if (res.success) {
+        setSuccessMsg('Signed in successfully via OTP! Redirecting...');
+        setTimeout(() => setActiveTab('home'), 600);
+      } else {
+        setError(res.error || 'Invalid OTP code.');
+      }
+    } catch (err: any) {
+      setError(err.message || 'OTP verification failed.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // -------------------------------------------------------------
+  // Progressive Multi-Step Registration Actions
+  // -------------------------------------------------------------
+  const handleRegSendOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    if (!regPhone || regPhone.length < 10) {
+      setError('Please enter a valid 10-digit mobile number.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const res = await sendOtp(regPhone);
+      if (res.success) {
+        setDevOtpToast(`OTP sent to +91 ${regPhone}! Code: ${res.devOtp || '123456'} (Master: 123456)`);
+        setRegStep(2);
+        setCountdown(60);
+        setIsTimerRunning(true);
+        setTimeout(() => otpInputRefs.current[0]?.focus(), 150);
+      } else {
+        setError(res.error || 'Could not send SMS OTP.');
+      }
+    } catch (err: any) {
+      setError(err.message || 'Failed to request OTP.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleRegVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    const code = otpDigits.join('');
+
+    if (code.length < 6) {
+      setError('Please enter all 6 digits of the OTP.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const res = await verifyOtp(regPhone, code);
+      if (res.success) {
+        setRegStep(3);
+      } else {
+        setError(res.error || 'Invalid OTP entered.');
+      }
+    } catch (err: any) {
+      setError(err.message || 'OTP verification failed.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleRegStep3Security = (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    if (!regName.trim()) {
+      setError('Please enter your full name.');
+      return;
+    }
+    if (!regPassword || regPassword.length < 4) {
+      setError('Please create a PIN or password of at least 4 digits/characters.');
+      return;
+    }
+
+    setRegStep(4);
+  };
+
+  const handleRegFinalSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setIsSubmitting(true);
+
+    try {
+      const payload: any = {
+        name: regName.trim(),
+        phone: regPhone,
+        password: regPassword,
+        role: selectedRole,
+        village: regVillage,
+        district: regDistrict,
+        state: regState,
+        pincode: regPincode
+      };
+
+      if (selectedRole === 'FARMER') {
+        payload.totalAcreage = parseFloat(regAcreage) || 3.0;
+        payload.primaryCrops = selectedCrops;
+        payload.farmingType = 'INTEGRATED';
+      } else if (selectedRole === 'BUYER') {
+        payload.companyName = buyerCompany || `${regName} Wholesale Mandi`;
+        payload.panGst = buyerPanGst;
+        payload.preferredCrops = selectedCrops;
+        payload.operatingRegion = buyerRegion;
+      } else if (selectedRole === 'VENDOR') {
+        payload.shopName = shopName || `${regName}'s Agro Seva Kendra`;
+        payload.licenseNumber = shopLicense || `AP/AGRI/${Math.floor(10000 + Math.random() * 90000)}`;
+        payload.address = shopAddress;
+      }
+
+      const res = await register(payload);
+      if (res.success) {
+        setRegStep(5);
         setTimeout(() => {
           setActiveTab('home');
-        }, 800);
+        }, 1200);
       } else {
-        setError(res.error || 'Invalid credentials. Please verify and try again.');
+        setError(res.error || 'Registration failed.');
       }
     } catch (err: any) {
-      setError(err.message || 'Network error during login.');
+      setError(err.message || 'Registration failed.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleRegisterSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setSuccessMsg(null);
-
-    if (!regName.trim() || !regEmail.trim() || !regPassword.trim() || !regPhone.trim()) {
-      setError('Name, phone, email, and password are required.');
-      return;
-    }
-
-    if (regPassword.length < 6) {
-      setError('Password must be at least 6 characters long.');
-      return;
-    }
-
-    setIsSubmitting(true);
-    try {
-      const res = await register({
-        name: regName.trim(),
-        phone: regPhone.trim(),
-        email: regEmail.trim(),
-        password: regPassword,
-        role,
-        village: regVillage.trim() || 'Kadiri Mandal',
-        district: regDistrict.trim(),
-        state: regState.trim(),
-        pincode: regPincode.trim(),
-        totalAcreage: parseFloat(regAcreage) || 3.0,
-        primaryCrops: [regPrimaryCrop],
-        farmingType: regFarmingType,
-        shopName: regShopName.trim(),
-        licenseNumber: regLicense.trim()
-      });
-
-      if (res.success) {
-        setSuccessMsg('Account registered successfully! Redirecting to your agricultural dashboard...');
-        setTimeout(() => {
-          if (role === 'VENDOR') setActiveTab('vendor-portal');
-          else if (role === 'ADMIN') setActiveTab('admin-portal');
-          else setActiveTab('home');
-        }, 1000);
-      } else {
-        setError(res.error || 'Registration failed. Please check your details.');
+  const toggleCrop = (crop: string) => {
+    if (selectedCrops.includes(crop)) {
+      if (selectedCrops.length > 1) {
+        setSelectedCrops(selectedCrops.filter(c => c !== crop));
       }
-    } catch (err: any) {
-      setError(err.message || 'Network error during registration.');
-    } finally {
-      setIsSubmitting(false);
+    } else {
+      setSelectedCrops([...selectedCrops, crop]);
     }
   };
 
-  const handleQuickDemoLogin = async (demoRole: UserRole) => {
-    setError(null);
-    setIsSubmitting(true);
-    try {
-      if (demoRole === 'FARMER') {
-        const res = await login('yugandharreddy350@gmail.com', 'password123');
-        if (res.success) {
-          setSuccessMsg('Logged in as nani! Redirecting...');
-          setTimeout(() => setActiveTab('home'), 700);
-          return;
-        }
-      }
-      await switchRole(demoRole);
-      setSuccessMsg(`Switched to demo ${demoRole.toLowerCase()} account! Redirecting...`);
-      setTimeout(() => {
-        if (demoRole === 'VENDOR') setActiveTab('vendor-portal');
-        else if (demoRole === 'ADMIN') setActiveTab('admin-portal');
-        else if (demoRole === 'BUYER') setActiveTab('produce');
-        else setActiveTab('home');
-      }, 700);
-    } catch (err: any) {
-      setError(err.message || 'Demo switch failed');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  // -------------------------------------------------------------
+  // Render Active Logged-in State Card (if already authenticated)
+  // -------------------------------------------------------------
+  if (isAuthenticated && user) {
+    return (
+      <div className="max-w-md mx-auto p-4 sm:p-6 space-y-6">
+        <div className="bg-white rounded-3xl p-6 shadow-xl border border-emerald-100 text-center space-y-4">
+          <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-800 mx-auto flex items-center justify-center font-black text-2xl border-4 border-emerald-50">
+            {user.name?.charAt(0) || 'K'}
+          </div>
+          <div>
+            <h2 className="text-xl font-black text-gray-900">{user.name}</h2>
+            <p className="text-xs font-mono font-bold text-emerald-800 mt-1">{user.phone}</p>
+            <span className="inline-block mt-2 px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-extrabold rounded-full uppercase tracking-wider">
+              {user.role}
+            </span>
+          </div>
 
-  return (
-    <div className="max-w-xl mx-auto space-y-6 pb-20 md:pb-8 pt-4">
-      {/* Header Card */}
-      <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-emerald-100 text-center relative overflow-hidden">
-        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-800 text-3xl mb-3 shadow-inner">
-          🌾
-        </div>
-        <h1 className="text-2xl font-black text-gray-900 tracking-tight">
-          {mode === 'LOGIN' ? 'Sign In to AgroDex' : 'Join AgroDex Platform'}
-        </h1>
-        <p className="text-xs sm:text-sm text-gray-500 mt-1 max-w-sm mx-auto">
-          {mode === 'LOGIN'
-            ? 'Access your farm management tools, AI crop diagnostics, input marketplace, and mandi buyers.'
-            : 'Register your farm, agro-dealer depot, or mandi wholesale trading account.'}
-        </p>
-
-        {/* Tab switch */}
-        <div className="flex bg-gray-100 p-1.5 rounded-2xl text-xs font-bold mt-5 max-w-xs mx-auto">
-          <button
-            type="button"
-            onClick={() => { setMode('LOGIN'); setError(null); setSuccessMsg(null); }}
-            className={`flex-1 py-2 rounded-xl transition ${
-              mode === 'LOGIN' ? 'bg-white text-emerald-800 shadow-sm' : 'text-gray-500'
-            }`}
-          >
-            Sign In
-          </button>
-          <button
-            type="button"
-            onClick={() => { setMode('REGISTER'); setError(null); setSuccessMsg(null); }}
-            className={`flex-1 py-2 rounded-xl transition ${
-              mode === 'REGISTER' ? 'bg-white text-emerald-800 shadow-sm' : 'text-gray-500'
-            }`}
-          >
-            Register / Onboard
-          </button>
+          <div className="pt-2 border-t border-gray-100 space-y-2">
+            <button
+              onClick={() => setActiveTab('home')}
+              className="w-full py-3 bg-emerald-700 hover:bg-emerald-800 text-white font-black text-sm rounded-2xl shadow transition"
+            >
+              Go to Dashboard →
+            </button>
+            <button
+              onClick={() => logout()}
+              className="w-full py-2.5 bg-stone-100 hover:bg-rose-50 hover:text-rose-600 text-stone-700 font-bold text-xs rounded-xl transition"
+            >
+              Sign Out of Mobile Session
+            </button>
+          </div>
         </div>
       </div>
+    );
+  }
 
-      {/* Error / Success Feedback Banners */}
-      {error && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-2xl flex items-start gap-2.5 text-xs text-red-900 animate-in fade-in">
-          <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
-          <span>{error}</span>
-        </div>
-      )}
-
-      {successMsg && (
-        <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-start gap-2.5 text-xs text-emerald-900 animate-in fade-in">
-          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-          <span>{successMsg}</span>
-        </div>
-      )}
-
-      {/* Currently logged in status banner */}
-      {isAuthenticated && user && (
-        <div className="bg-emerald-50/70 border border-emerald-200 rounded-2xl p-4 flex items-center justify-between text-xs">
-          <div>
-            <span className="text-gray-500">Currently signed in as:</span>
-            <p className="font-extrabold text-emerald-900">{user.name} ({user.role})</p>
-            <span className="text-[11px] text-gray-400">{user.email}</span>
-          </div>
-          <button
-            onClick={() => logout()}
-            className="px-3 py-1.5 bg-white border border-gray-200 hover:bg-red-50 hover:text-red-700 text-gray-700 font-bold rounded-xl text-xs transition"
-          >
-            Sign Out
-          </button>
-        </div>
-      )}
-
-      {/* 1. SIGN IN FORM */}
-      {mode === 'LOGIN' && (
-        <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-emerald-100 space-y-5">
-          <form onSubmit={handleLoginSubmit} className="space-y-4 text-xs">
-            <div>
-              <label className="font-bold text-gray-700 block mb-1">
-                Email Address or 10-Digit Mobile Phone *
-              </label>
-              <div className="relative">
-                <Mail className="w-4 h-4 text-gray-400 absolute left-3.5 top-3.5" />
-                <input
-                  type="text"
-                  value={loginIdentifier}
-                  onChange={e => setLoginIdentifier(e.target.value)}
-                  placeholder="farmer@agrodex.com or 9848012345"
-                  className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none text-xs"
-                  required
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="font-bold text-gray-700 block mb-1">
-                Password *
-              </label>
-              <div className="relative">
-                <Lock className="w-4 h-4 text-gray-400 absolute left-3.5 top-3.5" />
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  value={loginPassword}
-                  onChange={e => setLoginPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none text-xs"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 top-3 text-gray-400 hover:text-gray-600"
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <label className="flex items-center gap-2 cursor-pointer text-gray-600 select-none">
-                <input
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={e => setRememberMe(e.target.checked)}
-                  className="rounded text-emerald-600 accent-emerald-600"
-                />
-                <span>Remember this device</span>
-              </label>
-              <span className="text-[11px] text-emerald-700 font-bold hover:underline cursor-pointer">
-                Forgot Password?
-              </span>
-            </div>
-
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full py-3.5 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-extrabold rounded-2xl shadow-lg transition active:scale-95 text-xs flex items-center justify-center gap-2"
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Authenticating...</span>
-                </>
-              ) : (
-                <>
-                  <span>Sign In to AgroDex</span>
-                  <ArrowRight className="w-4 h-4" />
-                </>
-              )}
-            </button>
-          </form>
-
-          {/* Quick 1-Click Demo Accounts */}
-          <div className="pt-4 border-t border-gray-100">
-            <span className="text-[10px] font-extrabold text-gray-400 uppercase tracking-wider block text-center mb-2.5">
-              — Quick 1-Click Instant Demo Login —
+  // -------------------------------------------------------------
+  // Main Authentication Interface (Mobile-First)
+  // -------------------------------------------------------------
+  return (
+    <div className="min-h-[85vh] flex items-center justify-center p-3 sm:p-6">
+      <div className="w-full max-w-lg">
+        {/* Testing / Master OTP Banner Alert */}
+        <div className="mb-4 bg-amber-500/10 border border-amber-300/80 rounded-2xl p-3 flex items-center justify-between text-xs text-amber-900 shadow-sm">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-amber-600 flex-shrink-0" />
+            <span>
+              <strong>Hackathon Test Safeguard:</strong> Master OTP is <code className="bg-amber-100 px-1.5 py-0.5 rounded font-black text-amber-950 font-mono">123456</code>
             </span>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              <button
-                type="button"
-                onClick={() => handleQuickDemoLogin('FARMER')}
-                className="p-2.5 rounded-xl border border-gray-200 hover:border-emerald-500 hover:bg-emerald-50 text-left transition flex items-center gap-2"
-              >
-                <span className="text-xl">🌾</span>
-                <div className="min-w-0">
-                  <p className="font-bold text-[11px] text-gray-900 truncate">Farmer</p>
-                  <p className="text-[10px] text-gray-500 truncate">nani</p>
-                </div>
-              </button>
+          </div>
+          <span className="text-[10px] font-extrabold uppercase bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full">
+            Dev Mode
+          </span>
+        </div>
 
-              <button
-                type="button"
-                onClick={() => handleQuickDemoLogin('VENDOR')}
-                className="p-2.5 rounded-xl border border-gray-200 hover:border-emerald-500 hover:bg-emerald-50 text-left transition flex items-center gap-2"
-              >
-                <span className="text-xl">🏪</span>
-                <div className="min-w-0">
-                  <p className="font-bold text-[11px] text-gray-900 truncate">Agri Vendor</p>
-                  <p className="text-[10px] text-gray-500 truncate">Kadiri Depot</p>
-                </div>
-              </button>
+        {/* Dynamic Dev OTP Toast Notice */}
+        {devOtpToast && (
+          <div className="mb-4 bg-emerald-50 border border-emerald-300 rounded-2xl p-3 text-xs text-emerald-950 flex items-center justify-between animate-in fade-in">
+            <div className="flex items-center gap-2 font-bold">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              <span>{devOtpToast}</span>
+            </div>
+            <button onClick={() => setDevOtpToast(null)} className="text-emerald-700 font-black text-xs hover:underline">
+              Dismiss
+            </button>
+          </div>
+        )}
 
-              <button
-                type="button"
-                onClick={() => handleQuickDemoLogin('BUYER')}
-                className="p-2.5 rounded-xl border border-gray-200 hover:border-emerald-500 hover:bg-emerald-50 text-left transition flex items-center gap-2"
-              >
-                <span className="text-xl">📦</span>
-                <div className="min-w-0">
-                  <p className="font-bold text-[11px] text-gray-900 truncate">Mandi Buyer</p>
-                  <p className="text-[10px] text-gray-500 truncate">Wholesaler</p>
-                </div>
-              </button>
+        {/* Main Card Container */}
+        <div className="bg-white rounded-3xl shadow-xl border border-gray-200/90 overflow-hidden">
+          {/* Header Switcher */}
+          <div className="p-4 sm:p-6 bg-gradient-to-r from-emerald-900 via-emerald-800 to-teal-900 text-white relative">
+            <div className="flex items-center gap-2.5 mb-2">
+              <div className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center backdrop-blur-md border border-white/20">
+                <Phone className="w-5 h-5 text-amber-300" />
+              </div>
+              <div>
+                <h1 className="text-lg sm:text-xl font-black tracking-tight leading-tight">
+                  AgroDex Mobile Connect
+                </h1>
+                <p className="text-[11px] text-emerald-200 font-medium">
+                  100% Mobile Phone & SMS OTP Authentication
+                </p>
+              </div>
+            </div>
 
+            {/* Toggle: Sign In vs Progressive Register */}
+            <div className="grid grid-cols-2 p-1 bg-black/25 backdrop-blur-md rounded-2xl mt-4 border border-white/10 text-xs font-black">
               <button
                 type="button"
-                onClick={() => handleQuickDemoLogin('ADMIN')}
-                className="p-2.5 rounded-xl border border-gray-200 hover:border-emerald-500 hover:bg-emerald-50 text-left transition flex items-center gap-2"
+                onClick={() => {
+                  setAuthMode('SIGN_IN');
+                  setError(null);
+                  setSuccessMsg(null);
+                }}
+                className={`py-2 rounded-xl transition ${
+                  authMode === 'SIGN_IN'
+                    ? 'bg-white text-emerald-950 shadow-md'
+                    : 'text-emerald-100 hover:text-white'
+                }`}
               >
-                <span className="text-xl">⚙️</span>
-                <div className="min-w-0">
-                  <p className="font-bold text-[11px] text-gray-900 truncate">Admin</p>
-                  <p className="text-[10px] text-gray-500 truncate">Platform Admin</p>
-                </div>
+                Sign In
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setAuthMode('REGISTER');
+                  setRegStep(1);
+                  setError(null);
+                  setSuccessMsg(null);
+                }}
+                className={`py-2 rounded-xl transition ${
+                  authMode === 'REGISTER'
+                    ? 'bg-white text-emerald-950 shadow-md'
+                    : 'text-emerald-100 hover:text-white'
+                }`}
+              >
+                New Registration
               </button>
             </div>
           </div>
-        </div>
-      )}
 
-      {/* 2. REGISTRATION FORM */}
-      {mode === 'REGISTER' && (
-        <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-emerald-100 space-y-5">
-          <form onSubmit={handleRegisterSubmit} className="space-y-4 text-xs">
-            {/* Role Picker */}
-            <div>
-              <label className="font-bold text-gray-700 block mb-1.5">
-                Select Your Agricultural Role:
-              </label>
-              <div className="grid grid-cols-3 gap-2">
-                {[
-                  { id: 'FARMER', label: 'Farmer (రైతు)', icon: '🌾' },
-                  { id: 'VENDOR', label: 'Vendor (Shop)', icon: '🏪' },
-                  { id: 'BUYER', label: 'Produce Buyer', icon: '📦' }
-                ].map(r => (
+          <div className="p-4 sm:p-6 space-y-5">
+            {/* Global Error Banner */}
+            {error && (
+              <div className="p-3 bg-rose-50 border border-rose-200 rounded-2xl flex items-center gap-2.5 text-xs text-rose-800 font-bold animate-in fade-in">
+                <AlertCircle className="w-4 h-4 text-rose-600 flex-shrink-0" />
+                <span>{error}</span>
+              </div>
+            )}
+
+            {/* Global Success Banner */}
+            {successMsg && (
+              <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center gap-2.5 text-xs text-emerald-800 font-bold animate-in fade-in">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                <span>{successMsg}</span>
+              </div>
+            )}
+
+            {/* ======================================================= */}
+            {/* SECTION 1: RETURNING USER SIGN-IN                        */}
+            {/* ======================================================= */}
+            {authMode === 'SIGN_IN' && (
+              <div className="space-y-4">
+                {/* Method Switcher: Password vs SMS OTP */}
+                <div className="flex items-center justify-between p-1 bg-stone-100 rounded-xl text-xs font-bold">
                   <button
-                    key={r.id}
                     type="button"
-                    onClick={() => setRole(r.id as UserRole)}
-                    className={`p-2.5 rounded-xl text-center border transition ${
-                      role === r.id
-                        ? 'border-emerald-600 bg-emerald-50 text-emerald-900 font-extrabold shadow-2xs'
-                        : 'border-gray-200 bg-gray-50/50 text-gray-700 hover:bg-gray-100'
+                    onClick={() => {
+                      setSignInMethod('PASSWORD');
+                      setError(null);
+                    }}
+                    className={`flex-1 py-1.5 rounded-lg text-center transition ${
+                      signInMethod === 'PASSWORD'
+                        ? 'bg-white text-gray-900 shadow-sm'
+                        : 'text-stone-500 hover:text-stone-800'
                     }`}
                   >
-                    <span className="text-lg block">{r.icon}</span>
-                    <span className="text-[10px] mt-0.5 block">{r.label}</span>
+                    Mobile + Password
                   </button>
-                ))}
-              </div>
-            </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSignInMethod('OTP');
+                      setError(null);
+                    }}
+                    className={`flex-1 py-1.5 rounded-lg text-center transition flex items-center justify-center gap-1.5 ${
+                      signInMethod === 'OTP'
+                        ? 'bg-white text-emerald-900 shadow-sm font-black'
+                        : 'text-stone-500 hover:text-stone-800'
+                    }`}
+                  >
+                    <KeyRound className="w-3.5 h-3.5 text-emerald-700" />
+                    <span>Login via SMS OTP</span>
+                  </button>
+                </div>
 
-            {/* Personal credentials */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="font-bold text-gray-700 block mb-1">Full Name *</label>
-                <input
-                  type="text"
-                  value={regName}
-                  onChange={e => setRegName(e.target.value)}
-                  placeholder="e.g. nani"
-                  className="w-full p-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none"
-                  required
-                />
-              </div>
-              <div>
-                <label className="font-bold text-gray-700 block mb-1">Mobile Phone Number *</label>
-                <input
-                  type="text"
-                  value={regPhone}
-                  onChange={e => setRegPhone(e.target.value)}
-                  placeholder="+91 99515 18699"
-                  className="w-full p-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none"
-                  required
-                />
-              </div>
-            </div>
+                {signInMethod === 'PASSWORD' ? (
+                  /* Password-Based Login Form */
+                  <form onSubmit={handlePasswordLogin} className="space-y-4">
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1.5">
+                        Registered 10-Digit Mobile Number
+                      </label>
+                      <div className="relative flex rounded-2xl border border-gray-300 overflow-hidden focus-within:border-emerald-600 focus-within:ring-2 focus-within:ring-emerald-100">
+                        <span className="bg-stone-100 border-r border-gray-300 px-3 py-2.5 text-xs font-black text-gray-700 flex items-center gap-1">
+                          🇮🇳 +91
+                        </span>
+                        <input
+                          type="tel"
+                          maxLength={10}
+                          placeholder="98480 12345"
+                          value={loginPhone}
+                          onChange={e => handlePhoneInputChange(e.target.value, setLoginPhone)}
+                          className="w-full px-3 py-2.5 text-sm font-bold text-gray-900 outline-none"
+                          required
+                        />
+                      </div>
+                    </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="font-bold text-gray-700 block mb-1">Email Address *</label>
-                <input
-                  type="email"
-                  value={regEmail}
-                  onChange={e => setRegEmail(e.target.value)}
-                  placeholder="name@agrodex.com"
-                  className="w-full p-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none"
-                  required
-                />
-              </div>
-              <div>
-                <label className="font-bold text-gray-700 block mb-1">Create Password *</label>
-                <input
-                  type="password"
-                  value={regPassword}
-                  onChange={e => setRegPassword(e.target.value)}
-                  placeholder="Min 6 characters"
-                  className="w-full p-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none"
-                  required
-                />
-              </div>
-            </div>
+                    <div>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label className="block text-xs font-bold text-gray-700">
+                          Password / PIN
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => setSignInMethod('OTP')}
+                          className="text-[11px] font-bold text-emerald-700 hover:underline"
+                        >
+                          Forgot? Use OTP Login
+                        </button>
+                      </div>
+                      <div className="relative">
+                        <input
+                          type={showPassword ? 'text' : 'password'}
+                          placeholder="Enter your secure password"
+                          value={loginPassword}
+                          onChange={e => setLoginPassword(e.target.value)}
+                          className="w-full rounded-2xl border border-gray-300 px-3.5 py-2.5 text-sm font-bold text-gray-900 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 outline-none pr-10"
+                          required
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                        >
+                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                    </div>
 
-            {/* Location fields */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              <div className="col-span-2">
-                <label className="font-bold text-gray-700 block mb-1">Village / Mandal</label>
-                <input
-                  type="text"
-                  value={regVillage}
-                  onChange={e => setRegVillage(e.target.value)}
-                  placeholder="e.g. Kadiri Rural"
-                  className="w-full p-2 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none"
-                />
-              </div>
-              <div>
-                <label className="font-bold text-gray-700 block mb-1">District</label>
-                <input
-                  type="text"
-                  value={regDistrict}
-                  onChange={e => setRegDistrict(e.target.value)}
-                  className="w-full p-2 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none"
-                />
-              </div>
-              <div>
-                <label className="font-bold text-gray-700 block mb-1">Pincode</label>
-                <input
-                  type="text"
-                  value={regPincode}
-                  onChange={e => setRegPincode(e.target.value)}
-                  className="w-full p-2 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none"
-                />
-              </div>
-            </div>
-
-            {/* Role specific profile fields */}
-            {role === 'FARMER' && (
-              <div className="p-3.5 bg-emerald-50/60 rounded-2xl border border-emerald-100 space-y-3">
-                <span className="text-[10px] font-extrabold text-emerald-800 uppercase tracking-wider block">
-                  Farmer Specific Setup
-                </span>
-                <div className="grid grid-cols-3 gap-2">
-                  <div>
-                    <label className="font-bold text-gray-700 block mb-1">Total Acreage</label>
-                    <input
-                      type="number"
-                      step="0.5"
-                      value={regAcreage}
-                      onChange={e => setRegAcreage(e.target.value)}
-                      className="w-full p-2 rounded-xl border border-gray-200 bg-white"
-                    />
-                  </div>
-                  <div>
-                    <label className="font-bold text-gray-700 block mb-1">Primary Crop</label>
-                    <input
-                      type="text"
-                      value={regPrimaryCrop}
-                      onChange={e => setRegPrimaryCrop(e.target.value)}
-                      className="w-full p-2 rounded-xl border border-gray-200 bg-white"
-                    />
-                  </div>
-                  <div>
-                    <label className="font-bold text-gray-700 block mb-1">Method</label>
-                    <select
-                      value={regFarmingType}
-                      onChange={e => setRegFarmingType(e.target.value as any)}
-                      className="w-full p-2 rounded-xl border border-gray-200 bg-white"
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="w-full py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white font-black text-sm rounded-2xl shadow-lg shadow-emerald-900/20 transition active:scale-98 flex items-center justify-center gap-2"
                     >
-                      <option value="INTEGRATED">Integrated</option>
-                      <option value="ORGANIC">Organic</option>
-                      <option value="CONVENTIONAL">Conventional</option>
-                    </select>
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <span>Signing in...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>Sign In to Agri Account</span>
+                          <ArrowRight className="w-4 h-4" />
+                        </>
+                      )}
+                    </button>
+                  </form>
+                ) : (
+                  /* Passwordless SMS OTP Login Form */
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1.5">
+                        10-Digit Mobile Number
+                      </label>
+                      <div className="relative flex rounded-2xl border border-gray-300 overflow-hidden focus-within:border-emerald-600 focus-within:ring-2 focus-within:ring-emerald-100">
+                        <span className="bg-stone-100 border-r border-gray-300 px-3 py-2.5 text-xs font-black text-gray-700 flex items-center gap-1">
+                          🇮🇳 +91
+                        </span>
+                        <input
+                          type="tel"
+                          maxLength={10}
+                          placeholder="98480 12345"
+                          value={loginPhone}
+                          onChange={e => handlePhoneInputChange(e.target.value, setLoginPhone)}
+                          disabled={loginOtpSent}
+                          className="w-full px-3 py-2.5 text-sm font-bold text-gray-900 outline-none disabled:bg-stone-50"
+                        />
+                      </div>
+                    </div>
+
+                    {!loginOtpSent ? (
+                      <button
+                        type="button"
+                        onClick={handleRequestLoginOtp}
+                        disabled={isSubmitting || loginPhone.length < 10}
+                        className="w-full py-3 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-black text-sm rounded-2xl shadow-md transition flex items-center justify-center gap-2"
+                      >
+                        {isSubmitting ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <>
+                            <Phone className="w-4 h-4" />
+                            <span>Send 6-Digit OTP via SMS</span>
+                          </>
+                        )}
+                      </button>
+                    ) : (
+                      <form onSubmit={handleVerifyLoginOtp} className="space-y-4 animate-in fade-in">
+                        <div>
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-xs text-gray-600 font-bold">
+                              Enter OTP sent to +91 {loginPhone}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setLoginOtpSent(false);
+                                setLoginOtpDigits(['', '', '', '', '', '']);
+                              }}
+                              className="text-[11px] text-emerald-700 font-bold hover:underline"
+                            >
+                              Edit Number
+                            </button>
+                          </div>
+
+                          {/* 6 Box Inputs */}
+                          <div className="grid grid-cols-6 gap-2">
+                            {loginOtpDigits.map((digit, idx) => (
+                              <input
+                                key={idx}
+                                ref={el => (loginOtpRefs.current[idx] = el)}
+                                type="text"
+                                inputMode="numeric"
+                                maxLength={1}
+                                value={digit}
+                                onChange={e =>
+                                  handleOtpBoxChange(
+                                    idx,
+                                    e.target.value,
+                                    loginOtpDigits,
+                                    setLoginOtpDigits,
+                                    loginOtpRefs
+                                  )
+                                }
+                                onKeyDown={e =>
+                                  handleOtpKeyDown(idx, e, loginOtpDigits, loginOtpRefs)
+                                }
+                                onPaste={e =>
+                                  handleOtpPaste(e, setLoginOtpDigits, loginOtpRefs)
+                                }
+                                className="w-full h-12 text-center text-lg font-black rounded-xl border border-gray-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 outline-none"
+                              />
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Countdown & Resend */}
+                        <div className="flex items-center justify-between text-xs text-gray-500 font-bold">
+                          {isTimerRunning ? (
+                            <span className="flex items-center gap-1">
+                              <Clock className="w-3.5 h-3.5" /> Resend code in {countdown}s
+                            </span>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={handleRequestLoginOtp}
+                              className="text-emerald-700 hover:underline flex items-center gap-1 font-bold"
+                            >
+                              <RefreshCw className="w-3.5 h-3.5" /> Resend OTP
+                            </button>
+                          )}
+                          <span className="text-[11px] text-amber-700 bg-amber-50 px-2 py-0.5 rounded font-mono">
+                            Master: 123456
+                          </span>
+                        </div>
+
+                        <button
+                          type="submit"
+                          disabled={isSubmitting || loginOtpDigits.join('').length < 6}
+                          className="w-full py-3.5 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-black text-sm rounded-2xl shadow-lg transition flex items-center justify-center gap-2"
+                        >
+                          {isSubmitting ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <>
+                              <span>Verify & Sign In</span>
+                              <ArrowRight className="w-4 h-4" />
+                            </>
+                          )}
+                        </button>
+                      </form>
+                    )}
                   </div>
+                )}
+
+                {/* Bottom Toggle */}
+                <div className="pt-3 border-t border-gray-100 text-center">
+                  <p className="text-xs text-gray-500 font-medium">
+                    New to AgroDex?{' '}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAuthMode('REGISTER');
+                        setRegStep(1);
+                      }}
+                      className="font-black text-emerald-800 hover:underline"
+                    >
+                      Register with Mobile Number →
+                    </button>
+                  </p>
                 </div>
               </div>
             )}
 
-            {role === 'VENDOR' && (
-              <div className="p-3.5 bg-amber-50/60 rounded-2xl border border-amber-100 space-y-3">
-                <span className="text-[10px] font-extrabold text-amber-900 uppercase tracking-wider block">
-                  Shop & Depot Credentials
-                </span>
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <label className="font-bold text-gray-700 block mb-1">Agro Shop Name *</label>
-                    <input
-                      type="text"
-                      value={regShopName}
-                      onChange={e => setRegShopName(e.target.value)}
-                      placeholder="e.g. Sri Lakshmi Agri Inputs"
-                      className="w-full p-2 rounded-xl border border-gray-200 bg-white"
-                      required
-                    />
+            {/* ======================================================= */}
+            {/* SECTION 2: PROGRESSIVE MULTI-STEP REGISTRATION           */}
+            {/* ======================================================= */}
+            {authMode === 'REGISTER' && (
+              <div className="space-y-4">
+                {/* Step Indicator Progress Bar */}
+                <div className="space-y-1.5 pb-2">
+                  <div className="flex items-center justify-between text-[11px] font-black text-gray-500 uppercase tracking-wider">
+                    <span>
+                      Step {regStep} of 4:{' '}
+                      {regStep === 1
+                        ? 'Role & Phone'
+                        : regStep === 2
+                        ? 'SMS OTP'
+                        : regStep === 3
+                        ? 'Security'
+                        : regStep === 4
+                        ? 'Role Profile'
+                        : 'Completed'}
+                    </span>
+                    <span className="text-emerald-700 font-extrabold">{regStep * 25}%</span>
                   </div>
-                  <div>
-                    <label className="font-bold text-gray-700 block mb-1">Seed / Fertilizer License</label>
-                    <input
-                      type="text"
-                      value={regLicense}
-                      onChange={e => setRegLicense(e.target.value)}
-                      placeholder="e.g. AP/SSS/FERT/2023/910"
-                      className="w-full p-2 rounded-xl border border-gray-200 bg-white"
+                  <div className="w-full bg-stone-100 h-2 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-emerald-600 to-teal-500 transition-all duration-300"
+                      style={{ width: `${regStep * 25}%` }}
                     />
                   </div>
                 </div>
+
+                {/* STEP 1: ROLE SELECTION & MOBILE NUMBER */}
+                {regStep === 1 && (
+                  <form onSubmit={handleRegSendOtp} className="space-y-4 animate-in fade-in">
+                    <div>
+                      <label className="block text-xs font-black text-gray-800 uppercase tracking-wider mb-2">
+                        1. Select Your Role on AgroDex:
+                      </label>
+                      <div className="grid grid-cols-1 gap-2.5">
+                        {/* Option 1: Farmer */}
+                        <div
+                          onClick={() => setSelectedRole('FARMER')}
+                          className={`p-3 rounded-2xl border-2 cursor-pointer transition flex items-center justify-between ${
+                            selectedRole === 'FARMER'
+                              ? 'border-emerald-600 bg-emerald-50/60 shadow-sm'
+                              : 'border-gray-200 hover:border-emerald-300'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-emerald-700 text-white flex items-center justify-center font-black">
+                              <Sprout className="w-5 h-5" />
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-1.5">
+                                <h3 className="text-sm font-black text-gray-900">Farmer</h3>
+                                <span className="text-xs text-emerald-800 font-bold">(ಕಿಸಾನ್ / రైతు)</span>
+                              </div>
+                              <p className="text-[11px] text-gray-500">
+                                AI Crop Doctor, Kadiri Mandi Prices, Seed & Fertilizer Store
+                              </p>
+                            </div>
+                          </div>
+                          {selectedRole === 'FARMER' && (
+                            <CheckCircle2 className="w-5 h-5 text-emerald-700 flex-shrink-0" />
+                          )}
+                        </div>
+
+                        {/* Option 2: Vendor / Buyer (Produce Procurement & Wholesaler) */}
+                        <div
+                          onClick={() => setSelectedRole('BUYER')}
+                          className={`p-3 rounded-2xl border-2 cursor-pointer transition flex items-center justify-between ${
+                            selectedRole === 'BUYER'
+                              ? 'border-emerald-600 bg-emerald-50/60 shadow-sm'
+                              : 'border-gray-200 hover:border-emerald-300'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-blue-700 text-white flex items-center justify-center font-black">
+                              <Building2 className="w-5 h-5" />
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-1.5">
+                                <h3 className="text-sm font-black text-gray-900">Vendor / Buyer</h3>
+                                <span className="text-xs text-blue-800 font-bold">(Procurement & Wholesaler)</span>
+                              </div>
+                              <p className="text-[11px] text-gray-500">
+                                Direct farmer produce procurement, bulk mandi bidding
+                              </p>
+                            </div>
+                          </div>
+                          {selectedRole === 'BUYER' && (
+                            <CheckCircle2 className="w-5 h-5 text-emerald-700 flex-shrink-0" />
+                          )}
+                        </div>
+
+                        {/* Option 3: Agro Shop (Inputs Dealer) */}
+                        <div
+                          onClick={() => setSelectedRole('VENDOR')}
+                          className={`p-3 rounded-2xl border-2 cursor-pointer transition flex items-center justify-between ${
+                            selectedRole === 'VENDOR'
+                              ? 'border-emerald-600 bg-emerald-50/60 shadow-sm'
+                              : 'border-gray-200 hover:border-emerald-300'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-amber-700 text-white flex items-center justify-center font-black">
+                              <Store className="w-5 h-5" />
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-1.5">
+                                <h3 className="text-sm font-black text-gray-900">Agro Shop</h3>
+                                <span className="text-xs text-amber-800 font-bold">(Dealer & Inputs Hub)</span>
+                              </div>
+                              <p className="text-[11px] text-gray-500">
+                                Fertilizer, Pesticide, Seed inventory & store order fulfillment
+                              </p>
+                            </div>
+                          </div>
+                          {selectedRole === 'VENDOR' && (
+                            <CheckCircle2 className="w-5 h-5 text-emerald-700 flex-shrink-0" />
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-black text-gray-800 uppercase tracking-wider mb-1.5">
+                        2. Enter Your 10-Digit Mobile Number:
+                      </label>
+                      <div className="relative flex rounded-2xl border border-gray-300 overflow-hidden focus-within:border-emerald-600 focus-within:ring-2 focus-within:ring-emerald-100">
+                        <span className="bg-stone-100 border-r border-gray-300 px-3 py-2.5 text-xs font-black text-gray-700 flex items-center gap-1">
+                          🇮🇳 +91
+                        </span>
+                        <input
+                          type="tel"
+                          maxLength={10}
+                          placeholder="98480 12345"
+                          value={regPhone}
+                          onChange={e => handlePhoneInputChange(e.target.value, setRegPhone)}
+                          className="w-full px-3 py-2.5 text-sm font-bold text-gray-900 outline-none"
+                          required
+                        />
+                      </div>
+                      <p className="text-[11px] text-gray-500 mt-1">
+                        We will send a 6-digit OTP to verify your mobile number.
+                      </p>
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={isSubmitting || regPhone.length < 10}
+                      className="w-full py-3.5 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-black text-sm rounded-2xl shadow-lg transition flex items-center justify-center gap-2"
+                    >
+                      {isSubmitting ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <>
+                          <span>Get OTP to Verify Mobile</span>
+                          <ArrowRight className="w-4 h-4" />
+                        </>
+                      )}
+                    </button>
+                  </form>
+                )}
+
+                {/* STEP 2: SMS OTP VERIFICATION SCREEN */}
+                {regStep === 2 && (
+                  <form onSubmit={handleRegVerifyOtp} className="space-y-4 animate-in fade-in">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-sm font-black text-gray-900">
+                          Verify Mobile Number
+                        </h3>
+                        <p className="text-xs text-gray-500 font-medium">
+                          Enter 6-digit OTP sent to <strong>+91 {regPhone}</strong>
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setRegStep(1)}
+                        className="text-xs font-bold text-emerald-800 hover:underline"
+                      >
+                        Edit Number
+                      </button>
+                    </div>
+
+                    {/* 6 Auto-Focusing Box Inputs */}
+                    <div className="grid grid-cols-6 gap-2 pt-2">
+                      {otpDigits.map((digit, idx) => (
+                        <input
+                          key={idx}
+                          ref={el => (otpInputRefs.current[idx] = el)}
+                          type="text"
+                          inputMode="numeric"
+                          maxLength={1}
+                          value={digit}
+                          onChange={e =>
+                            handleOtpBoxChange(
+                              idx,
+                              e.target.value,
+                              otpDigits,
+                              setOtpDigits,
+                              otpInputRefs
+                            )
+                          }
+                          onKeyDown={e =>
+                            handleOtpKeyDown(idx, e, otpDigits, otpInputRefs)
+                          }
+                          onPaste={e =>
+                            handleOtpPaste(e, setOtpDigits, otpInputRefs)
+                          }
+                          className="w-full h-12 text-center text-lg font-black rounded-xl border border-gray-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 outline-none"
+                        />
+                      ))}
+                    </div>
+
+                    <div className="flex items-center justify-between text-xs text-gray-500 font-bold pt-1">
+                      {isTimerRunning ? (
+                        <span className="flex items-center gap-1">
+                          <Clock className="w-3.5 h-3.5" /> Resend OTP in {countdown}s
+                        </span>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            sendOtp(regPhone).then(r => {
+                              if (r.success) {
+                                setDevOtpToast(`New OTP sent! Code: ${r.devOtp || '123456'} (Master: 123456)`);
+                                setCountdown(60);
+                                setIsTimerRunning(true);
+                              }
+                            });
+                          }}
+                          className="text-emerald-700 hover:underline flex items-center gap-1 font-bold"
+                        >
+                          <RefreshCw className="w-3.5 h-3.5" /> Resend OTP
+                        </button>
+                      )}
+                      <span className="text-[11px] text-amber-700 bg-amber-50 px-2 py-0.5 rounded font-mono">
+                        Master: 123456
+                      </span>
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={isSubmitting || otpDigits.join('').length < 6}
+                      className="w-full py-3.5 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-black text-sm rounded-2xl shadow-lg transition flex items-center justify-center gap-2"
+                    >
+                      {isSubmitting ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <>
+                          <span>Verify & Proceed to Profile</span>
+                          <ArrowRight className="w-4 h-4" />
+                        </>
+                      )}
+                    </button>
+                  </form>
+                )}
+
+                {/* STEP 3: SECURITY & BASIC PROFILE */}
+                {regStep === 3 && (
+                  <form onSubmit={handleRegStep3Security} className="space-y-4 animate-in fade-in">
+                    <div>
+                      <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800">
+                        Phone Verified: +91 {regPhone} ✓
+                      </span>
+                      <h3 className="text-base font-black text-gray-900 mt-2">
+                        Create Your Identity & Security
+                      </h3>
+                      <p className="text-xs text-gray-500 font-medium">
+                        Set your display name and login password / PIN.
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1.5">
+                        Full Name *
+                      </label>
+                      <div className="relative">
+                        <User className="w-4 h-4 text-gray-400 absolute left-3.5 top-3.5" />
+                        <input
+                          type="text"
+                          placeholder="e.g. Ramesh Patel"
+                          value={regName}
+                          onChange={e => setRegName(e.target.value)}
+                          className="w-full rounded-2xl border border-gray-300 pl-10 pr-3.5 py-2.5 text-sm font-bold text-gray-900 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 outline-none"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1.5">
+                        Create PIN or Password (min 4 chars) *
+                      </label>
+                      <div className="relative">
+                        <Lock className="w-4 h-4 text-gray-400 absolute left-3.5 top-3.5" />
+                        <input
+                          type={showRegPassword ? 'text' : 'password'}
+                          placeholder="Enter 4-6 digit PIN or password"
+                          value={regPassword}
+                          onChange={e => setRegPassword(e.target.value)}
+                          className="w-full rounded-2xl border border-gray-300 pl-10 pr-10 py-2.5 text-sm font-bold text-gray-900 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 outline-none"
+                          required
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowRegPassword(!showRegPassword)}
+                          className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                        >
+                          {showRegPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2 pt-2">
+                      <button
+                        type="button"
+                        onClick={() => setRegStep(2)}
+                        className="py-3 px-4 rounded-2xl bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold text-xs"
+                      >
+                        Back
+                      </button>
+                      <button
+                        type="submit"
+                        className="flex-1 py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white font-black text-sm rounded-2xl shadow-lg transition flex items-center justify-center gap-2"
+                      >
+                        <span>Continue to Role Setup</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </form>
+                )}
+
+                {/* STEP 4: ROLE-SPECIFIC DETAILS (PROGRESSIVE FIELDS) */}
+                {regStep === 4 && (
+                  <form onSubmit={handleRegFinalSubmit} className="space-y-4 animate-in fade-in">
+                    <div>
+                      <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800">
+                        Role: {selectedRole}
+                      </span>
+                      <h3 className="text-base font-black text-gray-900 mt-2">
+                        {selectedRole === 'FARMER'
+                          ? 'Farm Location & Crop Information'
+                          : selectedRole === 'BUYER'
+                          ? 'Wholesale Procurement Details'
+                          : 'Agro Input Dealership Details'}
+                      </h3>
+                      <p className="text-xs text-gray-500 font-medium">
+                        {selectedRole === 'FARMER'
+                          ? 'Helps tailor disease alerts, soil health, and weather forecast.'
+                          : selectedRole === 'BUYER'
+                          ? 'Connects you directly to local farmers harvesting your preferred crops.'
+                          : 'Enables farmers in your radius to book fertilizer and pesticide stock.'}
+                      </p>
+                    </div>
+
+                    {/* FARMER FIELDS */}
+                    {selectedRole === 'FARMER' && (
+                      <div className="space-y-3">
+                        <div className="grid grid-cols-2 gap-2.5">
+                          <div>
+                            <label className="block text-[11px] font-bold text-gray-700 mb-1">
+                              Village / Town
+                            </label>
+                            <input
+                              type="text"
+                              value={regVillage}
+                              onChange={e => setRegVillage(e.target.value)}
+                              placeholder="Kadiri Rural"
+                              className="w-full rounded-xl border border-gray-300 px-3 py-2 text-xs font-bold outline-none focus:border-emerald-600"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[11px] font-bold text-gray-700 mb-1">
+                              District
+                            </label>
+                            <input
+                              type="text"
+                              value={regDistrict}
+                              onChange={e => setRegDistrict(e.target.value)}
+                              placeholder="Sri Sathya Sai"
+                              className="w-full rounded-xl border border-gray-300 px-3 py-2 text-xs font-bold outline-none focus:border-emerald-600"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2.5">
+                          <div>
+                            <label className="block text-[11px] font-bold text-gray-700 mb-1">
+                              State & PIN Code
+                            </label>
+                            <div className="flex gap-1.5">
+                              <input
+                                type="text"
+                                value={regState}
+                                onChange={e => setRegState(e.target.value)}
+                                className="w-2/3 rounded-xl border border-gray-300 px-2.5 py-2 text-xs font-bold outline-none"
+                              />
+                              <input
+                                type="text"
+                                value={regPincode}
+                                onChange={e => setRegPincode(e.target.value)}
+                                className="w-1/3 rounded-xl border border-gray-300 px-2 py-2 text-xs font-bold outline-none"
+                              />
+                            </div>
+                          </div>
+
+                          <div>
+                            <label className="block text-[11px] font-bold text-gray-700 mb-1">
+                              Total Land Area (Acres)
+                            </label>
+                            <input
+                              type="number"
+                              step="0.5"
+                              value={regAcreage}
+                              onChange={e => setRegAcreage(e.target.value)}
+                              className="w-full rounded-xl border border-gray-300 px-3 py-2 text-xs font-bold outline-none focus:border-emerald-600"
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-bold text-gray-700 mb-1.5">
+                            Primary Crops Grown:
+                          </label>
+                          <div className="flex flex-wrap gap-1.5">
+                            {['Groundnut', 'Tomato', 'Paddy', 'Chilli', 'Cotton', 'Maize', 'Sunflower', 'Mango'].map(crop => (
+                              <button
+                                key={crop}
+                                type="button"
+                                onClick={() => toggleCrop(crop)}
+                                className={`px-2.5 py-1 rounded-lg text-xs font-extrabold transition ${
+                                  selectedCrops.includes(crop)
+                                    ? 'bg-emerald-700 text-white shadow-sm'
+                                    : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
+                                }`}
+                              >
+                                {selectedCrops.includes(crop) ? `✓ ${crop}` : crop}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* VENDOR / BUYER FIELDS */}
+                    {selectedRole === 'BUYER' && (
+                      <div className="space-y-3">
+                        <div>
+                          <label className="block text-[11px] font-bold text-gray-700 mb-1">
+                            Company / Mandi Trading Firm Name *
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="e.g. Kisan Mandi Wholesalers"
+                            value={buyerCompany}
+                            onChange={e => setBuyerCompany(e.target.value)}
+                            className="w-full rounded-xl border border-gray-300 px-3 py-2 text-xs font-bold outline-none focus:border-emerald-600"
+                            required
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2.5">
+                          <div>
+                            <label className="block text-[11px] font-bold text-gray-700 mb-1">
+                              Business PAN / GST (Optional)
+                            </label>
+                            <input
+                              type="text"
+                              placeholder="GSTIN / PAN"
+                              value={buyerPanGst}
+                              onChange={e => setBuyerPanGst(e.target.value)}
+                              className="w-full rounded-xl border border-gray-300 px-3 py-2 text-xs font-bold outline-none uppercase"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[11px] font-bold text-gray-700 mb-1">
+                              Operating Region / Mandi
+                            </label>
+                            <input
+                              type="text"
+                              value={buyerRegion}
+                              onChange={e => setBuyerRegion(e.target.value)}
+                              placeholder="Kadiri Market Yard"
+                              className="w-full rounded-xl border border-gray-300 px-3 py-2 text-xs font-bold outline-none"
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-bold text-gray-700 mb-1.5">
+                            Preferred Buying Commodities:
+                          </label>
+                          <div className="flex flex-wrap gap-1.5">
+                            {['Groundnut', 'Tomato', 'Paddy', 'Chilli', 'Cotton', 'Maize', 'Mango'].map(crop => (
+                              <button
+                                key={crop}
+                                type="button"
+                                onClick={() => toggleCrop(crop)}
+                                className={`px-2.5 py-1 rounded-lg text-xs font-extrabold transition ${
+                                  selectedCrops.includes(crop)
+                                    ? 'bg-blue-700 text-white shadow-sm'
+                                    : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
+                                }`}
+                              >
+                                {selectedCrops.includes(crop) ? `✓ ${crop}` : crop}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* AGRO SHOP FIELDS */}
+                    {selectedRole === 'VENDOR' && (
+                      <div className="space-y-3">
+                        <div>
+                          <label className="block text-[11px] font-bold text-gray-700 mb-1">
+                            Agro Shop / Seva Kendra Name *
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="e.g. Sri Lakshmi Agri Inputs Hub"
+                            value={shopName}
+                            onChange={e => setShopName(e.target.value)}
+                            className="w-full rounded-xl border border-gray-300 px-3 py-2 text-xs font-bold outline-none focus:border-emerald-600"
+                            required
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2.5">
+                          <div>
+                            <label className="block text-[11px] font-bold text-gray-700 mb-1">
+                              Seed & Fertilizer License No. *
+                            </label>
+                            <input
+                              type="text"
+                              placeholder="AP/LIC/2026/9812"
+                              value={shopLicense}
+                              onChange={e => setShopLicense(e.target.value)}
+                              className="w-full rounded-xl border border-gray-300 px-3 py-2 text-xs font-bold outline-none uppercase font-mono"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[11px] font-bold text-gray-700 mb-1">
+                              Shop PIN Code
+                            </label>
+                            <input
+                              type="text"
+                              value={regPincode}
+                              onChange={e => setRegPincode(e.target.value)}
+                              className="w-full rounded-xl border border-gray-300 px-3 py-2 text-xs font-bold outline-none"
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-bold text-gray-700 mb-1">
+                            Physical Shop Address *
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="Shop #14, Main Bazaar, Kadiri"
+                            value={shopAddress}
+                            onChange={e => setShopAddress(e.target.value)}
+                            className="w-full rounded-xl border border-gray-300 px-3 py-2 text-xs font-bold outline-none"
+                            required
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="flex gap-2 pt-2">
+                      <button
+                        type="button"
+                        onClick={() => setRegStep(3)}
+                        className="py-3 px-4 rounded-2xl bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold text-xs"
+                      >
+                        Back
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="flex-1 py-3.5 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-black text-sm rounded-2xl shadow-lg transition flex items-center justify-center gap-2"
+                      >
+                        {isSubmitting ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <>
+                            <span>Complete Onboarding & Launch</span>
+                            <ArrowRight className="w-4 h-4" />
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </form>
+                )}
+
+                {/* STEP 5: SUCCESS & ONBOARDING CONFIRMATION */}
+                {regStep === 5 && (
+                  <div className="py-8 text-center space-y-3 animate-in zoom-in-95">
+                    <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-700 mx-auto flex items-center justify-center">
+                      <Check className="w-8 h-8 stroke-[3]" />
+                    </div>
+                    <h3 className="text-lg font-black text-gray-900">
+                      Registration Complete!
+                    </h3>
+                    <p className="text-xs text-gray-500 font-medium">
+                      Mobile session verified. Redirecting to your {selectedRole.toLowerCase()} dashboard...
+                    </p>
+                  </div>
+                )}
+
+                {/* Bottom Toggle back to Sign In */}
+                <div className="pt-3 border-t border-gray-100 text-center">
+                  <p className="text-xs text-gray-500 font-medium">
+                    Already registered?{' '}
+                    <button
+                      type="button"
+                      onClick={() => setAuthMode('SIGN_IN')}
+                      className="font-black text-emerald-800 hover:underline"
+                    >
+                      Sign In with Mobile Number →
+                    </button>
+                  </p>
+                </div>
               </div>
             )}
-
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full py-3.5 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-extrabold rounded-2xl shadow-lg transition active:scale-95 text-xs flex items-center justify-center gap-2"
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Registering Account...</span>
-                </>
-              ) : (
-                <>
-                  <span>Create Agriculture Account</span>
-                  <ArrowRight className="w-4 h-4" />
-                </>
-              )}
-            </button>
-          </form>
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 };

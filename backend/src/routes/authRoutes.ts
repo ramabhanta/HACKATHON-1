@@ -10,128 +10,222 @@ import { SupabaseDataService } from '../database/supabaseDataService.js';
 
 export const authRouter = Router();
 
-authRouter.post('/register', async (req: Request, res: Response) => {
+// In-memory OTP storage with 5-minute validity
+interface OtpRecord {
+  otp: string;
+  expiresAt: number;
+}
+const otpCache = new Map<string, OtpRecord>();
+
+/**
+ * Standardizes 10-digit mobile numbers with Indian country code +91
+ */
+function cleanPhone(raw: string): { formatted: string; rawDigits: string } {
+  const digits = (raw || '').replace(/[^0-9]/g, '');
+  const clean10 = digits.length >= 10 ? digits.slice(-10) : digits;
+  const formatted = clean10.length === 10
+    ? `+91 ${clean10.slice(0, 5)} ${clean10.slice(5)}`
+    : raw.trim();
+  return { formatted, rawDigits: clean10 };
+}
+
+// ============================================================================
+// 1. SEND SMS OTP (Mobile First + Dev Safeguard Master OTP 123456)
+// ============================================================================
+authRouter.post('/send-otp', async (req: Request, res: Response) => {
   try {
-    const { name, phone, email, password, role, language, village, district, state, pincode } = req.body;
-
-    if (!name || !email || !password) {
-      return res.status(400).json({ error: 'Name, email, and password are required' });
+    const { phone } = req.body;
+    if (!phone) {
+      return res.status(400).json({ error: '10-digit Mobile Number is required.' });
     }
 
-    const existingUser = await SupabaseDataService.getUserByEmailOrPhone(email);
-    if (existingUser) {
-      return res.status(400).json({ error: 'User with this email already exists' });
+    const { formatted, rawDigits } = cleanPhone(phone);
+    if (rawDigits.length < 10) {
+      return res.status(400).json({ error: 'Please enter a valid 10-digit mobile number.' });
     }
 
-    const passwordHash = await bcrypt.hash(password, 10);
-    const newUser: User = {
-      id: `usr-${uuidv4().substring(0, 8)}`,
-      name,
-      phone: phone || '',
-      email: email.toLowerCase(),
-      passwordHash,
-      role: (role as UserRole) || 'FARMER',
-      language: language || 'en',
-      village,
-      district: district || 'Sri Sathya Sai',
-      state: state || 'Andhra Pradesh',
-      pincode: pincode || '515591',
-      latitude: 14.1165,
-      longitude: 78.1634,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
+    // Generate real 6-digit random OTP
+    const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes
 
-    await SupabaseDataService.createUser(newUser);
-    await SupabaseDataService.upsertProfile(newUser, password);
+    // Store under multiple keys for resilient lookup
+    otpCache.set(rawDigits, { otp: generatedOtp, expiresAt });
+    otpCache.set(formatted, { otp: generatedOtp, expiresAt });
 
-    // Create profile based on selected role
-    if (newUser.role === 'FARMER') {
-      await SupabaseDataService.createFarmerProfile({
-        id: `prof-${uuidv4().substring(0, 8)}`,
-        userId: newUser.id,
-        totalAcreage: req.body.totalAcreage ? parseFloat(req.body.totalAcreage) : 3.0,
-        primaryCrops: req.body.primaryCrops ? (Array.isArray(req.body.primaryCrops) ? req.body.primaryCrops : [req.body.primaryCrops]) : ['Groundnut'],
-        farmingExperienceYears: req.body.farmingExperienceYears ? parseInt(req.body.farmingExperienceYears, 10) : 5,
-        farmingType: req.body.farmingType || 'INTEGRATED',
-        soilTypeDefault: req.body.soilTypeDefault || 'RED_LOAM',
-        hasSoilCard: false,
-        irrigationType: req.body.irrigationType || 'BOREWELL'
-      });
-    } else if (newUser.role === 'VENDOR') {
-      await SupabaseDataService.createVendorProfile({
-        id: `prof-${uuidv4().substring(0, 8)}`,
-        userId: newUser.id,
-        shopName: req.body.shopName || `${name}'s Agri Center`,
-        licenseNumber: req.body.licenseNumber || `AP/LIC/${Math.floor(1000 + Math.random() * 9000)}`,
-        gstNumber: req.body.gstNumber || '',
-        verificationStatus: 'PENDING',
-        address: req.body.address || `${village || 'Main Road'}, ${district || 'Kadiri'}`,
-        district: district || 'Sri Sathya Sai',
-        state: state || 'Andhra Pradesh',
-        pincode: pincode || '515591',
-        latitude: 14.1120,
-        longitude: 78.1601,
-        rating: 5.0,
-        reviewCount: 0,
-        deliveryRadiusKm: 25,
-        contactPhone: phone || '',
-        openingHours: '08:00 AM - 08:00 PM'
-      });
-    } else if (newUser.role === 'EXPERT') {
-      db.insert('expert_profiles', {
-        id: `prof-${uuidv4().substring(0, 8)}`,
-        userId: newUser.id,
-        qualification: req.body.qualification || 'Agricultural Specialist',
-        institution: req.body.institution || 'State Agricultural University',
-        specialization: req.body.specialization ? [req.body.specialization] : ['Crop Protection'],
-        isVerified: false,
-        experienceYears: req.body.experienceYears ? parseInt(req.body.experienceYears, 10) : 5,
-        bio: req.body.bio || 'Qualified agricultural consultant.'
-      });
-    }
+    console.log(`📱 [SMS OTP] Generated OTP ${generatedOtp} for ${formatted}. Master testing OTP: 123456`);
 
-    const token = jwt.sign({ userId: newUser.id, role: newUser.role }, config.jwtSecret, {
-      expiresIn: '7d'
+    return res.json({
+      success: true,
+      message: `6-digit OTP sent to ${formatted}`,
+      phone: formatted,
+      devOtp: generatedOtp,
+      masterOtp: '123456'
     });
-
-    const { passwordHash: _, ...userSafe } = newUser;
-    return res.status(201).json({ user: userSafe, token });
   } catch (err: any) {
-    return res.status(500).json({ error: err.message || 'Registration failed' });
+    return res.status(500).json({ error: err.message || 'Failed to send OTP.' });
   }
 });
 
-authRouter.post('/login', async (req: Request, res: Response) => {
+// ============================================================================
+// 2. VERIFY SMS OTP
+// ============================================================================
+authRouter.post('/verify-otp', async (req: Request, res: Response) => {
   try {
-    const { email, password, phone, identifier: rawIdentifier } = req.body;
-    const identifier = (rawIdentifier || email || phone || '').toLowerCase().trim();
-    if (!identifier || !password) {
-      return res.status(400).json({ error: 'Email or phone number and password are required' });
+    const { phone, otp } = req.body;
+    if (!phone || !otp) {
+      return res.status(400).json({ error: 'Phone number and 6-digit OTP are required.' });
     }
 
-    // Match by email OR phone directly from Supabase / db
-    let user = await SupabaseDataService.getUserByEmailOrPhone(identifier);
+    const { formatted, rawDigits } = cleanPhone(phone);
+    const trimmedOtp = otp.toString().trim();
+
+    // Instant Hackathon / Testing Master Bypass: 123456 is ALWAYS valid!
+    if (trimmedOtp === '123456') {
+      return res.json({
+        success: true,
+        verified: true,
+        phone: formatted,
+        message: 'Master OTP verified successfully.'
+      });
+    }
+
+    // Check stored OTP
+    const cached = otpCache.get(rawDigits) || otpCache.get(formatted);
+    if (!cached) {
+      return res.status(400).json({
+        error: 'OTP expired or not found. Please request a new OTP or use master code 123456.'
+      });
+    }
+
+    if (Date.now() > cached.expiresAt) {
+      otpCache.delete(rawDigits);
+      otpCache.delete(formatted);
+      return res.status(400).json({
+        error: 'OTP has expired. Please request a new OTP or use master code 123456.'
+      });
+    }
+
+    if (cached.otp !== trimmedOtp) {
+      return res.status(400).json({
+        error: 'Invalid OTP entered. Please check the code or use master code 123456.'
+      });
+    }
+
+    // Clear after successful use
+    otpCache.delete(rawDigits);
+    otpCache.delete(formatted);
+
+    return res.json({
+      success: true,
+      verified: true,
+      phone: formatted,
+      message: 'Mobile number verified successfully.'
+    });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message || 'OTP verification failed.' });
+  }
+});
+
+// ============================================================================
+// 3. LOGIN VIA SMS OTP (Passwordless 1-Click Mobile Login)
+// ============================================================================
+authRouter.post('/login-otp', async (req: Request, res: Response) => {
+  try {
+    const { phone, otp } = req.body;
+    if (!phone || !otp) {
+      return res.status(400).json({ error: 'Phone number and OTP are required.' });
+    }
+
+    const { formatted, rawDigits } = cleanPhone(phone);
+    const trimmedOtp = otp.toString().trim();
+
+    // Verify OTP
+    const isMaster = trimmedOtp === '123456';
+    const cached = otpCache.get(rawDigits) || otpCache.get(formatted);
+    const isValidCached = cached && cached.otp === trimmedOtp && Date.now() <= cached.expiresAt;
+
+    if (!isMaster && !isValidCached) {
+      return res.status(400).json({ error: 'Invalid or expired OTP. Use master code 123456.' });
+    }
+
+    // Clear cached OTP
+    otpCache.delete(rawDigits);
+    otpCache.delete(formatted);
+
+    // Look up user by phone in Supabase and local DB
+    let user = await SupabaseDataService.getUserByPhone(formatted);
+    if (!user) {
+      user = await SupabaseDataService.getUserByPhone(rawDigits);
+    }
 
     if (!user) {
-      // Auto-provision user account for 'nani' / 'yugandharreddy350@gmail.com'
-      let defaultName = req.body.name;
-      if (!defaultName) {
-        if (identifier === 'yugandharreddy350@gmail.com' || identifier.includes('nani')) {
-          defaultName = 'nani';
-        } else if (identifier.includes('@')) {
-          defaultName = identifier.split('@')[0];
-        } else {
-          defaultName = identifier;
-        }
-      }
-      const userEmail = identifier.includes('@') ? identifier : (identifier === 'nani' ? 'yugandharreddy350@gmail.com' : `${identifier}@agrodex.com`);
+      // Auto-provision basic profile if new user logs in via verified OTP
+      const passwordHash = await bcrypt.hash('password123', 10);
+      user = {
+        id: `usr-${uuidv4().substring(0, 8)}`,
+        name: `Kisan ${rawDigits.slice(-4)}`,
+        phone: formatted,
+        passwordHash,
+        role: 'FARMER',
+        language: 'en',
+        village: 'Kadiri Rural',
+        district: 'Sri Sathya Sai',
+        state: 'Andhra Pradesh',
+        pincode: '515591',
+        latitude: 14.1165,
+        longitude: 78.1634,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      await SupabaseDataService.createUser(user);
+      await SupabaseDataService.upsertProfile(user);
+    } else {
+      await SupabaseDataService.upsertProfile(user);
+    }
+
+    const token = jwt.sign(
+      { userId: user.id, phone: user.phone, role: user.role },
+      config.jwtSecret,
+      { expiresIn: '7d' }
+    );
+
+    const { passwordHash: _, ...userSafe } = user;
+    return res.json({ user: userSafe, token, success: true });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message || 'OTP Login failed.' });
+  }
+});
+
+// ============================================================================
+// 4. RETURNING USER SIGN-IN (Mobile Number + Password)
+// ============================================================================
+authRouter.post('/login', async (req: Request, res: Response) => {
+  try {
+    const { phone: rawPhone, password, identifier } = req.body;
+    const targetPhone = rawPhone || identifier;
+
+    if (!targetPhone || !password) {
+      return res.status(400).json({ error: 'Registered 10-digit Mobile Number and Password are required.' });
+    }
+
+    const { formatted, rawDigits } = cleanPhone(targetPhone);
+
+    // Look up user by phone
+    let user = await SupabaseDataService.getUserByPhone(formatted);
+    if (!user) {
+      user = await SupabaseDataService.getUserByPhone(rawDigits);
+    }
+    if (!user) {
+      user = await SupabaseDataService.getUserByEmailOrPhone(targetPhone);
+    }
+
+    if (!user) {
+      // Auto-provision user account for testing phone numbers
       const passwordHash = await bcrypt.hash(password, 10);
       user = {
         id: `usr-${uuidv4().substring(0, 8)}`,
-        name: defaultName,
-        phone: phone || '+91 9951518699',
-        email: userEmail,
+        name: `User ${rawDigits.slice(-4) || 'Farmer'}`,
+        phone: formatted,
         passwordHash,
         role: 'FARMER',
         language: 'en',
@@ -147,28 +241,180 @@ authRouter.post('/login', async (req: Request, res: Response) => {
       await SupabaseDataService.createUser(user);
       await SupabaseDataService.upsertProfile(user, password);
     } else {
-      const isValid = await bcrypt.compare(password, user.passwordHash);
-      if (!isValid && user.passwordHash !== password && !password.includes('demo') && !password.includes('password123') && identifier !== 'nani' && identifier !== 'yugandharreddy350@gmail.com') {
-        return res.status(401).json({ error: 'Invalid email, phone number, or password' });
+      let isValid = false;
+      if (user.passwordHash) {
+        try {
+          isValid = await bcrypt.compare(password, user.passwordHash);
+        } catch {
+          isValid = user.passwordHash === password;
+        }
       }
-      if (identifier === 'nani' || identifier === 'yugandharreddy350@gmail.com') {
-        user.name = 'nani';
+      if (!isValid && (password === 'password123' || password.includes('demo') || !user.passwordHash)) {
+        isValid = true;
       }
-      // Upsert row directly into Supabase 'profiles' table on every login!
+      if (!isValid) {
+        return res.status(401).json({ error: 'Incorrect mobile number or password.' });
+      }
       await SupabaseDataService.upsertProfile(user, password);
     }
 
-    const token = jwt.sign({ userId: user.id, role: user.role }, config.jwtSecret, {
-      expiresIn: '7d'
-    });
+    const token = jwt.sign(
+      { userId: user.id, phone: user.phone, role: user.role },
+      config.jwtSecret,
+      { expiresIn: '7d' }
+    );
 
     const { passwordHash: _, ...userSafe } = user;
-    return res.json({ user: userSafe, token });
+    return res.json({ user: userSafe, token, success: true });
   } catch (err: any) {
-    return res.status(500).json({ error: err.message || 'Login failed' });
+    return res.status(500).json({ error: err.message || 'Login failed.' });
   }
 });
 
+// ============================================================================
+// 5. PROGRESSIVE MULTI-STEP REGISTRATION (100% Mobile Phone Driven)
+// ============================================================================
+authRouter.post('/register', async (req: Request, res: Response) => {
+  try {
+    const {
+      name,
+      phone,
+      password,
+      role = 'FARMER',
+      language = 'en',
+      village = 'Kadiri Rural',
+      district = 'Sri Sathya Sai',
+      state = 'Andhra Pradesh',
+      pincode = '515591',
+      // Farmer Details
+      totalAcreage = 3.0,
+      primaryCrops = ['Groundnut'],
+      farmingType = 'INTEGRATED',
+      // Vendor / Buyer Details
+      companyName,
+      panGst,
+      preferredCrops = ['Groundnut', 'Tomato', 'Paddy'],
+      operatingRegion,
+      // Agro Shop (VENDOR) Details
+      shopName,
+      licenseNumber,
+      address
+    } = req.body;
+
+    if (!name || !phone || !password) {
+      return res.status(400).json({ error: 'Full Name, 10-digit Mobile Number, and Password/PIN are required.' });
+    }
+
+    const { formatted, rawDigits } = cleanPhone(phone);
+    if (rawDigits.length < 10) {
+      return res.status(400).json({ error: 'Please enter a valid 10-digit mobile number.' });
+    }
+
+    // Check if phone already registered
+    let existingUser = await SupabaseDataService.getUserByPhone(formatted);
+    if (!existingUser) {
+      existingUser = await SupabaseDataService.getUserByPhone(rawDigits);
+    }
+
+    const passwordHash = await bcrypt.hash(password, 10);
+    const userId = existingUser ? existingUser.id : `usr-${uuidv4().substring(0, 8)}`;
+
+    const registeredUser: User = {
+      id: userId,
+      name: name.trim(),
+      phone: formatted,
+      passwordHash,
+      role: (role as UserRole) || 'FARMER',
+      language: language || 'en',
+      village: village || 'Kadiri Rural',
+      district: district || 'Sri Sathya Sai',
+      state: state || 'Andhra Pradesh',
+      pincode: pincode || '515591',
+      latitude: 14.1165,
+      longitude: 78.1634,
+      createdAt: existingUser?.createdAt || new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+
+    if (existingUser) {
+      db.update('users', userId, registeredUser);
+    } else {
+      await SupabaseDataService.createUser(registeredUser);
+    }
+    await SupabaseDataService.upsertProfile(registeredUser, password);
+
+    // Persist role-specific profile data
+    if (registeredUser.role === 'FARMER') {
+      const cropsList = Array.isArray(primaryCrops)
+        ? primaryCrops
+        : typeof primaryCrops === 'string'
+        ? primaryCrops.split(',').map((c: string) => c.trim())
+        : ['Groundnut'];
+
+      await SupabaseDataService.createFarmerProfile({
+        id: `prof-${uuidv4().substring(0, 8)}`,
+        userId: registeredUser.id,
+        totalAcreage: parseFloat(String(totalAcreage)) || 3.0,
+        primaryCrops: cropsList,
+        farmingExperienceYears: 5,
+        farmingType: farmingType as any || 'INTEGRATED',
+        soilTypeDefault: 'RED_LOAM',
+        hasSoilCard: false,
+        irrigationType: 'BOREWELL'
+      });
+    } else if (registeredUser.role === 'VENDOR') {
+      // Agro Shop (Input Dealer)
+      await SupabaseDataService.createVendorProfile({
+        id: `prof-${uuidv4().substring(0, 8)}`,
+        userId: registeredUser.id,
+        shopName: shopName || `${name}'s Agro Seva Kendra`,
+        licenseNumber: licenseNumber || `AP/AGRI/${Math.floor(10000 + Math.random() * 90000)}`,
+        gstNumber: panGst || '',
+        verificationStatus: 'VERIFIED',
+        address: address || `${village}, ${district}`,
+        district: district || 'Sri Sathya Sai',
+        state: state || 'Andhra Pradesh',
+        pincode: pincode || '515591',
+        latitude: 14.1120,
+        longitude: 78.1601,
+        rating: 4.8,
+        reviewCount: 12,
+        deliveryRadiusKm: 25,
+        contactPhone: formatted,
+        openingHours: '08:00 AM - 08:00 PM'
+      });
+    } else if (registeredUser.role === 'BUYER') {
+      // Produce Procurement Wholesaler
+      const buyerProf = {
+        id: `prof-${uuidv4().substring(0, 8)}`,
+        userId: registeredUser.id,
+        companyName: companyName || `${name} Agri Mandi Trades`,
+        panGst: panGst || '',
+        preferredCrops: Array.isArray(preferredCrops) ? preferredCrops : ['Groundnut', 'Tomato', 'Paddy'],
+        operatingRegion: operatingRegion || `${district}, ${state}`,
+        pincode: pincode || '515591',
+        contactPhone: formatted
+      };
+      db.insert('procurement_vendors' as any, buyerProf);
+    }
+
+    const token = jwt.sign(
+      { userId: registeredUser.id, phone: registeredUser.phone, role: registeredUser.role },
+      config.jwtSecret,
+      { expiresIn: '7d' }
+    );
+
+    const { passwordHash: _, ...userSafe } = registeredUser;
+    return res.status(201).json({ user: userSafe, token, success: true });
+  } catch (err: any) {
+    console.error('Registration error:', err);
+    return res.status(500).json({ error: err.message || 'Registration failed.' });
+  }
+});
+
+// ============================================================================
+// 6. PROFILE ENDPOINTS
+// ============================================================================
 authRouter.get('/me', authenticate, async (req: AuthenticatedRequest, res: Response) => {
   if (!req.user) return res.status(401).json({ error: 'Not authenticated' });
   const { passwordHash: _, ...userSafe } = req.user;
@@ -185,7 +431,6 @@ authRouter.get('/me', authenticate, async (req: AuthenticatedRequest, res: Respo
   return res.json({ user: userSafe, profile });
 });
 
-// GET /api/auth/profile - Standard profile retrieval
 authRouter.get('/profile', authenticate, async (req: AuthenticatedRequest, res: Response) => {
   if (!req.user) return res.status(401).json({ error: 'Not authenticated' });
   const { passwordHash: _, ...userSafe } = req.user;
@@ -202,7 +447,6 @@ authRouter.get('/profile', authenticate, async (req: AuthenticatedRequest, res: 
   return res.json({ user: userSafe, profile });
 });
 
-// PUT /api/auth/profile - Update profile & sync to Supabase
 const handleProfileUpdate = async (req: AuthenticatedRequest, res: Response) => {
   try {
     if (!req.user) return res.status(401).json({ error: 'Not authenticated' });
@@ -211,7 +455,7 @@ const handleProfileUpdate = async (req: AuthenticatedRequest, res: Response) => 
     const user = req.user;
 
     if (name) user.name = name;
-    if (phone) user.phone = phone;
+    if (phone) user.phone = cleanPhone(phone).formatted;
     if (village) user.village = village;
     if (district) user.district = district;
     if (state) user.state = state;
@@ -243,39 +487,38 @@ const handleProfileUpdate = async (req: AuthenticatedRequest, res: Response) => 
 authRouter.put('/profile', authenticate, handleProfileUpdate);
 authRouter.post('/profile', authenticate, handleProfileUpdate);
 
-// Demo Role Switcher endpoint to easily test Farmer, Vendor, Buyer, Expert, Admin workflows
+// ============================================================================
+// 7. ROLE SWITCHER & ACTIVE PROFILES
+// ============================================================================
 authRouter.post('/demo-switch', async (req: Request, res: Response) => {
   const { role } = req.body as { role: UserRole };
   const users = await SupabaseDataService.getUsers(role);
   let user = users && users.length > 0 ? users[0] : db.findOne('users', u => u.role === role);
-  if (role === 'FARMER') {
-    const nani = users?.find(u => u.name?.toLowerCase() === 'nani' || u.email === 'yugandharreddy350@gmail.com') ||
-      db.findOne('users', u => u.name?.toLowerCase() === 'nani' || u.email === 'yugandharreddy350@gmail.com');
-    if (nani) user = nani;
-  }
   if (!user) {
-    return res.status(404).json({ error: `Demo user for role ${role} not found` });
+    return res.status(404).json({ error: `User for role ${role} not found` });
   }
 
-  const token = jwt.sign({ userId: user.id, role: user.role }, config.jwtSecret, {
-    expiresIn: '7d'
-  });
+  const token = jwt.sign(
+    { userId: user.id, phone: user.phone, role: user.role },
+    config.jwtSecret,
+    { expiresIn: '7d' }
+  );
 
   const { passwordHash: _, ...userSafe } = user;
   return res.json({ user: userSafe, token });
 });
 
-// Load active profile from Supabase
 authRouter.get('/active-farmer', async (_req: Request, res: Response) => {
   try {
     const users = await SupabaseDataService.getUsers();
-    let user: User | undefined = users?.find(u => u.name?.toLowerCase() === 'nani' || u.email?.toLowerCase() === 'yugandharreddy350@gmail.com' || (u.phone && u.phone.includes('yugandharreddy350@gmail.com')));
+    let user: User | undefined = users?.find(u => u.phone && u.phone.includes('9951518699')) ||
+      db.findOne('users', u => u.role === 'FARMER');
+
     if (!user) {
       user = {
-        id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
-        name: 'nani',
-        email: 'yugandharreddy350@gmail.com',
-        phone: '+91 9951518699',
+        id: 'usr-farmer-1',
+        name: 'Ramesh Patel',
+        phone: '+91 98480 12345',
         passwordHash: '',
         role: 'FARMER',
         language: 'en',
@@ -290,9 +533,11 @@ authRouter.get('/active-farmer', async (_req: Request, res: Response) => {
       };
     }
 
-    const token = jwt.sign({ userId: user.id, role: user.role }, config.jwtSecret, {
-      expiresIn: '7d'
-    });
+    const token = jwt.sign(
+      { userId: user.id, phone: user.phone, role: user.role },
+      config.jwtSecret,
+      { expiresIn: '7d' }
+    );
 
     const { passwordHash: _, ...userSafe } = user;
     return res.json({ user: userSafe, token });
@@ -300,4 +545,3 @@ authRouter.get('/active-farmer', async (_req: Request, res: Response) => {
     return res.status(500).json({ error: err.message });
   }
 });
-

@@ -3,6 +3,7 @@ import { getSupabase } from './supabaseClient.js';
 import { db } from './db.js';
 import {
   User,
+  UserRole,
   FarmerProfile,
   VendorProfile,
   Farm,
@@ -99,6 +100,36 @@ export class SupabaseDataService {
     );
   }
 
+  public static async getUserByPhone(phone: string): Promise<User | undefined> {
+    const rawDigits = phone.replace(/[^0-9]/g, '');
+    const clean10 = rawDigits.length >= 10 ? rawDigits.slice(-10) : rawDigits;
+    const client = getSupabase();
+    if (client) {
+      try {
+        let { data, error } = await client
+          .from('users')
+          .select('*')
+          .or(`phone.ilike.%${clean10}%,phone.eq.${phone}`)
+          .limit(1);
+        if (error || !data || data.length === 0) {
+          const p = await client
+            .from('profiles')
+            .select('*')
+            .or(`phone.ilike.%${clean10}%,phone.eq.${phone}`)
+            .limit(1);
+          if (!p.error && p.data && p.data[0]) data = p.data;
+        }
+        if (data && data[0]) return this.mapUserFromSupabase(data[0]);
+      } catch (e) {
+        console.warn('Supabase getUserByPhone fallback to local db:', (e as any)?.message);
+      }
+    }
+    return db.findOne('users', u => {
+      const uDigits = (u.phone || '').replace(/[^0-9]/g, '');
+      return uDigits.endsWith(clean10) || u.phone === phone;
+    });
+  }
+
   public static async createUser(user: User): Promise<User> {
     db.insert('users', user);
     const client = getSupabase();
@@ -150,7 +181,7 @@ export class SupabaseDataService {
     const payload: any = {
       id: userUuid,
       name: user.name || 'Farmer',
-      phone: user.email || user.phone || 'farmer@agrodex.com',
+      phone: user.phone || '+91 99515 18699',
       role: (user.role || 'farmer').toLowerCase(),
       location: `${user.village || ''}, ${user.district || 'Kadiri'}`.replace(/^, /, ''),
       created_at: user.createdAt || new Date().toISOString()
@@ -1161,23 +1192,24 @@ export class SupabaseDataService {
   // ============================================================================
 
   private static mapUserFromSupabase(d: any): User {
+    const local = db.findOne('users', u => u.id === d.id || (d.phone && u.phone === d.phone));
     return {
       id: d.id,
-      name: d.name,
-      phone: d.phone,
-      email: d.email,
-      passwordHash: d.password_hash,
-      role: d.role,
-      language: d.language || 'en',
-      village: d.village,
-      district: d.district,
-      state: d.state,
-      pincode: d.pincode,
-      latitude: d.latitude,
-      longitude: d.longitude,
-      avatarUrl: d.avatar_url,
-      createdAt: d.created_at,
-      updatedAt: d.updated_at
+      name: d.name || local?.name || 'Farmer',
+      phone: d.phone || local?.phone || '+91 99515 18699',
+      email: d.email || local?.email,
+      passwordHash: d.password_hash || d.passwordHash || local?.passwordHash || '',
+      role: (d.role ? String(d.role).toUpperCase() : local?.role || 'FARMER') as UserRole,
+      language: d.language || local?.language || 'en',
+      village: d.village || local?.village || 'Kadiri Rural',
+      district: d.district || local?.district || 'Sri Sathya Sai',
+      state: d.state || local?.state || 'Andhra Pradesh',
+      pincode: d.pincode || local?.pincode || '515591',
+      latitude: d.latitude || local?.latitude || 14.1165,
+      longitude: d.longitude || local?.longitude || 78.1634,
+      avatarUrl: d.avatar_url || local?.avatarUrl,
+      createdAt: d.created_at || local?.createdAt || new Date().toISOString(),
+      updatedAt: d.updated_at || local?.updatedAt || new Date().toISOString()
     };
   }
 }

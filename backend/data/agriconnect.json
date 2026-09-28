@@ -78,6 +78,54 @@
       "pincode": "500081",
       "createdAt": "2026-09-28T19:50:34.560Z",
       "updatedAt": "2026-09-28T19:50:34.560Z"
+    },
+    {
+      "id": "usr-32ef4299",
+      "name": "Anil Kumar Reddy",
+      "phone": "+91 99887 76655",
+      "passwordHash": "$2a$10$rqqqM0cMF1up2yKcyXnTxevcHxPji422WRheXUZMnROcBDgAEXJKa",
+      "role": "FARMER",
+      "language": "en",
+      "village": "Kadiri Rural",
+      "district": "Sri Sathya Sai",
+      "state": "Andhra Pradesh",
+      "pincode": "515591",
+      "latitude": 14.1165,
+      "longitude": 78.1634,
+      "createdAt": "2026-09-28T20:05:22.276Z",
+      "updatedAt": "2026-09-28T20:05:22.276Z"
+    },
+    {
+      "id": "usr-87c3df1d",
+      "name": "Venkatesh Rao",
+      "phone": "+91 91234 56780",
+      "passwordHash": "$2a$10$L/XFEa3y0.hgZejgo56U0.la02qZqkBluNMdbWPit9v5I2gzHUpaK",
+      "role": "BUYER",
+      "language": "en",
+      "village": "Kadiri Rural",
+      "district": "Sri Sathya Sai",
+      "state": "Andhra Pradesh",
+      "pincode": "515591",
+      "latitude": 14.1165,
+      "longitude": 78.1634,
+      "createdAt": "2026-09-28T20:05:23.041Z",
+      "updatedAt": "2026-09-28T20:06:55.531Z"
+    },
+    {
+      "id": "usr-5e318037",
+      "name": "Suresh Naidu",
+      "phone": "+91 94400 11223",
+      "passwordHash": "$2a$10$vqvp9P9ng6rh7Vm7C/RHdexxfTZWgw8ghAblRtDcFt1LwVIZGoKJO",
+      "role": "VENDOR",
+      "language": "en",
+      "village": "Kadiri Rural",
+      "district": "Sri Sathya Sai",
+      "state": "Andhra Pradesh",
+      "pincode": "515591",
+      "latitude": 14.1165,
+      "longitude": 78.1634,
+      "createdAt": "2026-09-28T20:05:23.656Z",
+      "updatedAt": "2026-09-28T20:05:23.656Z"
     }
   ],
   "farmer_profiles": [
@@ -94,6 +142,36 @@
       "farmingType": "INTEGRATED",
       "soilTypeDefault": "RED_LOAM",
       "hasSoilCard": true,
+      "irrigationType": "BOREWELL"
+    },
+    {
+      "id": "prof-1a89cb82",
+      "userId": "usr-32ef4299",
+      "totalAcreage": 6.5,
+      "primaryCrops": [
+        "Groundnut",
+        "Tomato",
+        "Sunflower"
+      ],
+      "farmingExperienceYears": 5,
+      "farmingType": "INTEGRATED",
+      "soilTypeDefault": "RED_LOAM",
+      "hasSoilCard": false,
+      "irrigationType": "BOREWELL"
+    },
+    {
+      "id": "prof-cf768cb0",
+      "userId": "d9d560cb-1f13-43da-a0be-9349d53a9ec4",
+      "totalAcreage": 6.5,
+      "primaryCrops": [
+        "Groundnut",
+        "Tomato",
+        "Sunflower"
+      ],
+      "farmingExperienceYears": 5,
+      "farmingType": "INTEGRATED",
+      "soilTypeDefault": "RED_LOAM",
+      "hasSoilCard": false,
       "irrigationType": "BOREWELL"
     }
   ],
@@ -116,6 +194,44 @@
       "deliveryRadiusKm": 25,
       "contactPhone": "+91 98490 54321",
       "openingHours": "07:30 AM - 08:30 PM (Mon-Sat)"
+    },
+    {
+      "id": "prof-b02036ff",
+      "userId": "usr-5e318037",
+      "shopName": "Kadiri Kisan Fertilizer Hub",
+      "licenseNumber": "AP/AGRI/2026/8899",
+      "gstNumber": "",
+      "verificationStatus": "VERIFIED",
+      "address": "Shop #22, Main Bazaar, Kadiri",
+      "district": "Sri Sathya Sai",
+      "state": "Andhra Pradesh",
+      "pincode": "515591",
+      "latitude": 14.112,
+      "longitude": 78.1601,
+      "rating": 4.8,
+      "reviewCount": 12,
+      "deliveryRadiusKm": 25,
+      "contactPhone": "+91 94400 11223",
+      "openingHours": "08:00 AM - 08:00 PM"
+    },
+    {
+      "id": "prof-734ec246",
+      "userId": "7a09d751-265d-4cc9-a010-f0505045a66a",
+      "shopName": "Kadiri Kisan Fertilizer Hub",
+      "licenseNumber": "AP/AGRI/2026/8899",
+      "gstNumber": "",
+      "verificationStatus": "VERIFIED",
+      "address": "Shop #22, Main Bazaar, Kadiri",
+      "district": "Sri Sathya Sai",
+      "state": "Andhra Pradesh",
+      "pincode": "515591",
+      "latitude": 14.112,
+      "longitude": 78.1601,
+      "rating": 4.8,
+      "reviewCount": 12,
+      "deliveryRadiusKm": 25,
+      "contactPhone": "+91 94400 11223",
+      "openingHours": "08:00 AM - 08:00 PM"
     }
   ],
   "expert_profiles": [
@@ -12146,6 +12262,34 @@
       "qualityPreference": "Fair Average Quality (FAQ), Moisture < 12%",
       "rating": 4.8,
       "verified": true
+    },
+    {
+      "id": "prof-fa734ae0",
+      "userId": "usr-87c3df1d",
+      "companyName": "Sri Sai Mandi Wholesalers",
+      "panGst": "37AAAAA0000A1Z5",
+      "preferredCrops": [
+        "Groundnut",
+        "Tomato",
+        "Paddy"
+      ],
+      "operatingRegion": "Rayalaseema Kadiri AP",
+      "pincode": "515591",
+      "contactPhone": "+91 91234 56780"
+    },
+    {
+      "id": "prof-b52f99aa",
+      "userId": "usr-87c3df1d",
+      "companyName": "Sri Sai Mandi Wholesalers",
+      "panGst": "37AAAAA0000A1Z5",
+      "preferredCrops": [
+        "Groundnut",
+        "Tomato",
+        "Paddy"
+      ],
+      "operatingRegion": "Rayalaseema Kadiri AP",
+      "pincode": "515591",
+      "contactPhone": "+91 91234 56780"
     }
   ],
   "vendor_deal_requests": [

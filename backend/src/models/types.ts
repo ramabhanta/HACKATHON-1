@@ -4,7 +4,7 @@ export interface User {
   id: string;
   name: string;
   phone: string;
-  email: string;
+  email?: string;
   passwordHash: string;
   role: UserRole;
   language: 'en' | 'te' | 'hi';

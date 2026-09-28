@@ -19,6 +19,7 @@ import {
   Clock,
   Loader2
 } from 'lucide-react';
+import { subscribeToTable } from '../../services/supabaseClient';
 
 interface FarmManagerProps {
   setActiveTab: (tab: string) => void;
@@ -109,6 +110,18 @@ export const FarmManager: React.FC<FarmManagerProps> = ({ setActiveTab }) => {
 
   useEffect(() => {
     loadData();
+
+    let farmChan: any = null;
+    let soilChan: any = null;
+    try {
+      farmChan = subscribeToTable('farms', { onChange: loadData });
+      soilChan = subscribeToTable('soil_health_records', { onChange: loadData });
+    } catch {}
+
+    return () => {
+      if (farmChan) farmChan.unsubscribe();
+      if (soilChan) soilChan.unsubscribe();
+    };
   }, []);
 
   // Reset or initialize task modal form

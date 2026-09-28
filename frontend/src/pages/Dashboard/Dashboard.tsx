@@ -31,6 +31,20 @@ import {
   TrendingDown
 } from 'lucide-react';
 
+function normalizeCategory(cat?: string): string {
+  if (!cat) return 'OTHER';
+  const c = cat.trim().toUpperCase();
+  if (c.includes('FLOWER')) return 'FLOWER';
+  if (c.includes('VEG')) return 'VEGETABLE';
+  if (c.includes('FRUIT')) return 'FRUIT';
+  if (c.includes('GRAIN') || c.includes('CEREAL') || c === 'PADDY' || c === 'RICE') return 'GRAIN';
+  if (c.includes('PULSE') || c.includes('DAL') || c.includes('GRAM')) return 'PULSE';
+  if (c.includes('SPICE') || c.includes('CONDIMENT')) return 'SPICE';
+  if (c.includes('OILSEED') || c.includes('OIL')) return 'OILSEED';
+  if (c.includes('CROP') || c.includes('FIBER') || c.includes('COTTON') || c.includes('SUGARCANE')) return 'CROP';
+  return c;
+}
+
 interface DashboardProps {
   setActiveTab: (tab: string) => void;
   onOpenVoice: () => void;
@@ -131,6 +145,24 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
   useEffect(() => {
     loadData();
   }, []);
+
+  useEffect(() => {
+    async function fetchDashPrices() {
+      try {
+        const params = new URLSearchParams();
+        if (dashState !== 'ALL') params.append('state', dashState);
+        if (dashDistrict !== 'ALL') params.append('district', dashDistrict);
+        const res = await fetch(`/api/market-prices?${params.toString()}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data)) setMandiPrices(data);
+        }
+      } catch (err) {
+        console.error('Failed to load dashboard prices:', err);
+      }
+    }
+    fetchDashPrices();
+  }, [dashState, dashDistrict]);
 
   const refreshWeather = async () => {
     setWeatherRefreshing(true);
@@ -346,10 +378,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
   const dashFilteredPrices = React.useMemo(() => {
     return mandiPrices.filter(p => {
       if (dashState !== 'ALL' && p.state?.toLowerCase() !== dashState.toLowerCase()) return false;
-      if (dashDistrict !== 'ALL' && p.district?.toLowerCase() !== dashDistrict.toLowerCase()) return false;
-      if (dashCategory !== 'ALL' && p.commodityType !== dashCategory) return false;
+      if (dashDistrict !== 'ALL' && !p.isFallback && p.district?.toLowerCase() !== dashDistrict.toLowerCase()) return false;
+      if (dashCategory !== 'ALL' && normalizeCategory(p.category || p.commodityType) !== normalizeCategory(dashCategory)) return false;
       return true;
-    }).slice(0, 6);
+    }).slice(0, 9);
   }, [mandiPrices, dashState, dashDistrict, dashCategory]);
 
   return (
@@ -682,11 +714,15 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
             </label>
             <div className="flex gap-1 overflow-x-auto pb-0.5">
               {[
-                { id: 'ALL', label: t('catAll'), icon: '🌐' },
-                { id: 'FLOWER', label: t('catFlowers'), icon: '🌸' },
-                { id: 'CROP', label: t('catCrops'), icon: '🌾' },
-                { id: 'VEGETABLE', label: t('catVegetables'), icon: '🥕' },
-                { id: 'SPICE', label: t('catSpices'), icon: '🌶️' }
+                { id: 'ALL', label: t('catAll') || 'All', icon: '🌐' },
+                { id: 'FLOWER', label: t('catFlowers') || '🌸 Flowers', icon: '🌸' },
+                { id: 'CROP', label: t('catCrops') || '🌾 Crops & Fibers', icon: '🌾' },
+                { id: 'GRAIN', label: t('catGrains') || '🌽 Grains', icon: '🌽' },
+                { id: 'VEGETABLE', label: t('catVegetables') || '🥕 Veg', icon: '🥕' },
+                { id: 'FRUIT', label: t('catFruits') || '🍎 Fruits', icon: '🍎' },
+                { id: 'PULSE', label: t('catPulses') || '🫘 Pulses', icon: '🫘' },
+                { id: 'SPICE', label: t('catSpices') || '🌶️ Spice', icon: '🌶️' },
+                { id: 'OILSEED', label: t('catOilseeds') || '🌻 Oilseeds', icon: '🌻' },
               ].map(cat => (
                 <button
                   key={cat.id}
@@ -714,7 +750,15 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
             {dashFilteredPrices.map(item => {
-              const isFlower = item.commodityType === 'FLOWER';
+              const catNorm = normalizeCategory(item.category || item.commodityType);
+              const isFlower = catNorm === 'FLOWER';
+              const modalVal = item.modalPrice || item.modal_price || 0;
+              const minVal = item.minPrice || item.min_price || 0;
+              const maxVal = item.maxPrice || item.max_price || 0;
+              const pDate = item.priceDate || item.date || 'Today';
+              const displayName = item.name || item.commodity;
+              const unitStr = item.unit === 'QUINTAL' || item.unit === '₹/Quintal' ? 'Qtl' : item.unit === 'KG' || item.unit === '₹/Kg' ? 'Kg' : item.unit === '100_FLOWERS' ? '100 flw' : item.unit === 'BUNDLE' ? 'Bndl' : (item.unit || 'Qtl');
+
               return (
                 <div
                   key={item.id}
@@ -730,18 +774,23 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
                       <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full ${
                         isFlower ? 'bg-pink-100 text-pink-800' : 'bg-emerald-100 text-emerald-800'
                       }`}>
-                        {isFlower ? t('flowerBadge') : item.commodityType}
+                        {isFlower ? t('flowerBadge') : catNorm}
                       </span>
-                      <span className="text-[10px] font-bold text-gray-400">{item.priceDate}</span>
+                      <span className="text-[10px] font-bold text-gray-400">{pDate}</span>
                     </div>
 
-                    <h4 className="font-extrabold text-sm text-gray-900 truncate" title={item.commodity}>
-                      {item.commodity}
+                    <h4 className="font-extrabold text-sm text-gray-900 truncate" title={displayName}>
+                      {displayName}
                     </h4>
                     <p className="text-[11px] text-gray-500 truncate">{item.variety}</p>
                     <p className="text-[11px] text-gray-600 mt-1 font-medium truncate">
                       📍 {item.market}, {item.district}
                     </p>
+                    {item.fallbackBadge && (
+                      <span className="text-[10px] font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md inline-block mt-1">
+                        📍 {item.fallbackBadge}
+                      </span>
+                    )}
                   </div>
 
                   <div className="mt-3 pt-2.5 border-t border-gray-200/70 flex items-center justify-between">
@@ -749,17 +798,17 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
                       <span className="text-[10px] text-gray-400 block font-semibold">{t('modalRate')}</span>
                       <div className="flex items-baseline gap-1">
                         <span className="text-xl font-black text-emerald-900">
-                          ₹{item.modalPrice.toLocaleString('en-IN')}
+                          ₹{modalVal.toLocaleString('en-IN')}
                         </span>
                         <span className="text-[10px] font-semibold text-gray-500">
-                          /{item.unit === 'QUINTAL' ? 'Qtl' : item.unit === '100_FLOWERS' ? '100 flw' : item.unit === 'BUNDLE' ? 'Bndl' : item.unit.toLowerCase()}
+                          /{unitStr}
                         </span>
                       </div>
                     </div>
 
                     <div className="text-right">
                       <span className="text-[10px] text-gray-400 block font-semibold">
-                        {t('priceRange')} ₹{item.minPrice} - ₹{item.maxPrice}
+                        {t('priceRange')} ₹{minVal} - ₹{maxVal}
                       </span>
                       <span className={`inline-flex items-center gap-0.5 text-xs font-bold ${
                         item.trend === 'UP' ? 'text-emerald-600' : item.trend === 'DOWN' ? 'text-rose-600' : 'text-gray-500'

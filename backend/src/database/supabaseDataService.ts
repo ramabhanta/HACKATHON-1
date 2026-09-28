@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import { getSupabase } from './supabaseClient.js';
 import { db } from './db.js';
 import {
@@ -76,13 +77,13 @@ export class SupabaseDataService {
         let { data, error } = await client
           .from('users')
           .select('*')
-          .or(`email.ilike.${lower},phone.eq.${identifier}`)
+          .or(`email.ilike.${lower},phone.eq.${identifier},name.ilike.${lower}`)
           .limit(1);
         if (error || !data || data.length === 0) {
           const p = await client
             .from('profiles')
             .select('*')
-            .or(`email.ilike.${lower},phone.eq.${identifier}`)
+            .or(`email.ilike.${lower},phone.eq.${identifier},name.ilike.${lower}`)
             .limit(1);
           if (!p.error && p.data && p.data[0]) data = p.data;
         }
@@ -91,7 +92,11 @@ export class SupabaseDataService {
         console.warn('Supabase getUserByEmailOrPhone fallback to local db:', (e as any)?.message);
       }
     }
-    return db.findOne('users', u => u.email?.toLowerCase() === identifier.toLowerCase() || u.phone === identifier);
+    return db.findOne('users', u => 
+      u.email?.toLowerCase() === identifier.toLowerCase() || 
+      u.phone === identifier ||
+      u.name?.toLowerCase() === identifier.toLowerCase()
+    );
   }
 
   public static async createUser(user: User): Promise<User> {
@@ -128,63 +133,38 @@ export class SupabaseDataService {
     return user;
   }
 
+  public static toUuid(str: string): string {
+    if (!str) return 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
+    if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str)) {
+      return str;
+    }
+    const hash = crypto.createHash('md5').update(str).digest('hex');
+    return `${hash.slice(0, 8)}-${hash.slice(8, 12)}-4${hash.slice(13, 16)}-a${hash.slice(17, 20)}-${hash.slice(20, 32)}`;
+  }
+
   public static async upsertProfile(user: User, rawPassword?: string): Promise<void> {
     const client = getSupabase();
     if (!client) return;
 
+    const userUuid = this.toUuid(user.id);
     const payload: any = {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      password: rawPassword || user.passwordHash,
-      password_hash: user.passwordHash,
-      phone: user.phone || '',
-      avatar: user.avatarUrl || '',
-      avatar_url: user.avatarUrl || '',
-      role: user.role || 'FARMER',
-      language: user.language || 'en',
-      village: user.village || '',
-      district: user.district || '',
-      state: user.state || '',
-      pincode: user.pincode || '515591',
-      created_at: user.createdAt || new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      id: userUuid,
+      name: user.name || 'Farmer',
+      phone: user.email || user.phone || 'farmer@agrodex.com',
+      role: (user.role || 'farmer').toLowerCase(),
+      location: `${user.village || ''}, ${user.district || 'Kadiri'}`.replace(/^, /, ''),
+      created_at: user.createdAt || new Date().toISOString()
     };
 
     try {
       const { error } = await client.from('profiles').upsert(payload, { onConflict: 'id' });
       if (error) {
-        console.error('[SUPABASE ERROR] upsertProfile failed:', error.message, error.details || error);
-        if (error.message.includes('column') && error.message.includes('does not exist')) {
-          const minimal: any = {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            phone: user.phone || '',
-            role: user.role || 'FARMER',
-            created_at: user.createdAt || new Date().toISOString()
-          };
-          if (!error.message.includes('"password"')) {
-            minimal.password = rawPassword || user.passwordHash;
-          }
-          if (!error.message.includes('"password_hash"')) {
-            minimal.password_hash = user.passwordHash;
-          }
-          if (!error.message.includes('"avatar"')) {
-            minimal.avatar = user.avatarUrl || '';
-          }
-          const retry = await client.from('profiles').upsert(minimal, { onConflict: 'id' });
-          if (retry.error) {
-            console.error('[SUPABASE ERROR] upsertProfile retry failed:', retry.error.message);
-          } else {
-            console.log(`✅ [SUPABASE SUCCESS] Profile '${user.name}' upserted into profiles table.`);
-          }
-        }
+        console.warn('[SUPABASE] upsertProfile error:', error.message);
       } else {
-        console.log(`✅ [SUPABASE SUCCESS] Profile '${user.name}' (${user.email}) upserted into profiles table.`);
+        console.log(`✅ [SUPABASE SUCCESS] Profile '${user.name}' upserted to Supabase 'profiles' (UUID: ${userUuid}).`);
       }
     } catch (err: any) {
-      console.error('[SUPABASE EXCEPTION] upsertProfile:', err?.message || err);
+      console.warn('[SUPABASE EXCEPTION] upsertProfile:', err?.message || err);
     }
   }
 
@@ -486,6 +466,75 @@ export class SupabaseDataService {
   }
 
   // ============================================================================
+  // 2b. SOIL TESTS & HEALTH RECORDS
+  // ============================================================================
+
+  public static async getSoilTests(farmId?: string): Promise<SoilTestRecord[]> {
+    const client = getSupabase();
+    if (client) {
+      try {
+        let q = client.from('soil_health_records').select('*');
+        if (farmId) q = q.eq('farm_id', this.toUuid(farmId));
+        const { data, error } = await q;
+        if (!error && data && data.length > 0) {
+          return data.map((d: any) => ({
+            id: d.id,
+            farmId: farmId || 'farm-1',
+            userId: 'usr-farmer-1',
+            testDate: d.tested_at || new Date().toISOString().split('T')[0],
+            isLabCertified: true,
+            sourceType: 'LAB_REPORT',
+            ph: d.ph_level || 6.8,
+            nitrogenKgPerHa: d.nitrogen || 180,
+            phosphorusKgPerHa: d.phosphorus || 22,
+            potassiumKgPerHa: d.potassium || 240,
+            organicCarbonPct: d.organic_carbon || 0.55,
+            electricalConductivity: 0.8,
+            soilMoisturePct: 35,
+            summary: `Soil pH: ${d.ph_level || 6.8}, Nitrogen: ${d.nitrogen || 180} kg/ha, Phosphorus: ${d.phosphorus || 22} kg/ha, Potassium: ${d.potassium || 240} kg/ha.`,
+            recommendations: d.fertilizer_recommendation ? d.fertilizer_recommendation.split('; ') : ['Apply balanced NPK nutrients based on crop stage.'],
+            createdAt: d.tested_at || new Date().toISOString()
+          }));
+        }
+      } catch (e: any) {
+        console.warn('Supabase getSoilTests fallback:', e?.message);
+      }
+    }
+    return farmId ? db.find('soil_tests', s => s.farmId === farmId) : db.getTable('soil_tests');
+  }
+
+  public static async saveSoilTest(record: SoilTestRecord): Promise<SoilTestRecord> {
+    db.insert('soil_tests', record);
+    const client = getSupabase();
+    if (client) {
+      try {
+        const soilUuid = this.toUuid(record.id);
+        const farmUuid = this.toUuid(record.farmId || 'farm-1');
+        const payload = {
+          id: soilUuid,
+          farm_id: farmUuid,
+          ph_level: record.ph,
+          nitrogen: record.nitrogenKgPerHa,
+          phosphorus: record.phosphorusKgPerHa,
+          potassium: record.potassiumKgPerHa,
+          organic_carbon: record.organicCarbonPct,
+          fertilizer_recommendation: Array.isArray(record.recommendations) ? record.recommendations.join('; ') : String(record.recommendations || ''),
+          tested_at: record.testDate ? record.testDate.split('T')[0] : new Date().toISOString().split('T')[0]
+        };
+        const { error } = await client.from('soil_health_records').upsert(payload, { onConflict: 'id' });
+        if (error) {
+          console.warn('[SUPABASE] saveSoilTest error:', error.message);
+        } else {
+          console.log(`✅ [SUPABASE SUCCESS] Soil test persisted to Supabase soil_health_records (UUID: ${soilUuid}).`);
+        }
+      } catch (err: any) {
+        console.warn('[SUPABASE EXCEPTION] saveSoilTest:', err?.message || err);
+      }
+    }
+    return record;
+  }
+
+  // ============================================================================
   // 3. DISEASE SCANS (AI DIAGNOSES)
   // ============================================================================
 
@@ -548,45 +597,33 @@ export class SupabaseDataService {
         ? remediesList.map(r => `• ${r}`).join('\n')
         : 'Consult local Krishi Vigyan Kendra (KVK)';
 
+      // Ensure valid UUID for farmer_id and id
+      let farmerId = diagnosis.userId;
+      if (!farmerId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(farmerId)) {
+        farmerId = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'; // Default farmer UUID
+      }
+      let scanId = diagnosis.id;
+      if (!scanId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(scanId)) {
+        scanId = crypto.randomUUID();
+      }
+
       const scanPayload: any = {
-        id: diagnosis.id,
-        farmer_id: diagnosis.userId,
-        user_id: diagnosis.userId,
-        image_url: diagnosis.imageUrl,
-        detected_disease: diagnosis.suspectedIssue,
-        suspected_issue: diagnosis.suspectedIssue,
-        confidence: diagnosis.confidenceScore,
-        confidence_score: diagnosis.confidenceScore,
-        remedies: remediesStr,
-        crop_name: diagnosis.cropName,
-        severity: diagnosis.severity,
+        id: scanId,
+        farmer_id: farmerId,
+        image_url: diagnosis.imageUrl || 'https://images.unsplash.com/photo-1592417817098-8f3d6910a455?w=500',
+        detected_disease: diagnosis.suspectedIssue || 'Plant Foliar Condition',
+        confidence_score: diagnosis.confidenceScore > 1 ? Number((diagnosis.confidenceScore / 100).toFixed(2)) : (diagnosis.confidenceScore || 0.95),
+        treatment_recommendations: remediesStr,
         created_at: diagnosis.createdAt || new Date().toISOString()
       };
 
       try {
-        console.log(`[SUPABASE] Inserting diagnosis '${diagnosis.id}' into 'disease_scans'...`);
+        console.log(`[SUPABASE] Inserting diagnosis '${scanId}' into 'disease_scans'...`);
         const { error } = await client.from('disease_scans').upsert(scanPayload, { onConflict: 'id' });
         if (error) {
           console.error('[SUPABASE ERROR] disease_scans upsert failed:', error.message, error.details || error);
-          if (error.message.includes('column') && error.message.includes('does not exist')) {
-            const minimalScan = {
-              id: diagnosis.id,
-              farmer_id: diagnosis.userId,
-              image_url: diagnosis.imageUrl,
-              detected_disease: diagnosis.suspectedIssue,
-              confidence: diagnosis.confidenceScore,
-              remedies: remediesStr,
-              created_at: diagnosis.createdAt || new Date().toISOString()
-            };
-            const retry = await client.from('disease_scans').upsert(minimalScan, { onConflict: 'id' });
-            if (retry.error) {
-              console.error('[SUPABASE ERROR] disease_scans minimal columns retry failed:', retry.error.message);
-            } else {
-              console.log(`✅ [SUPABASE SUCCESS] Disease scan '${diagnosis.id}' saved to disease_scans.`);
-            }
-          }
         } else {
-          console.log(`✅ [SUPABASE SUCCESS] Disease scan '${diagnosis.id}' inserted into disease_scans table.`);
+          console.log(`✅ [SUPABASE SUCCESS] Disease scan '${scanId}' inserted into disease_scans table.`);
         }
       } catch (e: any) {
         console.error('[SUPABASE EXCEPTION] saveDiagnosis:', e?.message || e);
@@ -595,87 +632,6 @@ export class SupabaseDataService {
     return diagnosis;
   }
 
-  // ============================================================================
-  // 4. SOIL HEALTH RECORDS
-  // ============================================================================
-
-  public static async getSoilTests(farmId?: string): Promise<SoilTestRecord[]> {
-    const client = getSupabase();
-    if (client) {
-      try {
-        let q = client.from('soil_tests').select('*');
-        if (farmId) q = q.eq('farm_id', farmId);
-        let { data, error } = await q;
-
-        if (error || !data || data.length === 0) {
-          let shQ = client.from('soil_health_records').select('*');
-          if (farmId) shQ = shQ.eq('farm_id', farmId);
-          const shRes = await shQ;
-          if (!shRes.error && shRes.data && shRes.data.length > 0) {
-            data = shRes.data;
-          }
-        }
-
-        if (data && data.length > 0) {
-          return data.map(d => ({
-            id: d.id,
-            farmId: d.farm_id,
-            userId: d.user_id,
-            testDate: d.test_date,
-            isLabCertified: d.is_lab_certified,
-            sourceType: d.source_type,
-            ph: d.ph,
-            nitrogenKgPerHa: d.nitrogen_kg_per_ha,
-            phosphorusKgPerHa: d.phosphorus_kg_per_ha,
-            potassiumKgPerHa: d.potassium_kg_per_ha,
-            organicCarbonPct: d.organic_carbon_pct,
-            electricalConductivity: d.electrical_conductivity,
-            soilMoisturePct: d.soil_moisture_pct,
-            summary: d.summary,
-            recommendations: d.recommendations || [],
-            createdAt: d.created_at
-          }));
-        }
-      } catch (e) {
-        console.warn('Supabase getSoilTests fallback to local db:', (e as any)?.message);
-      }
-    }
-    return farmId ? db.find('soil_tests', s => s.farmId === farmId) : db.getTable('soil_tests');
-  }
-
-  public static async saveSoilTest(test: SoilTestRecord): Promise<SoilTestRecord> {
-    db.insert('soil_tests', test);
-    const client = getSupabase();
-    if (client) {
-      const soilPayload = {
-        id: test.id,
-        farm_id: test.farmId,
-        user_id: test.userId,
-        test_date: test.testDate,
-        is_lab_certified: test.isLabCertified,
-        source_type: test.sourceType,
-        ph: test.ph,
-        nitrogen_kg_per_ha: test.nitrogenKgPerHa,
-        phosphorus_kg_per_ha: test.phosphorusKgPerHa,
-        potassium_kg_per_ha: test.potassiumKgPerHa,
-        organic_carbon_pct: test.organicCarbonPct,
-        electrical_conductivity: test.electricalConductivity,
-        soil_moisture_pct: test.soilMoisturePct,
-        summary: test.summary,
-        recommendations: test.recommendations,
-        created_at: test.createdAt
-      };
-      try {
-        await Promise.allSettled([
-          client.from('soil_tests').upsert(soilPayload),
-          client.from('soil_health_records').upsert(soilPayload)
-        ]);
-      } catch (e) {
-        console.warn('Supabase saveSoilTest mirror warning:', (e as any)?.message);
-      }
-    }
-    return test;
-  }
 
   // ============================================================================
   // 5. MARKETPLACE PRODUCTS & CATEGORIES
@@ -1086,57 +1042,6 @@ export class SupabaseDataService {
     return db.getTable('orders');
   }
 
-  public static async createOrder(order: Order): Promise<Order> {
-    db.insert('orders', order);
-    const client = getSupabase();
-    if (client) {
-      const orderPayload = {
-        id: order.id,
-        farmer_id: order.farmerId,
-        vendor_id: order.vendorId,
-        items: order.items,
-        total_amount: order.totalAmount,
-        payment_mode: order.paymentMethod,
-        payment_status: order.paymentStatus,
-        delivery_address: `${order.deliveryAddress.village}, ${order.deliveryAddress.district}`,
-        delivery_status: order.status,
-        tracking_timeline: order.trackingUpdates,
-        created_at: order.createdAt
-      };
-      try {
-        console.log(`[SUPABASE] Inserting order '${order.id}' into 'orders'...`);
-        const { error } = await client.from('orders').upsert(orderPayload, { onConflict: 'id' });
-        if (error) {
-          console.error('[SUPABASE ERROR] createOrder failed:', error.message);
-        } else {
-          console.log(`✅ [SUPABASE SUCCESS] Order '${order.id}' saved to orders table.`);
-        }
-      } catch (e: any) {
-        console.error('[SUPABASE EXCEPTION] createOrder:', e?.message || e);
-      }
-    }
-    return order;
-  }
-
-  public static async updateOrderStatus(id: string, status: Order['status'], trackingUpdates: any[]): Promise<Order | undefined> {
-    const local = db.update('orders', id, {
-      status,
-      trackingUpdates,
-      updatedAt: new Date().toISOString()
-    });
-    const client = getSupabase();
-    if (client) {
-      try {
-        await client.from('orders').update({
-          delivery_status: status,
-          tracking_timeline: trackingUpdates
-        }).eq('id', id);
-      } catch (e) {
-        console.warn('Supabase updateOrderStatus mirror warning:', (e as any)?.message);
-      }
-    }
-    return local;
-  }
 
   // ============================================================================
   // 8. MARKET PRICES
@@ -1176,6 +1081,79 @@ export class SupabaseDataService {
       }
     }
     return db.getTable('market_prices');
+  }
+
+  // ============================================================================
+  // 12. ORDERS & AGRI STORE BOOKINGS
+  // ============================================================================
+
+  public static async createOrder(order: Order): Promise<Order> {
+    db.insert('orders', order);
+    const client = getSupabase();
+    if (client) {
+      try {
+        const orderUuid = this.toUuid(order.id);
+        const buyerUuid = this.toUuid(order.farmerId || 'usr-farmer-1');
+
+        const orderPayload = {
+          id: orderUuid,
+          buyer_id: buyerUuid,
+          total_amount: order.totalAmount || 0,
+          payment_status: (order.paymentStatus || 'pending').toLowerCase(),
+          delivery_status: (order.status || 'placed').toLowerCase(),
+          items: order.items || [],
+          created_at: order.createdAt || new Date().toISOString()
+        };
+
+        const { data, error } = await client.from('orders').insert(orderPayload).select();
+        if (error) {
+          console.warn('[SUPABASE] createOrder insert error:', error.message);
+        } else {
+          console.log(`✅ [SUPABASE SUCCESS] Order '${order.id}' persisted to Supabase orders table (UUID: ${orderUuid}).`);
+        }
+      } catch (err: any) {
+        console.warn('[SUPABASE EXCEPTION] createOrder:', err?.message || err);
+      }
+    }
+    return order;
+  }
+
+  public static async updateOrderStatus(orderId: string, status: string, paymentStatusOrExtra?: any): Promise<Order | undefined> {
+    const existing = db.findById('orders', orderId);
+    let local: Order | undefined;
+    if (existing) {
+      existing.status = status as any;
+      if (typeof paymentStatusOrExtra === 'string') {
+        existing.paymentStatus = paymentStatusOrExtra as any;
+      } else if (Array.isArray(paymentStatusOrExtra)) {
+        existing.trackingUpdates = paymentStatusOrExtra;
+      }
+      existing.updatedAt = new Date().toISOString();
+      local = db.update('orders', orderId, existing);
+    }
+
+    const client = getSupabase();
+    if (client) {
+      try {
+        const orderUuid = this.toUuid(orderId);
+        const updatePayload: any = {
+          delivery_status: status.toLowerCase()
+        };
+        if (typeof paymentStatusOrExtra === 'string') {
+          updatePayload.payment_status = paymentStatusOrExtra.toLowerCase();
+        }
+
+        const { error } = await client.from('orders').update(updatePayload).eq('id', orderUuid);
+        if (error) {
+          console.warn('[SUPABASE] updateOrderStatus error:', error.message);
+        } else {
+          console.log(`✅ [SUPABASE SUCCESS] Order '${orderId}' status updated in Supabase to '${status}'.`);
+        }
+      } catch (err: any) {
+        console.warn('[SUPABASE EXCEPTION] updateOrderStatus:', err?.message || err);
+      }
+    }
+    return local;
   }
 
   // ============================================================================

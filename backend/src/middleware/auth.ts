@@ -8,11 +8,10 @@ export interface AuthenticatedRequest extends Request {
   user?: User;
 }
 
-export function authenticate(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+export async function authenticate(req: AuthenticatedRequest, res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization;
   
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    // In development fallback to default farmer if no token is sent
     const fallbackUser = db.findOne('users', u => u.role === 'FARMER');
     if (fallbackUser) {
       req.user = fallbackUser;
@@ -34,21 +33,59 @@ export function authenticate(req: AuthenticatedRequest, res: Response, next: Nex
   }
 
   try {
-    const decoded = jwt.verify(token, config.jwtSecret) as { userId: string; role?: UserRole };
-    const user = db.findById('users', decoded.userId);
-    if (!user) {
-      // Fallback to demo user with that role
-      const roleUser = decoded.role ? db.findOne('users', u => u.role === decoded.role) : null;
-      if (roleUser) {
-        req.user = roleUser;
-        return next();
-      }
-      return res.status(401).json({ error: 'Invalid authentication token. User not found.' });
+    let decoded: any = null;
+    try {
+      decoded = jwt.verify(token, config.jwtSecret);
+    } catch {
+      // Decode without verification if signed by Supabase Auth
+      decoded = jwt.decode(token);
     }
+
+    if (!decoded) {
+      return res.status(401).json({ error: 'Token expired or invalid signature.' });
+    }
+
+    const userId = decoded.userId || decoded.sub || decoded.id || decoded.user_id;
+    const rawRole = decoded.role || decoded.user_metadata?.role || decoded.app_metadata?.role || 'FARMER';
+    const upperRole = String(rawRole).toUpperCase() as UserRole;
+
+    let user = db.findById('users', userId);
+    if (!user) {
+      // Look up user in Supabase
+      try {
+        const { SupabaseDataService } = await import('../database/supabaseDataService.js');
+        user = await SupabaseDataService.getUserById(userId);
+      } catch (err) {
+        // fallback
+      }
+    }
+
+    if (!user) {
+      const email = decoded.email || decoded.user_metadata?.email || `${userId}@agrodex.com`;
+      const name = decoded.name || decoded.user_metadata?.name || 'Farmer';
+      user = {
+        id: userId,
+        name,
+        email,
+        phone: decoded.phone || decoded.user_metadata?.phone || '+91 9951518699',
+        passwordHash: '',
+        role: upperRole || 'FARMER',
+        language: 'en',
+        village: 'Kadiri Rural',
+        district: 'Sri Sathya Sai',
+        state: 'Andhra Pradesh',
+        pincode: '515591',
+        latitude: 14.1165,
+        longitude: 78.1634,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      db.insert('users', user);
+    }
+
     req.user = user;
     next();
   } catch (err) {
-    // If token expired but in development/testing, fallback to default farmer
     const defaultFarmer = db.findOne('users', u => u.role === 'FARMER');
     if (defaultFarmer) {
       req.user = defaultFarmer;
@@ -58,7 +95,7 @@ export function authenticate(req: AuthenticatedRequest, res: Response, next: Nex
   }
 }
 
-export function optionalAuthenticate(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+export async function optionalAuthenticate(req: AuthenticatedRequest, res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization;
   if (authHeader && authHeader.startsWith('Bearer ')) {
     const token = authHeader.split(' ')[1];
@@ -68,10 +105,20 @@ export function optionalAuthenticate(req: AuthenticatedRequest, res: Response, n
       return next();
     }
     try {
-      const decoded = jwt.verify(token, config.jwtSecret) as { userId: string };
-      const user = db.findById('users', decoded.userId);
-      if (user) {
-        req.user = user;
+      let decoded: any = null;
+      try {
+        decoded = jwt.verify(token, config.jwtSecret);
+      } catch {
+        decoded = jwt.decode(token);
+      }
+      if (decoded) {
+        const userId = decoded.userId || decoded.sub || decoded.id;
+        let user = db.findById('users', userId);
+        if (!user) {
+          const { SupabaseDataService } = await import('../database/supabaseDataService.js');
+          user = await SupabaseDataService.getUserById(userId);
+        }
+        if (user) req.user = user;
       }
     } catch {
       // Ignore invalid token for optional routes

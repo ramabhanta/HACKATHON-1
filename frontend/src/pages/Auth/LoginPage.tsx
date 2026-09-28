@@ -35,7 +35,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Login form state
-  const [loginIdentifier, setLoginIdentifier] = useState('farmer@agrodex.com');
+  const [loginIdentifier, setLoginIdentifier] = useState('yugandharreddy350@gmail.com');
   const [loginPassword, setLoginPassword] = useState('password123');
   const [rememberMe, setRememberMe] = useState(true);
 
@@ -140,6 +140,14 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
     setError(null);
     setIsSubmitting(true);
     try {
+      if (demoRole === 'FARMER') {
+        const res = await login('yugandharreddy350@gmail.com', 'password123');
+        if (res.success) {
+          setSuccessMsg('Logged in as nani! Redirecting...');
+          setTimeout(() => setActiveTab('home'), 700);
+          return;
+        }
+      }
       await switchRole(demoRole);
       setSuccessMsg(`Switched to demo ${demoRole.toLowerCase()} account! Redirecting...`);
       setTimeout(() => {
@@ -319,7 +327,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                 <span className="text-xl">🌾</span>
                 <div className="min-w-0">
                   <p className="font-bold text-[11px] text-gray-900 truncate">Farmer</p>
-                  <p className="text-[10px] text-gray-500 truncate">Ramesh Patel</p>
+                  <p className="text-[10px] text-gray-500 truncate">nani</p>
                 </div>
               </button>
 
@@ -403,7 +411,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                   type="text"
                   value={regName}
                   onChange={e => setRegName(e.target.value)}
-                  placeholder="e.g. Ramesh Patel"
+                  placeholder="e.g. nani"
                   className="w-full p-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none"
                   required
                 />
@@ -414,7 +422,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                   type="text"
                   value={regPhone}
                   onChange={e => setRegPhone(e.target.value)}
-                  placeholder="+91 98480 12345"
+                  placeholder="+91 99515 18699"
                   className="w-full p-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none"
                   required
                 />

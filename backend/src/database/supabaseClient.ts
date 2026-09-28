@@ -4,50 +4,58 @@ import { db } from './db.js';
 import fs from 'fs';
 import path from 'path';
 import dns from 'dns';
+import crypto from 'crypto';
 
 let supabaseInstance: SupabaseClient | null = null;
 
-export function getSupabase(): SupabaseClient | null {
+export function getSupabase(): SupabaseClient {
   if (supabaseInstance) return supabaseInstance;
 
-  const url = config.supabaseUrl || process.env.SUPABASE_URL;
-  const key = config.supabaseServiceKey || config.supabaseAnonKey || process.env.SUPABASE_ANON_KEY;
+  const url = process.env.SUPABASE_URL || config.supabaseUrl;
+  let serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || config.supabaseServiceKey;
+  if (serviceKey && serviceKey.startsWith('Sb_')) {
+    serviceKey = 'sb_' + serviceKey.slice(3);
+  }
 
-  if (url && key && url.startsWith('http')) {
-    try {
-      supabaseInstance = createClient(url, key, {
-        auth: { persistSession: false },
-        global: {
-          fetch: async (fetchUrl, options) => {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 8000); // 8s timeout
-            try {
-              const res = await fetch(fetchUrl, {
-                ...options,
-                signal: controller.signal
-              });
-              clearTimeout(timeoutId);
-              return res;
-            } catch (err: any) {
-              clearTimeout(timeoutId);
-              console.error(`[SUPABASE NETWORK/FETCH ERROR] ${fetchUrl}:`, err?.message || err);
-              throw err;
-            }
+  if (!url) {
+    throw new Error('[SUPABASE CONFIG ERROR] Missing SUPABASE_URL. Please ensure SUPABASE_URL is set in backend/.env');
+  }
+  if (!serviceKey) {
+    throw new Error('[SUPABASE CONFIG ERROR] Missing SUPABASE_SERVICE_ROLE_KEY. Please ensure SUPABASE_SERVICE_ROLE_KEY is set in backend/.env');
+  }
+
+  try {
+    supabaseInstance = createClient(url, serviceKey, {
+      auth: { persistSession: false, autoRefreshToken: false },
+      global: {
+        fetch: async (fetchUrl, options) => {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 12000);
+          try {
+            const res = await fetch(fetchUrl, {
+              ...options,
+              signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+            return res;
+          } catch (err: any) {
+            clearTimeout(timeoutId);
+            console.error(`[SUPABASE NETWORK/FETCH ERROR] ${fetchUrl}:`, err?.message || err);
+            throw err;
           }
         }
-      });
-      return supabaseInstance;
-    } catch (err) {
-      console.error('[SUPABASE INIT ERROR] Failed to initialize Supabase client:', err);
-      return null;
-    }
+      }
+    });
+    return supabaseInstance;
+  } catch (err) {
+    console.error('[SUPABASE INIT ERROR] Failed to initialize Supabase client:', err);
+    throw err;
   }
-  return null;
 }
 
 export function isSupabaseConfigured(): boolean {
-  const url = config.supabaseUrl || process.env.SUPABASE_URL;
-  const key = config.supabaseAnonKey || config.supabaseServiceKey || process.env.SUPABASE_ANON_KEY;
+  const url = process.env.SUPABASE_URL || config.supabaseUrl;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || config.supabaseServiceKey;
   return Boolean(url && key && url.startsWith('http') && !url.includes('your-project-id'));
 }
 
@@ -132,53 +140,51 @@ export async function syncLocalDataToSupabase(): Promise<{
   const errors: string[] = [];
   const syncedCounts: Record<string, number> = {};
 
+  const toUuid = (str: string): string => {
+    if (!str) return 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
+    if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str)) return str;
+    const hash = crypto.createHash('md5').update(str).digest('hex');
+    return `${hash.slice(0, 8)}-${hash.slice(8, 12)}-4${hash.slice(13, 16)}-a${hash.slice(17, 20)}-${hash.slice(20, 32)}`;
+  };
+
+  const normalizeRole = (role?: string): string => {
+    const r = (role || 'farmer').toLowerCase();
+    if (r === 'admin') return 'admin';
+    if (r === 'vendor') return 'vendor';
+    return 'farmer';
+  };
+
   try {
-    // 1. Sync users & profiles (Default farmer Ramesh Patel etc.)
+    // 1. Sync profiles
     const users = db.getTable('users');
     if (users.length > 0) {
-      const userRows = users.map(u => ({
-        id: u.id,
-        name: u.name,
-        phone: u.phone,
-        email: u.email || `${u.id}@agriconnect.com`,
-        password_hash: u.passwordHash,
-        role: u.role,
-        language: u.language || 'en',
-        village: u.village || '',
-        district: u.district || '',
-        state: u.state || '',
-        pincode: u.pincode || '515591',
-        latitude: u.latitude,
-        longitude: u.longitude,
-        avatar_url: u.avatarUrl,
-        created_at: u.createdAt
+      const profileRows = users.map(u => ({
+        id: toUuid(u.id),
+        name: u.name || 'Farmer',
+        phone: u.email || u.phone || '+91 9951518699',
+        role: normalizeRole(u.role),
+        location: `${u.village || ''}, ${u.district || 'Kadiri'}`.replace(/^, /, ''),
+        created_at: u.createdAt || new Date().toISOString()
       }));
       try {
-        const { error } = await client.from('users').upsert(userRows, { onConflict: 'id' });
-        if (error) errors.push(`users sync error: ${error.message}`);
-        else syncedCounts.users = userRows.length;
+        const { error } = await client.from('profiles').upsert(profileRows, { onConflict: 'id' });
+        if (error) errors.push(`profiles sync error: ${error.message}`);
+        else syncedCounts.profiles = profileRows.length;
       } catch (e: any) {
-        errors.push(`users: ${e.message}`);
+        errors.push(`profiles: ${e.message}`);
       }
-      try {
-        await client.from('profiles').upsert(userRows, { onConflict: 'id' });
-        syncedCounts.profiles = userRows.length;
-      } catch {}
     }
 
-    // 2. Sync farms (Sri Venkateswara Farm)
+    // 2. Sync farms
     const farms = db.getTable('farms');
     if (farms.length > 0) {
       const farmRows = farms.map(f => ({
-        id: f.id,
-        user_id: f.userId,
-        name: f.name,
-        total_acres: f.totalArea || 6.5,
+        id: toUuid(f.id),
+        farmer_id: toUuid(f.userId || 'usr-farmer-1'),
+        name: f.name || 'Sri Venkateswara Farm',
+        acreage: f.totalArea || 5.0,
         soil_type: f.soilType || 'RED_LOAM',
         irrigation_type: f.irrigationSource || 'BOREWELL',
-        village: f.location || 'Kadiri Rural',
-        district: f.district || 'Sri Sathya Sai',
-        state: f.state || 'Andhra Pradesh',
         created_at: f.createdAt || new Date().toISOString()
       }));
       try {
@@ -190,20 +196,17 @@ export async function syncLocalDataToSupabase(): Promise<{
       }
     }
 
-    // 3. Sync crops (Groundnut, Tomato, Chilli)
+    // 3. Sync crops
     const crops = db.getTable('crops');
     if (crops.length > 0) {
       const cropRows = crops.map(c => ({
-        id: c.id,
-        farm_id: c.farmId,
-        crop_name: c.cropName,
-        variety: c.variety,
-        season: 'Kharif',
-        sowing_date: c.sowingDate ? c.sowingDate.split('T')[0] : '2026-07-10',
-        expected_harvest_date: c.expectedHarvestDate ? c.expectedHarvestDate.split('T')[0] : '2026-10-25',
-        acreage: c.areaPlanted || 2.0,
-        status: 'GROWING',
-        health_status: c.healthStatus || 'HEALTHY',
+        id: toUuid(c.id),
+        farm_id: toUuid(c.farmId || 'farm-1'),
+        crop_name: c.cropName || 'Groundnut',
+        variety: c.variety || 'Kadiri-6',
+        planting_date: c.sowingDate ? c.sowingDate.split('T')[0] : '2026-06-15',
+        harvest_expected_date: c.expectedHarvestDate ? c.expectedHarvestDate.split('T')[0] : '2026-10-30',
+        status: ((c as any).status || c.growthStage || 'growing').toLowerCase(),
         created_at: c.createdAt || new Date().toISOString()
       }));
       try {
@@ -215,174 +218,105 @@ export async function syncLocalDataToSupabase(): Promise<{
       }
     }
 
-    // 4. Sync soil tests / soil_health_records
+    // 4. Sync soil_health_records
     const soilTests = db.getTable('soil_tests');
     if (soilTests.length > 0) {
       const soilRows = soilTests.map(s => ({
-        id: s.id,
-        farm_id: s.farmId,
-        user_id: s.userId,
-        test_date: s.testDate || '2026-06-20',
-        is_lab_certified: s.isLabCertified ?? true,
-        source_type: s.sourceType || 'LAB_REPORT',
-        ph: s.ph,
-        nitrogen_kg_per_ha: s.nitrogenKgPerHa,
-        phosphorus_kg_per_ha: s.phosphorusKgPerHa,
-        potassium_kg_per_ha: s.potassiumKgPerHa,
-        organic_carbon_pct: s.organicCarbonPct,
-        electrical_conductivity: s.electricalConductivity,
-        soil_moisture_pct: s.soilMoisturePct,
-        summary: s.summary,
-        recommendations: s.recommendations,
-        created_at: s.createdAt || new Date().toISOString()
+        id: toUuid(s.id),
+        farm_id: toUuid(s.farmId || 'farm-1'),
+        ph_level: s.ph || 6.8,
+        nitrogen: s.nitrogenKgPerHa || 180,
+        phosphorus: s.phosphorusKgPerHa || 22,
+        potassium: s.potassiumKgPerHa || 240,
+        organic_carbon: s.organicCarbonPct || 0.55,
+        fertilizer_recommendation: s.recommendations || 'Apply 50kg Urea and 25kg DAP per acre',
+        tested_at: s.testDate ? s.testDate.split('T')[0] : '2026-06-20'
       }));
       try {
-        await client.from('soil_tests').upsert(soilRows, { onConflict: 'id' });
-        syncedCounts.soil_tests = soilRows.length;
-      } catch {}
-      try {
-        await client.from('soil_health_records').upsert(soilRows, { onConflict: 'id' });
-        syncedCounts.soil_health_records = soilRows.length;
-      } catch {}
+        const { error } = await client.from('soil_health_records').upsert(soilRows, { onConflict: 'id' });
+        if (error) errors.push(`soil sync error: ${error.message}`);
+        else syncedCounts.soil_health_records = soilRows.length;
+      } catch (e: any) {
+        errors.push(`soil_health_records: ${e.message}`);
+      }
     }
 
-    // 5. Sync product categories
-    const categories = db.getTable('product_categories');
-    if (categories.length > 0) {
-      const catRows = categories.map(c => ({
-        id: c.id,
-        slug: c.slug,
-        name_en: c.nameEn,
-        name_hi: c.nameHi || c.nameEn,
-        name_te: c.nameTe || c.nameEn,
-        icon: c.icon
-      }));
-      try {
-        await client.from('product_categories').upsert(catRows, { onConflict: 'id' });
-        syncedCounts.product_categories = catRows.length;
-      } catch {}
-    }
-
-    // 6. Sync products & marketplace_products
+    // 5. Sync marketplace_products (all 128 products)
     const products = db.getTable('products');
     if (products.length > 0) {
-      const prodRows = products.map(p => ({
-        id: p.id,
-        vendor_id: p.vendorId,
-        category_id: p.categoryId,
+      const mpRows = products.map(p => ({
+        id: toUuid(p.id),
+        vendor_id: toUuid(p.vendorId || 'usr-vendor-1'),
         name: p.name,
-        brand: p.brand,
         category: p.category,
         price: p.price,
-        original_price: p.mrp || p.price,
-        pack_size: p.packSize,
-        in_stock: p.stockQuantity > 0,
-        stock_quantity: p.stockQuantity,
-        images: p.images || [],
-        description: p.description,
-        agricultural_use: p.agriculturalUse,
-        dosage_guidance: p.dosageGuidance,
-        label_instructions: p.labelInstructions,
-        safety_warnings: p.safetyPrecautions || []
+        stock_quantity: p.stockQuantity || 50,
+        unit: p.packSize || 'kg',
+        image_url: p.images?.[0] || 'https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?w=400',
+        created_at: p.createdAt || new Date().toISOString()
       }));
       try {
-        const { error } = await client.from('products').upsert(prodRows, { onConflict: 'id' });
-        if (error) errors.push(`products sync error: ${error.message}`);
-        else syncedCounts.products = prodRows.length;
+        const { error } = await client.from('marketplace_products').upsert(mpRows, { onConflict: 'id' });
+        if (error) errors.push(`marketplace_products sync error: ${error.message}`);
+        else syncedCounts.marketplace_products = mpRows.length;
       } catch (e: any) {
-        errors.push(`products: ${e.message}`);
+        errors.push(`marketplace_products: ${e.message}`);
       }
-      try {
-        await client.from('marketplace_products').upsert(prodRows, { onConflict: 'id' });
-        syncedCounts.marketplace_products = prodRows.length;
-      } catch {}
     }
 
-    // 7. Sync disease_scans & ai_diagnoses
+    // 6. Sync disease_scans
     const diagnoses = db.getTable('ai_diagnoses');
     if (diagnoses.length > 0) {
-      const diagRows = diagnoses.map(d => ({
-        id: d.id,
-        user_id: d.userId,
-        farm_id: d.farmId,
-        crop_name: d.cropName,
-        image_url: d.imageUrl,
-        photo_metadata: d.photoMetadata || {},
-        suspected_issue: d.suspectedIssue,
-        confidence_score: d.confidenceScore,
-        severity: d.severity,
-        symptoms_evidence: d.symptomsEvidence || [],
-        cultural_control: d.culturalControl || [],
-        biological_control: d.biologicalControl || [],
-        chemical_control_safe: d.chemicalControlSafe || [],
-        safety_warnings: d.safetyWarnings || [],
-        recommended_product_ids: d.recommendedProductIds || [],
-        follow_up_questions: d.followUpQuestions || [],
-        is_expert_reviewed: d.isExpertReviewed ?? false,
+      const scanRows = diagnoses.map(d => ({
+        id: toUuid(d.id),
+        farmer_id: toUuid(d.userId || 'usr-farmer-1'),
+        image_url: d.imageUrl || 'https://images.unsplash.com/photo-1592417817098-8f3d6910a455?w=500',
+        detected_disease: d.suspectedIssue || 'Plant Foliar Condition',
+        confidence_score: d.confidenceScore > 1 ? Number((d.confidenceScore / 100).toFixed(2)) : d.confidenceScore,
+        treatment_recommendations: (d.chemicalControlSafe || []).join('; ') || 'Apply recommended crop protection input',
         created_at: d.createdAt || new Date().toISOString()
       }));
       try {
-        await client.from('disease_scans').upsert(diagRows, { onConflict: 'id' });
-        syncedCounts.disease_scans = diagRows.length;
-      } catch {}
-      try {
-        await client.from('ai_diagnoses').upsert(diagRows, { onConflict: 'id' });
-        syncedCounts.ai_diagnoses = diagRows.length;
-      } catch {}
-    }
-
-    // 8. Sync market prices
-    const prices = db.getTable('market_prices');
-    if (prices.length > 0) {
-      const priceRows = prices.map(p => ({
-        id: p.id,
-        state: p.state,
-        district: p.district,
-        market: p.market,
-        commodity: p.commodity,
-        commodity_type: p.commodityType || 'CROP',
-        variety: p.variety,
-        unit: p.unit || 'QUINTAL',
-        min_price: p.minPrice,
-        max_price: p.maxPrice,
-        modal_price: p.modalPrice,
-        price_date: p.priceDate,
-        trend: p.trend,
-        change_amount: p.changeAmount || 0,
-        reported_by: p.reportedBy,
-        reported_by_name: p.reportedByName
-      }));
-      try {
-        const { error } = await client.from('market_prices').upsert(priceRows, { onConflict: 'id' });
-        if (error) errors.push(`Prices sync error: ${error.message}`);
-        else syncedCounts.market_prices = priceRows.length;
+        const { error } = await client.from('disease_scans').upsert(scanRows, { onConflict: 'id' });
+        if (error) errors.push(`disease_scans sync error: ${error.message}`);
+        else syncedCounts.disease_scans = scanRows.length;
       } catch (e: any) {
-        errors.push(`prices: ${e.message}`);
+        errors.push(`disease_scans: ${e.message}`);
       }
     }
 
-    // 9. Sync produce listings
+    // 7. Sync orders
+    const orders = db.getTable('orders');
+    if (orders.length > 0) {
+      const orderRows = orders.map(o => ({
+        id: toUuid(o.id),
+        buyer_id: toUuid(o.farmerId || 'usr-farmer-1'),
+        total_amount: o.totalAmount || 0,
+        payment_status: (o.paymentStatus || 'pending').toLowerCase(),
+        delivery_status: (o.status || 'placed').toLowerCase(),
+        items: o.items || [],
+        created_at: o.createdAt || new Date().toISOString()
+      }));
+      try {
+        const { error } = await client.from('orders').upsert(orderRows, { onConflict: 'id' });
+        if (error) errors.push(`orders sync error: ${error.message}`);
+        else syncedCounts.orders = orderRows.length;
+      } catch (e: any) {
+        errors.push(`orders: ${e.message}`);
+      }
+    }
+
+    // 8. Sync produce listings
     const listings = db.getTable('produce_listings');
     if (listings.length > 0) {
       const listRows = listings.map(l => ({
-        id: l.id,
-        farmer_id: l.farmerId,
-        farmer_name: l.farmerName,
-        farmer_phone: l.farmerPhone,
+        id: toUuid(l.id),
+        farmer_id: toUuid(l.farmerId || 'usr-farmer-1'),
         crop_name: l.cropName,
-        variety: l.variety,
-        quantity_quintals: l.quantity,
-        available_quantity_quintals: l.quantity,
-        expected_price_per_quintal: l.expectedPricePerUnit,
-        harvest_date: l.harvestDate,
-        description: l.description,
-        photos: l.images || [],
-        location: `${l.village}, ${l.district}`,
-        district: l.district,
-        state: l.state,
-        pincode: '515591',
-        status: l.status,
-        verified_sample: true
+        quantity: l.quantity || 10,
+        expected_price_per_unit: l.expectedPricePerUnit || 5000,
+        status: (l.status || 'active').toLowerCase(),
+        created_at: l.createdAt || new Date().toISOString()
       }));
       try {
         const { error } = await client.from('produce_listings').upsert(listRows, { onConflict: 'id' });
@@ -455,11 +389,79 @@ export function saveSupabaseConfig(url: string, anonKey: string, serviceKey?: st
   }
 }
 
+export const REQUIRED_STORAGE_BUCKETS = [
+  'crop-scans',
+  'scan-images',
+  'soil-reports',
+  'products',
+  'avatars',
+  'profiles',
+  'crop-images'
+] as const;
+
+export type SupportedBucket = typeof REQUIRED_STORAGE_BUCKETS[number];
+
 /**
- * Uploads a disease scan leaf photo directly to Supabase Storage bucket 'scan-images'
- * and returns the public CDN URL.
+ * Ensures all required Supabase Storage buckets exist and are marked public.
  */
-export async function uploadScanImageToStorage(
+export async function ensureStorageBucketsExist(): Promise<{ success: boolean; buckets: string[]; errors: string[] }> {
+  const client = getSupabase();
+  if (!client) {
+    return { success: false, buckets: [], errors: ['Supabase client not configured'] };
+  }
+
+  const existingBuckets: string[] = [];
+  const errors: string[] = [];
+
+  try {
+    const { data: buckets, error: listErr } = await client.storage.listBuckets();
+    if (listErr) {
+      errors.push(`listBuckets error: ${listErr.message}`);
+    }
+
+    const currentNames = new Set(buckets?.map(b => b.name) || []);
+
+    for (const bName of REQUIRED_STORAGE_BUCKETS) {
+      if (!currentNames.has(bName)) {
+        try {
+          const { error: createErr } = await client.storage.createBucket(bName, {
+            public: true,
+            fileSizeLimit: 15728640 // 15MB
+          });
+          if (createErr) {
+            errors.push(`Bucket '${bName}' creation error: ${createErr.message}`);
+          } else {
+            console.log(`📦 [SUPABASE STORAGE] Created bucket '${bName}' (public: true)`);
+            existingBuckets.push(bName);
+          }
+        } catch (e: any) {
+          errors.push(`Bucket '${bName}' exception: ${e?.message}`);
+        }
+      } else {
+        existingBuckets.push(bName);
+      }
+    }
+
+    return {
+      success: errors.length === 0,
+      buckets: existingBuckets,
+      errors
+    };
+  } catch (err: any) {
+    return {
+      success: false,
+      buckets: existingBuckets,
+      errors: [err?.message || String(err)]
+    };
+  }
+}
+
+/**
+ * Universal file uploader for any Supabase Storage bucket.
+ * Falls back to local file hosting (/uploads/...) if Supabase is temporarily unreachable.
+ */
+export async function uploadToStorage(
+  bucketName: SupportedBucket | string,
   fileBuffer: Buffer,
   fileName: string,
   mimeType: string = 'image/jpeg'
@@ -470,18 +472,6 @@ export async function uploadScanImageToStorage(
   }
 
   try {
-    const bucketName = 'scan-images';
-    // Ensure bucket exists or create it
-    try {
-      const { data: buckets } = await client.storage.listBuckets();
-      const bucketExists = buckets?.some(b => b.name === bucketName);
-      if (!bucketExists) {
-        await client.storage.createBucket(bucketName, { public: true });
-      }
-    } catch {
-      // ignore check error
-    }
-
     const cleanName = fileName.replace(/[^a-zA-Z0-9._-]/g, '_');
     const storagePath = `${Date.now()}_${cleanName}`;
 
@@ -493,7 +483,15 @@ export async function uploadScanImageToStorage(
       });
 
     if (uploadError) {
-      console.warn('Supabase storage upload error, using local fallback:', uploadError.message);
+      console.warn(`[SUPABASE STORAGE] Upload to bucket '${bucketName}' failed:`, uploadError.message);
+      // If primary bucket failed, try fallback bucket
+      if (bucketName === 'crop-scans') {
+        const { error: fbErr } = await client.storage.from('scan-images').upload(storagePath, fileBuffer, { contentType: mimeType, upsert: true });
+        if (!fbErr) {
+          const { data: fbUrl } = client.storage.from('scan-images').getPublicUrl(storagePath);
+          if (fbUrl?.publicUrl) return fbUrl.publicUrl;
+        }
+      }
       return `/uploads/${fileName}`;
     }
 
@@ -503,9 +501,21 @@ export async function uploadScanImageToStorage(
 
     return urlData?.publicUrl || `/uploads/${fileName}`;
   } catch (err: any) {
-    console.warn('Supabase storage exception, using local fallback:', err?.message || err);
+    console.warn(`[SUPABASE STORAGE] Exception uploading to '${bucketName}':`, err?.message || err);
     return `/uploads/${fileName}`;
   }
+}
+
+/**
+ * Uploads a disease scan leaf photo directly to Supabase Storage bucket 'crop-scans' / 'scan-images'
+ * and returns the public CDN URL.
+ */
+export async function uploadScanImageToStorage(
+  fileBuffer: Buffer,
+  fileName: string,
+  mimeType: string = 'image/jpeg'
+): Promise<string> {
+  return uploadToStorage('crop-scans', fileBuffer, fileName, mimeType);
 }
 
 /**

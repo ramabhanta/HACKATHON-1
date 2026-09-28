@@ -106,16 +106,34 @@ shopRouter.get('/nearby', (req: Request, res: Response) => {
     }
   ];
 
-  let filtered = demoShops.filter(s => s.distanceKm <= maxDistanceKm);
+  const dbShops = db.getTable('shops');
+  const baseShops = dbShops && dbShops.length > 0 ? dbShops : demoShops;
+  const shopsWithDist = baseShops.map(s => ({
+    ...s,
+    distanceKm: calculateDistance(userLat, userLon, s.latitude, s.longitude)
+  }));
+
+  let filtered = shopsWithDist.filter(s => s.distanceKm <= maxDistanceKm);
 
   if (search) {
     filtered = filtered.filter(s =>
       s.name.toLowerCase().includes(search) ||
       s.address.toLowerCase().includes(search) ||
-      s.featuredInputs.some(i => i.toLowerCase().includes(search))
+      (s.featuredInputs && s.featuredInputs.some((i: string) => i.toLowerCase().includes(search)))
     );
   }
 
-  filtered.sort((a, b) => a.distanceKm - b.distanceKm);
+  filtered.sort((a, b) => (a.distanceKm || 0) - (b.distanceKm || 0));
   return res.json(filtered);
+});
+
+// GET shop by ID
+shopRouter.get('/:id', (req: Request, res: Response) => {
+  const { id } = req.params;
+  const shops = db.getTable('shops');
+  const shop = shops.find(s => s.id === id);
+  if (!shop) {
+    return res.status(404).json({ error: 'Shop not found' });
+  }
+  return res.json(shop);
 });

@@ -106,7 +106,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialTa
   };
 
   const handleQuickDemo = async (demoRole: UserRole) => {
-    await switchRole(demoRole);
+    if (demoRole === 'FARMER') {
+      await login('yugandharreddy350@gmail.com', 'password123');
+    } else {
+      await switchRole(demoRole);
+    }
     onClose();
   };
 
@@ -212,7 +216,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialTa
                   <span className="text-base">🌾</span>
                   <div>
                     <p className="font-bold text-[11px] text-gray-900 leading-tight">Farmer</p>
-                    <p className="text-[9px] text-gray-500">Ramesh Patel</p>
+                    <p className="text-[9px] text-gray-500">nani</p>
                   </div>
                 </button>
                 <button
@@ -290,7 +294,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialTa
                   type="text"
                   value={name}
                   onChange={e => setName(e.target.value)}
-                  placeholder="e.g. Ramesh Patel"
+                  placeholder="e.g. nani"
                   className="w-full p-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none"
                   required
                 />
@@ -301,7 +305,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialTa
                   type="text"
                   value={phone}
                   onChange={e => setPhone(e.target.value)}
-                  placeholder="+91 98480 12345"
+                  placeholder="+91 99515 18699"
                   className="w-full p-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none"
                   required
                 />
@@ -315,7 +319,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialTa
                   type="email"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
-                  placeholder="ramesh@example.com"
+                  placeholder="yugandharreddy350@gmail.com"
                   className="w-full p-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none"
                   required
                 />

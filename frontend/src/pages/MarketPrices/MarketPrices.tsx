@@ -42,23 +42,74 @@ export type MandiCommodityType =
 
 export interface MarketPrice {
   id: string;
+  name?: string;
   state: string;
   district: string;
   market: string;
   commodity: string;
+  category?: string;
   commodityType: MandiCommodityType;
   variety: string;
-  unit: 'QUINTAL' | 'KG' | 'CRATE' | 'BUNDLE' | '100_FLOWERS' | 'TON';
+  unit: string;
   minPrice: number;
   maxPrice: number;
   modalPrice: number;
+  min_price?: number;
+  max_price?: number;
+  modal_price?: number;
   priceDate: string;
+  date?: string;
   trend: 'UP' | 'DOWN' | 'STABLE';
   changeAmount?: number;
+  isFallback?: boolean;
+  fallbackSource?: string;
+  fallbackBadge?: string;
   reportedBy?: string;
   reportedByName?: string;
   createdAt: string;
 }
+
+export function normalizeCategory(cat?: string): string {
+  if (!cat) return 'ALL';
+  const c = cat.toUpperCase().trim();
+  if (c === 'ALL' || c === 'ALL COMMODITIES') return 'ALL';
+  if (c.includes('FLOWER')) return 'FLOWER';
+  if (c.includes('VEG')) return 'VEGETABLE';
+  if (c.includes('FRUIT')) return 'FRUIT';
+  if (c.includes('GRAIN') || c.includes('CEREAL')) return 'GRAIN';
+  if (c.includes('PULSE') || c.includes('DAL') || c.includes('GRAM')) return 'PULSE';
+  if (c.includes('SPICE') || c.includes('CONDIMENT')) return 'SPICE';
+  if (c.includes('OILSEED') || c.includes('OIL')) return 'OILSEED';
+  if (c.includes('FIBER') || c.includes('FIBRE') || c.includes('CASH') || c.includes('CROP')) return 'CROP';
+  return c;
+}
+
+const CACHE_TTL_MS = 12 * 60 * 60 * 1000; // 12 hours
+
+const getCachedPrices = (cacheKey: string): MarketPrice[] | null => {
+  try {
+    const raw = localStorage.getItem(`agrodex_prices_${cacheKey}`);
+    if (!raw) return null;
+    const { timestamp, data } = JSON.parse(raw);
+    if (Date.now() - timestamp < CACHE_TTL_MS && Array.isArray(data) && data.length > 0) {
+      return data;
+    }
+  } catch {
+    // ignore
+  }
+  return null;
+};
+
+const setCachedPrices = (cacheKey: string, data: MarketPrice[]) => {
+  try {
+    localStorage.setItem(
+      `agrodex_prices_${cacheKey}`,
+      JSON.stringify({ timestamp: Date.now(), data })
+    );
+  } catch {
+    // ignore
+  }
+};
 
 export interface StateRegion {
   state: string;
@@ -121,13 +172,17 @@ export const MarketPrices: React.FC<MarketPricesProps> = ({ setActiveTab }) => {
   // Fetch states and regions
   useEffect(() => {
     fetchRegions();
-    fetchPrices();
     fetchSummary();
   }, []);
 
+  // Refetch prices dynamically whenever state or district changes
+  useEffect(() => {
+    fetchPrices();
+  }, [selectedState, selectedDistrict]);
+
   const fetchRegions = async () => {
     try {
-      const res = await fetch('/api/prices/states');
+      const res = await fetch('/api/market-prices/states');
       if (res.ok) {
         const data = await res.json();
         if (Array.isArray(data.states) && data.states.length > 0 && typeof data.states[0] === 'object') {
@@ -146,13 +201,29 @@ export const MarketPrices: React.FC<MarketPricesProps> = ({ setActiveTab }) => {
     }
   };
 
-  const fetchPrices = async () => {
+  const fetchPrices = async (bypassCache = false) => {
     setLoading(true);
+    const cacheKey = `${selectedState}_${selectedDistrict}`;
+    if (!bypassCache) {
+      const cached = getCachedPrices(cacheKey);
+      if (cached && cached.length > 0) {
+        setPrices(cached);
+        setLoading(false);
+      }
+    }
     try {
-      const res = await fetch('/api/prices');
+      const params = new URLSearchParams();
+      if (selectedState !== 'ALL') params.append('state', selectedState);
+      if (selectedDistrict !== 'ALL') params.append('district', selectedDistrict);
+      if (bypassCache) params.append('refresh', 'true');
+
+      const res = await fetch(`/api/market-prices?${params.toString()}`);
       if (res.ok) {
         const data = await res.json();
-        setPrices(Array.isArray(data) ? data : []);
+        if (Array.isArray(data)) {
+          setPrices(data);
+          setCachedPrices(cacheKey, data);
+        }
       }
     } catch (err) {
       console.error('Failed to load prices', err);
@@ -164,7 +235,7 @@ export const MarketPrices: React.FC<MarketPricesProps> = ({ setActiveTab }) => {
 
   const fetchSummary = async () => {
     try {
-      const res = await fetch('/api/prices/summary');
+      const res = await fetch('/api/market-prices/summary');
       if (res.ok) {
         const data = await res.json();
         setSummary(data);
@@ -176,7 +247,7 @@ export const MarketPrices: React.FC<MarketPricesProps> = ({ setActiveTab }) => {
 
   const handleRefresh = () => {
     setRefreshing(true);
-    fetchPrices();
+    fetchPrices(true);
     fetchSummary();
   };
 
@@ -213,40 +284,47 @@ export const MarketPrices: React.FC<MarketPricesProps> = ({ setActiveTab }) => {
     }
   };
 
-  // Filtered prices
+  // Filtered prices with normalized category and intelligent fallback handling
   const filteredPrices = useMemo(() => {
     return prices
       .filter(p => {
         // State filter
-        if (selectedState !== 'ALL' && p.state.toLowerCase() !== selectedState.toLowerCase()) {
+        if (selectedState !== 'ALL' && p.state && p.state.toLowerCase() !== selectedState.toLowerCase()) {
           return false;
         }
-        // District filter
-        if (selectedDistrict !== 'ALL' && p.district.toLowerCase() !== selectedDistrict.toLowerCase()) {
+        // District filter: do not eliminate fallback items injected for this district!
+        if (selectedDistrict !== 'ALL' && !p.isFallback && p.district && p.district.toLowerCase() !== selectedDistrict.toLowerCase()) {
           return false;
         }
-        // Category filter
-        if (selectedCategory !== 'ALL' && p.commodityType !== selectedCategory) {
-          return false;
+        // Category filter using robust normalization (handles plurals, case, and aliases)
+        if (selectedCategory !== 'ALL') {
+          const itemCat = normalizeCategory(p.category || p.commodityType);
+          const selCat = normalizeCategory(selectedCategory);
+          if (itemCat !== selCat) {
+            return false;
+          }
         }
         // Search query
         if (searchQuery.trim()) {
           const q = searchQuery.toLowerCase();
           const matches =
-            p.commodity.toLowerCase().includes(q) ||
-            p.variety.toLowerCase().includes(q) ||
-            p.market.toLowerCase().includes(q) ||
-            p.district.toLowerCase().includes(q) ||
-            p.state.toLowerCase().includes(q);
+            (p.name && p.name.toLowerCase().includes(q)) ||
+            (p.commodity && p.commodity.toLowerCase().includes(q)) ||
+            (p.variety && p.variety.toLowerCase().includes(q)) ||
+            (p.market && p.market.toLowerCase().includes(q)) ||
+            (p.district && p.district.toLowerCase().includes(q)) ||
+            (p.state && p.state.toLowerCase().includes(q));
           if (!matches) return false;
         }
         return true;
       })
       .sort((a, b) => {
-        if (sortBy === 'modalDesc') return b.modalPrice - a.modalPrice;
-        if (sortBy === 'modalAsc') return a.modalPrice - b.modalPrice;
-        if (sortBy === 'nameAsc') return a.commodity.localeCompare(b.commodity);
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        const aModal = a.modalPrice || a.modal_price || 0;
+        const bModal = b.modalPrice || b.modal_price || 0;
+        if (sortBy === 'modalDesc') return bModal - aModal;
+        if (sortBy === 'modalAsc') return aModal - bModal;
+        if (sortBy === 'nameAsc') return (a.name || a.commodity).localeCompare(b.name || b.commodity);
+        return new Date(b.createdAt || b.date || b.priceDate || '').getTime() - new Date(a.createdAt || a.date || a.priceDate || '').getTime();
       });
   }, [prices, selectedState, selectedDistrict, selectedCategory, searchQuery, sortBy]);
 
@@ -426,50 +504,56 @@ export const MarketPrices: React.FC<MarketPricesProps> = ({ setActiveTab }) => {
     }
   };
 
-  const getCategoryBadge = (type: MandiCommodityType) => {
+  const getCategoryBadge = (rawType: string) => {
+    const type = normalizeCategory(rawType);
     switch (type) {
       case 'FLOWER':
         return {
           bg: 'bg-pink-100 text-pink-800 border-pink-200',
           icon: '🌸',
-          label: 'Flower'
+          label: 'Flower (పూలు)'
         };
       case 'SPICE':
         return {
           bg: 'bg-red-100 text-red-800 border-red-200',
           icon: '🌶️',
-          label: 'Spice'
+          label: 'Spice (మసాలాలు)'
         };
       case 'VEGETABLE':
         return {
           bg: 'bg-orange-100 text-orange-800 border-orange-200',
           icon: '🥕',
-          label: 'Vegetable'
+          label: 'Vegetable (కూరగాయలు)'
         };
       case 'GRAIN':
-      case 'CROP':
         return {
           bg: 'bg-amber-100 text-amber-900 border-amber-200',
+          icon: '🌽',
+          label: 'Grains & Cereals (ధాన్యాలు)'
+        };
+      case 'CROP':
+        return {
+          bg: 'bg-emerald-100 text-emerald-900 border-emerald-200',
           icon: '🌾',
-          label: type === 'GRAIN' ? 'Grain' : 'Crop'
+          label: 'Crops & Fibers (పంటలు)'
         };
       case 'OILSEED':
         return {
           bg: 'bg-yellow-100 text-yellow-900 border-yellow-200',
           icon: '🌻',
-          label: 'Oilseed'
+          label: 'Oilseed (నూనెగింజలు)'
         };
       case 'PULSE':
         return {
-          bg: 'bg-emerald-100 text-emerald-900 border-emerald-200',
+          bg: 'bg-teal-100 text-teal-900 border-teal-200',
           icon: '🫘',
-          label: 'Pulse'
+          label: 'Pulse (పప్పుధాన్యాలు)'
         };
       case 'FRUIT':
         return {
           bg: 'bg-purple-100 text-purple-900 border-purple-200',
           icon: '🍎',
-          label: 'Fruit'
+          label: 'Fruit (పండ్లు)'
         };
       default:
         return {
@@ -481,22 +565,15 @@ export const MarketPrices: React.FC<MarketPricesProps> = ({ setActiveTab }) => {
   };
 
   const getUnitDisplay = (unit: string) => {
-    switch (unit) {
-      case 'QUINTAL':
-        return '/ Quintal (100 kg)';
-      case 'KG':
-        return '/ kg';
-      case 'BUNDLE':
-        return '/ Bundle (కట్ట / बंडल)';
-      case '100_FLOWERS':
-        return '/ 100 Flowers (100 పూలు)';
-      case 'CRATE':
-        return '/ Crate';
-      case 'TON':
-        return '/ Ton';
-      default:
-        return `/${unit}`;
-    }
+    if (!unit) return '/ Quintal (100 kg)';
+    const u = unit.toUpperCase();
+    if (u.includes('QUINTAL')) return '/ Quintal (100 kg)';
+    if (u.includes('KG')) return '/ kg';
+    if (u.includes('BUNDLE')) return '/ Bundle (కట్ట)';
+    if (u.includes('100_FLOWERS') || u.includes('100')) return '/ 100 Flowers (100 పూలు)';
+    if (u.includes('CRATE')) return '/ Crate (15 kg)';
+    if (u.includes('TON')) return '/ Ton (1,000 kg)';
+    return `/${unit.replace(/^₹\/?/, '')}`;
   };
 
   return (
@@ -856,16 +933,24 @@ export const MarketPrices: React.FC<MarketPricesProps> = ({ setActiveTab }) => {
                   {/* Commodity Name & Variety */}
                   <div className="space-y-1">
                     <h3 className="text-lg font-extrabold text-gray-900 tracking-tight leading-snug">
-                      {item.commodity}
+                      {item.name || item.commodity}
                     </h3>
                     <p className="text-xs text-gray-600 font-medium">{item.variety}</p>
                   </div>
 
-                  {/* Market & Location */}
+                  {/* Market & Location with Fallback Badge */}
                   <div className="mt-3 flex items-start gap-2 text-xs text-gray-600 bg-stone-50 p-2.5 rounded-xl border border-stone-100">
                     <MapPin className="w-3.5 h-3.5 text-emerald-700 shrink-0 mt-0.5" />
-                    <div>
-                      <span className="font-bold text-gray-900 block">{item.market}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-1 flex-wrap">
+                        <span className="font-bold text-gray-900">{item.market}</span>
+                        {item.fallbackBadge && (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-amber-100 text-amber-900 border border-amber-300">
+                            <span>📍</span>
+                            <span>{item.fallbackBadge}</span>
+                          </span>
+                        )}
+                      </div>
                       <span className="text-gray-500">
                         {item.district}, {item.state}
                       </span>
@@ -881,7 +966,7 @@ export const MarketPrices: React.FC<MarketPricesProps> = ({ setActiveTab }) => {
                         </span>
                         <div className="flex items-baseline gap-1 mt-0.5">
                           <span className="text-2xl font-black text-emerald-900">
-                            ₹{item.modalPrice.toLocaleString('en-IN')}
+                            ₹{(item.modalPrice || item.modal_price || 0).toLocaleString('en-IN')}
                           </span>
                           <span className="text-xs font-semibold text-gray-600">
                             {getUnitDisplay(item.unit)}
@@ -944,7 +1029,7 @@ export const MarketPrices: React.FC<MarketPricesProps> = ({ setActiveTab }) => {
                   return (
                     <tr key={item.id} className="hover:bg-emerald-50/40 transition">
                       <td className="py-3.5 px-5">
-                        <div className="font-bold text-gray-900">{item.commodity}</div>
+                        <div className="font-bold text-gray-900">{item.name || item.commodity}</div>
                         <div className="text-xs text-gray-500">{item.variety}</div>
                       </td>
                       <td className="py-3.5 px-4 whitespace-nowrap">
@@ -959,18 +1044,25 @@ export const MarketPrices: React.FC<MarketPricesProps> = ({ setActiveTab }) => {
                         <div className="font-semibold text-gray-900">{item.district}</div>
                         <div className="text-xs text-gray-500">{item.state}</div>
                       </td>
-                      <td className="py-3.5 px-4 text-gray-800 font-medium">{item.market}</td>
+                      <td className="py-3.5 px-4 text-gray-800 font-medium">
+                        <div>{item.market}</div>
+                        {item.fallbackBadge && (
+                          <span className="inline-block mt-0.5 text-[10px] font-bold text-amber-800 bg-amber-50 border border-amber-200 px-1.5 py-0.2 rounded">
+                            {item.fallbackBadge}
+                          </span>
+                        )}
+                      </td>
                       <td className="py-3.5 px-4 text-right font-medium text-gray-600 whitespace-nowrap">
-                        ₹{item.minPrice.toLocaleString('en-IN')}
+                        ₹{(item.minPrice || item.min_price || 0).toLocaleString('en-IN')}
                       </td>
                       <td className="py-3.5 px-4 text-right whitespace-nowrap">
                         <span className="font-extrabold text-emerald-900 text-base">
-                          ₹{item.modalPrice.toLocaleString('en-IN')}
+                          ₹{(item.modalPrice || item.modal_price || 0).toLocaleString('en-IN')}
                         </span>
                         <span className="text-[11px] text-gray-500 block">{getUnitDisplay(item.unit)}</span>
                       </td>
                       <td className="py-3.5 px-4 text-right font-medium text-gray-600 whitespace-nowrap">
-                        ₹{item.maxPrice.toLocaleString('en-IN')}
+                        ₹{(item.maxPrice || item.max_price || 0).toLocaleString('en-IN')}
                       </td>
                       <td className="py-3.5 px-4 text-center whitespace-nowrap">
                         {item.trend === 'UP' && (

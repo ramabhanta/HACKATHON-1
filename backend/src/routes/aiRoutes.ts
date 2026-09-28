@@ -5,10 +5,38 @@ import { AiService } from '../services/aiService.js';
 import { fetchWeather } from '../services/weatherService.js';
 import { db } from '../database/db.js';
 import { config } from '../config/index.js';
-import { uploadScanImageToStorage } from '../database/supabaseClient.js';
+import { uploadScanImageToStorage, getSupabase } from '../database/supabaseClient.js';
 import { SupabaseDataService } from '../database/supabaseDataService.js';
 import fs from 'fs';
 import path from 'path';
+import crypto from 'crypto';
+
+async function getOrCreateDefaultFarmerId(): Promise<string> {
+  const supabase = getSupabase();
+  if (supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id')
+        .limit(1)
+        .maybeSingle();
+      if (!error && data?.id) {
+        return data.id;
+      }
+      const defaultUuid = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
+      await supabase.from('profiles').upsert({
+        id: defaultUuid,
+        name: 'nani',
+        phone: 'yugandharreddy350@gmail.com',
+        role: 'farmer'
+      });
+      return defaultUuid;
+    } catch (err) {
+      console.error('Supabase scan insert error: Failed to get/create default farmer ID:', err);
+    }
+  }
+  return 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
+}
 
 export const aiRouter = Router();
 
@@ -72,11 +100,36 @@ aiRouter.post('/chat/stream', optionalAuthenticate, async (req: AuthenticatedReq
   }
 });
 
-// 2. Deep Learning Crop Disease Scan (Optimized for Sub-3-Second Latency)
 aiRouter.post('/crop-disease', optionalAuthenticate, upload.single('image'), async (req: AuthenticatedRequest, res: Response) => {
   try {
     const userId = req.user?.id || 'usr-farmer-1';
-    const { cropName, farmId, photoMetadata } = req.body;
+    const { cropName, farmId, photoMetadata, imageUrl: bodyImageUrl } = req.body;
+
+    const supabase = getSupabase();
+    let publicUrl = bodyImageUrl || '';
+
+    // a) Immediately when an image is received:
+    // Upload image buffer directly to Supabase Storage bucket ('crop-scans' / 'scan-images')
+    if (req.file) {
+      try {
+        const filePath = req.file.path || path.join(config.uploadDir, req.file.filename);
+        let fileBuffer: Buffer | null = null;
+        if (req.file.buffer) {
+          fileBuffer = req.file.buffer;
+        } else if (fs.existsSync(filePath)) {
+          fileBuffer = fs.readFileSync(filePath);
+        }
+
+        if (fileBuffer) {
+          const cleanName = (req.file.originalname || req.file.filename || 'leaf_scan.jpg').replace(/[^a-zA-Z0-9._-]/g, '_');
+          const { uploadToStorage } = await import('../database/supabaseClient.js');
+          publicUrl = await uploadToStorage('crop-scans', fileBuffer, cleanName, req.file.mimetype || 'image/jpeg');
+          console.log('✅ [SUPABASE STORAGE] Scan image uploaded to crop-scans bucket:', publicUrl);
+        }
+      } catch (storageException: any) {
+        console.error('Supabase scan upload exception:', storageException);
+      }
+    }
 
     let parsedMetadata = undefined;
     if (photoMetadata) {
@@ -87,7 +140,7 @@ aiRouter.post('/crop-disease', optionalAuthenticate, upload.single('image'), asy
       }
     }
 
-    // Run deep learning multimodal diagnosis immediately without blocking on Supabase cloud network
+    // Run deep learning multimodal diagnosis
     const diagnosis = await AiService.diagnoseDisease(
       userId,
       req.file,
@@ -96,36 +149,94 @@ aiRouter.post('/crop-disease', optionalAuthenticate, upload.single('image'), asy
       parsedMetadata
     );
 
-    // Immediately save diagnosis to Supabase 'disease_scans' table
-    try {
-      if (req.file) {
-        const filePath = req.file.path || path.join(config.uploadDir, req.file.filename);
-        if (fs.existsSync(filePath)) {
-          const fileBuf = fs.readFileSync(filePath);
-          const supabaseImageUrl = await uploadScanImageToStorage(
-            fileBuf,
-            req.file.originalname || req.file.filename,
-            req.file.mimetype || 'image/jpeg'
-          );
-          if (supabaseImageUrl && supabaseImageUrl.startsWith('http')) {
-            diagnosis.imageUrl = supabaseImageUrl;
-          }
-        }
-      }
-      await SupabaseDataService.saveDiagnosis(diagnosis);
-    } catch (saveErr: any) {
-      console.error('[SUPABASE ERROR] Error saving disease scan to Supabase:', saveErr?.message || saveErr);
+    if (publicUrl) {
+      diagnosis.imageUrl = publicUrl;
     }
 
-    // Fetch matched verified inputs from instant in-memory cache (0ms)
+    // Format remedies and standard snake_case fields
+    const remediesList = [
+      ...(diagnosis.culturalControl || []),
+      ...(diagnosis.biologicalControl || []),
+      ...(diagnosis.chemicalControlSafe || [])
+    ];
+    const remediesText = remediesList.length > 0
+      ? remediesList.map(r => `• ${r}`).join('\n')
+      : (diagnosis.remedies || 'Consult local Krishi Vigyan Kendra (KVK)');
+
+    diagnosis.detected_disease = diagnosis.detected_disease || diagnosis.suspectedIssue || 'Plant Foliar Condition';
+    diagnosis.confidence = diagnosis.confidence !== undefined
+      ? diagnosis.confidence
+      : (diagnosis.confidenceScore > 1 ? Number((diagnosis.confidenceScore / 100).toFixed(2)) : diagnosis.confidenceScore);
+    diagnosis.remedies = diagnosis.remedies || remediesText;
+
+    // b) After Gemini returns the diagnosis, perform a real database insert (only for valid crop plants):
+    if (supabase && diagnosis.isCropPlant !== false) {
+      try {
+        let farmer_id = req.body.farmer_id || req.user?.id;
+        if (!farmer_id || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(farmer_id)) {
+          farmer_id = await getOrCreateDefaultFarmerId();
+        }
+
+        const scanId = crypto.randomUUID();
+        const scanPayload: any = {
+          id: scanId,
+          farmer_id,
+          image_url: publicUrl || diagnosis.imageUrl || 'https://images.unsplash.com/photo-1592417817098-8f3d6910a455?w=500',
+          detected_disease: diagnosis.detected_disease,
+          confidence_score: diagnosis.confidence,
+          treatment_recommendations: diagnosis.remedies,
+          created_at: new Date().toISOString()
+        };
+
+        console.log(`[SUPABASE] Awaiting supabase.from('disease_scans').insert(...) using service role client...`, scanPayload);
+        let { data, error } = await supabase.from('disease_scans').insert(scanPayload).select();
+
+        if (error) {
+          if (error.code === 'PGRST204' || error.message?.includes('confidence') || error.message?.includes('remedies')) {
+            const alternatePayload: any = {
+              id: scanId,
+              farmer_id,
+              image_url: scanPayload.image_url,
+              detected_disease: diagnosis.detected_disease,
+              confidence: diagnosis.confidence,
+              remedies: diagnosis.remedies,
+              created_at: scanPayload.created_at
+            };
+            const retry = await supabase.from('disease_scans').insert(alternatePayload).select();
+            data = retry.data;
+            error = retry.error;
+          }
+        }
+
+        if (error) {
+          console.error('Supabase scan insert error:', error);
+        } else {
+          console.log(`[SUPABASE SUCCESS] Scan row created with ID: ${scanId}`);
+        }
+      } catch (insertError: any) {
+        console.error('Supabase scan insert error:', insertError);
+      }
+    } else {
+      console.warn('[SUPABASE] Supabase client not available, skipping cloud disease_scans insert.');
+    }
+
+    // Save to local cache as well
+    try {
+      await SupabaseDataService.saveDiagnosis(diagnosis);
+    } catch {
+      // ignore local mirror err
+    }
+
+    // Fetch matched verified inputs from instant in-memory cache
     const allProducts = db.getTable('products');
     const matchedProducts = allProducts.filter(p => diagnosis.recommendedProductIds.includes(p.id));
 
-    return res.json({
+    return res.status(201).json({
       ...diagnosis,
       products: matchedProducts
     });
   } catch (err: any) {
+    console.error('Crop disease diagnostic route error:', err);
     return res.status(500).json({ error: err.message || 'Crop disease diagnostic failed' });
   }
 });
@@ -190,8 +301,30 @@ aiRouter.post('/soil-analysis', optionalAuthenticate, upload.single('report'), a
       soilType
     });
 
+    let reportUrl: string | undefined = undefined;
+    if (req.file) {
+      try {
+        const filePath = req.file.path || path.join(config.uploadDir, req.file.filename);
+        let fileBuffer: Buffer | null = null;
+        if (req.file.buffer) fileBuffer = req.file.buffer;
+        else if (fs.existsSync(filePath)) fileBuffer = fs.readFileSync(filePath);
+
+        if (fileBuffer) {
+          const { uploadToStorage } = await import('../database/supabaseClient.js');
+          const cleanName = (req.file.originalname || `soil_report_${Date.now()}`).replace(/[^a-zA-Z0-9._-]/g, '_');
+          reportUrl = await uploadToStorage('soil-reports', fileBuffer, cleanName, req.file.mimetype || 'application/pdf');
+        }
+      } catch (e) {
+        console.warn('Soil report upload warning:', e);
+      }
+    }
+
+    if (reportUrl) {
+      result.summary = `${result.summary} (Attached report: ${reportUrl})`;
+    }
+
     await SupabaseDataService.saveSoilTest(result);
-    return res.json(result);
+    return res.status(201).json(result);
   } catch (err: any) {
     return res.status(500).json({ error: err.message || 'Soil analysis service failed' });
   }

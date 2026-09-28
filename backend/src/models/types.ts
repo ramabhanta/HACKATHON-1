@@ -137,7 +137,10 @@ export interface AiDiagnosis {
   imageUrl: string;
   photoMetadata?: PhotoMetadata;
   suspectedIssue: string;
+  detected_disease?: string;
   confidenceScore: number;
+  confidence?: number;
+  remedies?: string;
   severity: 'MILD' | 'MODERATE' | 'SEVERE';
   symptomsEvidence: string[];
   culturalControl: string[];
@@ -149,6 +152,9 @@ export interface AiDiagnosis {
   expertNotes?: string;
   clarificationPrompt?: string;
   cropIdentified?: boolean;
+  isCropPlant?: boolean;
+  notPlantReason?: string;
+  requiresFarmerConfirmation?: boolean;
   followUpQuestions?: string[];
   createdAt: string;
 }
@@ -162,13 +168,48 @@ export interface ProductCategory {
   icon: string;
 }
 
+export interface NearbyShopInfo {
+  shopId: string;
+  shopName: string;
+  ownerName?: string;
+  distanceKm: number;
+  inStock: boolean;
+  stockCount: number;
+  phone?: string;
+  address?: string;
+  rating?: number;
+}
+
+export interface Shop {
+  id: string;
+  name: string;
+  ownerName: string;
+  phone: string;
+  address: string;
+  district: string;
+  state: string;
+  pincode: string;
+  latitude: number;
+  longitude: number;
+  rating: number;
+  reviews: number;
+  isVerified: boolean;
+  openingHours: string;
+  distanceKm?: number;
+  googleMapsUrl?: string;
+  featuredInputs?: string[];
+  inStockCount?: number;
+}
+
 export interface Product {
   id: string;
   vendorId: string;
   categoryId: string;
   name: string;
   brand: string;
-  category: 'SEEDS' | 'FERTILIZERS' | 'CROP_PROTECTION' | 'EQUIPMENT';
+  brandBadge?: string;
+  category: 'SEEDS' | 'FERTILIZERS' | 'CROP_PROTECTION' | 'EQUIPMENT' | 'UREA' | 'COMPLEX_NPK' | 'WATER_SOLUBLE' | 'MICRONUTRIENTS' | 'BIO_ORGANIC';
+  subcategory?: string;
   images: string[];
   description: string;
   agriculturalUse: string;
@@ -176,6 +217,10 @@ export interface Product {
   packSize: string;
   price: number;
   mrp: number;
+  subsidyDiscountedRate?: number;
+  subsidyLabel?: string;
+  compositionFormula?: string;
+  packagingType?: 'BAG' | 'BOTTLE' | 'POUCH' | 'BOX' | 'CAN';
   stockQuantity: number;
   isOrganic: boolean;
   chemicalComposition?: string;
@@ -183,6 +228,8 @@ export interface Product {
   safetyPrecautions: string[];
   labelInstructions: string;
   status: 'DRAFT' | 'PENDING_REVIEW' | 'APPROVED' | 'REJECTED';
+  preferredShopId?: string;
+  nearbyShops?: NearbyShopInfo[];
   createdAt: string;
 }
 
@@ -200,15 +247,35 @@ export interface OrderItem {
   productId: string;
   productName: string;
   brand: string;
+  brandBadge?: string;
   price: number;
+  mrp?: number;
+  subsidyDiscountedRate?: number;
   quantity: number;
   packSize: string;
+  imageUrl?: string;
+  compositionFormula?: string;
 }
+
+export type OrderStatus =
+  | 'PENDING_OWNER_CONFIRMATION'
+  | 'ACCEPTED'
+  | 'REJECTED'
+  | 'EXPIRED_AUTO_CANCELLED'
+  | 'PENDING'
+  | 'CONFIRMED'
+  | 'PROCESSING'
+  | 'SHIPPED'
+  | 'OUT_FOR_DELIVERY'
+  | 'DELIVERED'
+  | 'CANCELLED';
 
 export interface Order {
   id: string;
   orderNumber: string;
   farmerId: string;
+  farmerName?: string;
+  farmerPhone?: string;
   vendorId: string;
   vendorName: string;
   items: OrderItem[];
@@ -224,10 +291,32 @@ export interface Order {
     pincode: string;
     landmark?: string;
   };
-  paymentMethod: 'UPI' | 'CARDS' | 'NET_BANKING' | 'COD';
+  paymentMethod: 'UPI' | 'CARDS' | 'NET_BANKING' | 'COD' | 'CASH_ON_PICKUP';
   paymentStatus: 'PAID' | 'PENDING' | 'FAILED';
-  status: 'PENDING' | 'CONFIRMED' | 'PROCESSING' | 'SHIPPED' | 'OUT_FOR_DELIVERY' | 'DELIVERED' | 'CANCELLED';
-  estimatedDeliveryDate: string;
+  status: OrderStatus;
+  bookingType?: 'STORE_RESERVATION' | 'DIRECT_PURCHASE';
+  pickupPreference?: 'COUNTER_PICKUP' | 'STORE_DELIVERY';
+  expiresAt?: string; // 24-hour expiry SLA
+  collectionOtp?: string; // 4-digit code generated when accepted
+  rejectionReason?: 'OUT_OF_STOCK' | 'PRICE_REVISION' | 'SHOP_CLOSED' | 'DELIVERY_UNAVAILABLE' | string;
+  rejectionNotes?: string;
+  shopDetails?: {
+    id: string;
+    name: string;
+    address: string;
+    phone: string;
+    mapUrl?: string;
+    distanceKm?: number;
+  };
+  alternativeShops?: Array<{
+    id: string;
+    name: string;
+    distanceKm: number;
+    phone: string;
+    address: string;
+  }>;
+  transferredFromOrderId?: string;
+  estimatedDeliveryDate?: string;
   trackingUpdates: {
     status: string;
     message: string;
@@ -236,6 +325,8 @@ export interface Order {
   createdAt: string;
   updatedAt: string;
 }
+
+export type BookingOrder = Order;
 
 export interface ProduceListing {
   id: string;
@@ -382,23 +473,41 @@ export interface AppNotification {
   createdAt: string;
 }
 
-export type MandiCommodityType = 'CROP' | 'VEGETABLE' | 'FRUIT' | 'FLOWER' | 'PULSE' | 'OILSEED' | 'SPICE';
+export type MandiCommodityType =
+  | 'CROP'
+  | 'VEGETABLE'
+  | 'FRUIT'
+  | 'FLOWER'
+  | 'PULSE'
+  | 'OILSEED'
+  | 'SPICE'
+  | 'GRAIN'
+  | 'OTHER';
 
 export interface MarketPrice {
   id: string;
-  state: string;
-  district: string;
-  market: string;
+  name?: string;
   commodity: string;
+  category?: string;
   commodityType: MandiCommodityType;
   variety: string;
-  unit: 'QUINTAL' | 'KG' | 'CRATE' | 'BUNDLE' | '100_FLOWERS';
+  market: string;
+  district: string;
+  state: string;
+  unit: 'QUINTAL' | 'KG' | 'CRATE' | 'BUNDLE' | '100_FLOWERS' | 'TON' | string;
   minPrice: number;
   maxPrice: number;
   modalPrice: number;
+  min_price?: number;
+  max_price?: number;
+  modal_price?: number;
   priceDate: string;
+  date?: string;
   trend: 'UP' | 'DOWN' | 'STABLE';
   changeAmount?: number;
+  isFallback?: boolean;
+  fallbackSource?: string;
+  fallbackBadge?: string;
   reportedBy?: string;
   reportedByName?: string;
   createdAt: string;

@@ -55,16 +55,26 @@ productRouter.get('/', async (req: Request, res: Response) => {
     products = products.filter(p => p.stockQuantity > 0);
   }
 
-  // Attach vendor profile summary to each product
+  // Attach vendor profile summary and nearby shop details to each product
   const vendorProfiles = db.getTable('vendor_profiles');
+  const dbProducts = db.getTable('products');
   const enriched = products.map(prod => {
+    const localProd = dbProducts.find(p => p.id === prod.id);
     const vProf = vendorProfiles.find(v => v.userId === prod.vendorId);
     return {
+      ...(localProd || {}),
       ...prod,
-      vendorName: vProf?.shopName || 'Sri Lakshmi Agri Traders',
+      brandBadge: localProd?.brandBadge || prod.brandBadge || prod.brand,
+      compositionFormula: localProd?.compositionFormula || prod.compositionFormula || '',
+      subsidyDiscountedRate: localProd?.subsidyDiscountedRate || prod.subsidyDiscountedRate || prod.price,
+      subsidyLabel: localProd?.subsidyLabel || prod.subsidyLabel || 'Subsidized Rate',
+      packagingType: localProd?.packagingType || prod.packagingType || 'BAG',
+      images: (localProd?.images && localProd.images.length > 0) ? localProd.images : prod.images,
+      nearbyShops: localProd?.nearbyShops || prod.nearbyShops || [],
+      vendorName: vProf?.shopName || 'Sri Lakshmi Agri Inputs',
       vendorRating: vProf?.rating || 4.8,
       vendorLocation: vProf ? `${vProf.district}, ${vProf.state}` : 'Kadiri, Andhra Pradesh',
-      vendorDistanceKm: 2.3
+      vendorDistanceKm: localProd?.nearbyShops?.[0]?.distanceKm || 2.3
     };
   });
 

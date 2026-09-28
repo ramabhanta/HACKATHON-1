@@ -19,9 +19,11 @@ import {
   FarmExpense,
   AppNotification,
   AiDiagnosis,
-  MarketPrice
+  MarketPrice,
+  Shop
 } from '../models/types.js';
 import { syncLocalDataToSupabase } from './supabaseClient.js';
+import { extendedCategories, comprehensiveProductsCatalog } from './productsCatalog.js';
 
 export async function seedDatabase() {
   console.log('🌱 Seeding AgriConnect AI database with realistic agricultural data...');
@@ -251,278 +253,124 @@ export async function seedDatabase() {
     }
   ];
 
-  // 5. Product Categories
-  const productCategories: ProductCategory[] = [
+  // 5. Shops & Input Dealers
+  const shops: Shop[] = [
     {
-      id: 'cat-fertilizers',
-      slug: 'fertilizers',
-      nameEn: 'Fertilizers & Nutrients',
-      nameHi: 'उर्वरक एवं पोषक तत्व',
-      nameTe: 'ఎరువులు & పోషకాలు',
-      icon: 'Sprout'
+      id: 'shop-1',
+      name: 'Sri Lakshmi Agri Inputs & Seeds Depot',
+      ownerName: 'Sri Lakshmi Agri Traders',
+      phone: '+91 98490 54321',
+      address: 'Shop #14, Main Bazaar, Near Old Bus Stand, Kadiri',
+      district: 'Sri Sathya Sai',
+      state: 'Andhra Pradesh',
+      pincode: '515591',
+      latitude: 14.1120,
+      longitude: 78.1601,
+      rating: 4.8,
+      reviews: 142,
+      isVerified: true,
+      openingHours: '07:30 AM - 08:30 PM (Mon-Sat)',
+      distanceKm: 2.3,
+      googleMapsUrl: 'https://maps.google.com/?q=14.1120,78.1601',
+      featuredInputs: ['Neem Coated Urea', 'DAP 18:46:0', 'Coromandel Gromor 28-28-0', 'Groundnut K6 Seeds'],
+      inStockCount: 38
     },
     {
-      id: 'cat-seeds',
-      slug: 'seeds',
-      nameEn: 'Certified Seeds',
-      nameHi: 'प्रमाणित बीज',
-      nameTe: 'ధృవీకరించబడిన విత్తనాలు',
-      icon: 'Wheat'
+      id: 'shop-2',
+      name: 'Kisan Seva Kendra & Fertilizer Hub',
+      ownerName: 'Anantha Farmers Cooperative',
+      phone: '+91 94411 77889',
+      address: 'Court Road, Opposite Rythu Bharosa Kendra, Kadiri',
+      district: 'Sri Sathya Sai',
+      state: 'Andhra Pradesh',
+      pincode: '515591',
+      latitude: 14.1205,
+      longitude: 78.1680,
+      rating: 4.6,
+      reviews: 98,
+      isVerified: true,
+      openingHours: '08:00 AM - 07:00 PM',
+      distanceKm: 3.1,
+      googleMapsUrl: 'https://maps.google.com/?q=14.1205,78.1680',
+      featuredInputs: ['Organic Compost', 'Bio-fertilizers', 'Knapsack Sprayers', 'Drip Lateral Pipes'],
+      inStockCount: 29
     },
     {
-      id: 'cat-protection',
-      slug: 'crop-protection',
-      nameEn: 'Crop Protection & Bio-Inputs',
-      nameHi: 'फसल सुरक्षा एवं कीटनाशक',
-      nameTe: 'పంట సంరక్షణ & జీవ రసాయనాలు',
-      icon: 'ShieldCheck'
+      id: 'shop-3',
+      name: 'Balaji Agro-Chemicals & Plant Health Clinic',
+      ownerName: 'Balaji Agro Enterprises',
+      phone: '+91 98485 22334',
+      address: 'NH 42 Junction, Tanakal Road, Kadiri Bypass',
+      district: 'Sri Sathya Sai',
+      state: 'Andhra Pradesh',
+      pincode: '515591',
+      latitude: 14.0950,
+      longitude: 78.1450,
+      rating: 4.7,
+      reviews: 64,
+      isVerified: true,
+      openingHours: '07:00 AM - 09:00 PM',
+      distanceKm: 4.8,
+      googleMapsUrl: 'https://maps.google.com/?q=14.0950,78.1450',
+      featuredInputs: ['Trichoderma Viride', 'Neem Oil 10,000 PPM', 'NPK 19-19-19', 'Tomato Hybrid Seeds'],
+      inStockCount: 34
     },
     {
-      id: 'cat-equipment',
-      slug: 'equipment',
-      nameEn: 'Farming Tools & Machinery',
-      nameHi: 'कृषि उपकरण एवं मशीनरी',
-      nameTe: 'వ్యవసాయ పరికరాలు',
-      icon: 'Wrench'
+      id: 'shop-4',
+      name: 'Rythu Mitra Agri Super Center',
+      ownerName: 'Chaitanya Reddy',
+      phone: '+91 99890 33445',
+      address: 'Mudigubba Road, Kadiri West',
+      district: 'Sri Sathya Sai',
+      state: 'Andhra Pradesh',
+      pincode: '515591',
+      latitude: 14.1350,
+      longitude: 78.1820,
+      rating: 4.5,
+      reviews: 51,
+      isVerified: true,
+      openingHours: '08:00 AM - 08:00 PM',
+      distanceKm: 6.2,
+      googleMapsUrl: 'https://maps.google.com/?q=14.1350,78.1820',
+      featuredInputs: ['MOP Fertilizer', 'SSP Single Super Phosphate', 'Drip Filters', 'Tarpaulins'],
+      inStockCount: 22
+    },
+    {
+      id: 'shop-5',
+      name: 'Sri Venkateswara Krishi Seva Kendra',
+      ownerName: 'K. Venkataswamy',
+      phone: '+91 94901 88220',
+      address: 'Market Yard Road, Near APMC Gate 2, Kadiri',
+      district: 'Sri Sathya Sai',
+      state: 'Andhra Pradesh',
+      pincode: '515591',
+      latitude: 14.1080,
+      longitude: 78.1520,
+      rating: 4.9,
+      reviews: 110,
+      isVerified: true,
+      openingHours: '06:30 AM - 08:00 PM',
+      distanceKm: 7.5,
+      googleMapsUrl: 'https://maps.google.com/?q=14.1080,78.1520',
+      featuredInputs: ['Certified Groundnut Seeds', 'Water Soluble Fertilizers', 'Syngenta Fungicides'],
+      inStockCount: 45
     }
   ];
 
-  // 6. Products
-  const products: Product[] = [
-    {
-      id: 'prod-urea',
-      vendorId: 'usr-vendor-1',
-      categoryId: 'cat-fertilizers',
-      name: 'Urea 46% N (Neem Coated)',
-      brand: 'IFFCO',
-      category: 'FERTILIZERS',
-      images: ['https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?w=400'],
-      description: 'Government subsidized Neem Coated Urea providing 46% slow-release Ammoniacal Nitrogen for vigorous vegetative growth and chlorophyll synthesis.',
-      agriculturalUse: 'Primary Nitrogen source for all cereals, legumes, and vegetable crops. Top-dress during active vegetative stages.',
-      applicableCrops: ['Paddy', 'Groundnut', 'Wheat', 'Maize', 'Cotton', 'Tomato', 'Chilli'],
-      packSize: '45 kg Bag',
-      price: 266.50,
-      mrp: 266.50,
-      stockQuantity: 180,
-      isOrganic: false,
-      chemicalComposition: 'Nitrogen (N) 46.0% minimum, Neem Oil extract coating 0.035%',
-      dosageGuidance: 'Follow soil-test recommendations. For Groundnut: 15-20 kg/acre as basal dose. Do not over-apply to avoid excessive vegetative growth and pest incidence.',
-      safetyPrecautions: [
-        'Store in a cool, dry place away from rain and moisture.',
-        'Keep away from children, livestock feed, and drinking water sources.',
-        'Wear gloves during manual broadcasting.'
-      ],
-      labelInstructions: 'Manufactured per Fertilizer (Control) Order 1985 guidelines. Maximum retail price regulated by Government of India.',
-      status: 'APPROVED',
-      createdAt: '2026-06-01T00:00:00.000Z'
-    },
-    {
-      id: 'prod-dap',
-      vendorId: 'usr-vendor-1',
-      categoryId: 'cat-fertilizers',
-      name: 'DAP (Di-Ammonium Phosphate 18:46:0)',
-      brand: 'Coromandel / IFFCO',
-      category: 'FERTILIZERS',
-      images: ['https://images.unsplash.com/photo-1628352081506-83c43123ed6d?w=400'],
-      description: 'High-analysis phosphatic fertilizer providing 18% Nitrogen and 46% water-soluble Phosphate to establish robust root systems and early seedling vigor.',
-      agriculturalUse: 'Ideal basal fertilizer applied at sowing or transplanting time beneath the seed row.',
-      applicableCrops: ['Groundnut', 'Paddy', 'Cotton', 'Tomato', 'Maize', 'Pulses'],
-      packSize: '50 kg Bag',
-      price: 1350.00,
-      mrp: 1400.00,
-      stockQuantity: 95,
-      isOrganic: false,
-      chemicalComposition: 'Total Nitrogen 18.0%, Available P2O5 46.0%',
-      dosageGuidance: 'Basal application: 40-50 kg/acre for Groundnut and Tomato based on soil analysis.',
-      safetyPrecautions: [
-        'Place 5 cm away from seeds to avoid germination burn.',
-        'Store on raised wooden pallets in waterproof godown.'
-      ],
-      labelInstructions: 'Conforms to FCO specifications. Ensure bag is sealed with official manufacturer tamper-evident stitch.',
-      status: 'APPROVED',
-      createdAt: '2026-06-01T00:00:00.000Z'
-    },
-    {
-      id: 'prod-gromor-28',
-      vendorId: 'usr-vendor-1',
-      categoryId: 'cat-fertilizers',
-      name: 'Coromandel Gromor 28-28-0 Complex',
-      brand: 'Coromandel International',
-      category: 'FERTILIZERS',
-      images: ['https://images.unsplash.com/photo-1592417817098-8f3d6910985b?w=400'],
-      description: 'Balanced high-grade complex fertilizer with equal proportions of Ammoniacal & Nitrate Nitrogen (28%) and Water-soluble Phosphorus (28%).',
-      agriculturalUse: 'Excellent for top-dressing and vegetative boost in intensive vegetable and commercial crops.',
-      applicableCrops: ['Groundnut', 'Tomato', 'Chilli', 'Sugarcane', 'Cotton', 'Maize'],
-      packSize: '50 kg Bag',
-      price: 1450.00,
-      mrp: 1520.00,
-      stockQuantity: 60,
-      isOrganic: false,
-      chemicalComposition: 'Total Nitrogen (N) 28%, Available Phosphorus (P2O5) 28%',
-      dosageGuidance: 'Apply 35-45 kg per acre during mid-vegetative stage, incorporated 3-5 cm into moist soil.',
-      safetyPrecautions: ['Wash hands thoroughly with soap after handling.', 'Do not mix with alkaline substances or unslaked lime.'],
-      labelInstructions: 'Official Coromandel genuine agrochemical product.',
-      status: 'APPROVED',
-      createdAt: '2026-06-05T00:00:00.000Z'
-    },
-    {
-      id: 'prod-npk-19',
-      vendorId: 'usr-vendor-1',
-      categoryId: 'cat-fertilizers',
-      name: 'NPK 19-19-19 100% Water Soluble Foliar Fertilizer',
-      brand: 'Mahadhan',
-      category: 'FERTILIZERS',
-      images: ['https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=400'],
-      description: 'Premium fully water-soluble balanced NPK formulation designed for drip fertigation and foliar spray to rapidly correct multiple nutrient deficiencies.',
-      agriculturalUse: 'Foliar spray at vegetative and flowering transitions for instant uptake and flower drop prevention.',
-      applicableCrops: ['Groundnut', 'Tomato', 'Chilli', 'Paddy', 'Banana', 'Mango'],
-      packSize: '1 kg Pouch',
-      price: 180.00,
-      mrp: 210.00,
-      stockQuantity: 150,
-      isOrganic: false,
-      chemicalComposition: 'Total N 19%, Total P2O5 19%, Total K2O 19%',
-      dosageGuidance: 'Foliar: 5 grams per litre of clean water (75-100g per 15L knapsack sprayer). Spray during early morning or late afternoon.',
-      safetyPrecautions: ['Do not spray during peak midday sunlight or when heavy rain is expected within 3 hours.'],
-      labelInstructions: 'Keep airtight in original container.',
-      status: 'APPROVED',
-      createdAt: '2026-06-05T00:00:00.000Z'
-    },
-    {
-      id: 'prod-trichoderma',
-      vendorId: 'usr-vendor-1',
-      categoryId: 'cat-protection',
-      name: 'Trichoderma Viride 1% WP (Bio-Fungicide)',
-      brand: 'Multiplex Bio-Tech',
-      category: 'CROP_PROTECTION',
-      images: ['https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=400'],
-      description: 'Antagonistic beneficial fungus for eco-friendly biological control of soil-borne and fungal diseases such as Root Rot, Collar Rot, Wilt, and Damping-off.',
-      agriculturalUse: 'Seed treatment, nursery soil drenching, and soil enrichment mixed with compost/FYM.',
-      applicableCrops: ['Groundnut', 'Tomato', 'Chilli', 'Cotton', 'Pulses', 'Ginger'],
-      packSize: '1 kg Pack',
-      price: 220.00,
-      mrp: 260.00,
-      stockQuantity: 85,
-      isOrganic: true,
-      chemicalComposition: 'Trichoderma viride 1.0% W.P. (minimum 2x10^6 CFU/g)',
-      dosageGuidance: 'Seed treatment: 10g per kg seed. Soil application: Mix 2 kg with 100 kg well-decomposed FYM, incubate under shade for 7 days, then apply to 1 acre.',
-      safetyPrecautions: ['Do not mix or apply simultaneously with synthetic chemical fungicides. Maintain a 10-day gap.'],
-      labelInstructions: 'CIB&RC registered biological crop protection agent. Safe for bees and beneficial soil fauna.',
-      status: 'APPROVED',
-      createdAt: '2026-06-10T00:00:00.000Z'
-    },
-    {
-      id: 'prod-neem-oil',
-      vendorId: 'usr-vendor-1',
-      categoryId: 'cat-protection',
-      name: 'Cold Pressed Pure Neem Oil 10,000 PPM (Azadirachtin)',
-      brand: 'GreenAgri Bio',
-      category: 'CROP_PROTECTION',
-      images: ['https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?w=400'],
-      description: 'Natural broad-spectrum botanical bio-pesticide with antifeedant, repellent, and oviposition deterrent properties against sucking pests, aphids, thrips, and caterpillars.',
-      agriculturalUse: 'Preventive and early-stage pest management in organic and integrated pest management systems.',
-      applicableCrops: ['Groundnut', 'Tomato', 'Chilli', 'Cotton', 'Brinjal', 'Paddy'],
-      packSize: '1 Litre Bottle',
-      price: 420.00,
-      mrp: 490.00,
-      stockQuantity: 45,
-      isOrganic: true,
-      chemicalComposition: 'Azadirachtin 1% (10,000 PPM) with natural emulsifiers',
-      dosageGuidance: '3-4 ml per litre of water (45-60 ml per 15L knapsack tank). Shake well before mixing.',
-      safetyPrecautions: ['Wear standard eye protection while measuring.', 'Non-toxic to humans but avoid inhalation of concentrated spray mist.'],
-      labelInstructions: 'Eco-certified for organic agriculture. Leaves zero toxic chemical residues on produce.',
-      status: 'APPROVED',
-      createdAt: '2026-06-10T00:00:00.000Z'
-    },
-    {
-      id: 'prod-seeds-groundnut',
-      vendorId: 'usr-vendor-1',
-      categoryId: 'cat-seeds',
-      name: 'Certified Kadiri-6 (K-6) Groundnut Seeds',
-      brand: 'AP State Seeds Development Corp',
-      category: 'SEEDS',
-      images: ['https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?w=400'],
-      description: 'High-yielding Spanish bunch type groundnut variety bred specifically for semi-arid rainfed and borewell tracts. Resistant to drought stress and moderate resistance to leaf spots.',
-      agriculturalUse: 'Commercial oilseed and kernel production. Sowing rate: 40-45 kg per acre depending on spacing.',
-      applicableCrops: ['Groundnut'],
-      packSize: '30 kg Bag',
-      price: 2850.00,
-      mrp: 3000.00,
-      stockQuantity: 40,
-      isOrganic: false,
-      dosageGuidance: 'Treat with Trichoderma viride or Thiram prior to sowing. Recommended row spacing 30 cm x 10 cm.',
-      safetyPrecautions: ['Treated seed. Not for human consumption or animal feed.'],
-      labelInstructions: 'Government certified blue label seed. Purity 98%, Minimum Germination 75%.',
-      status: 'APPROVED',
-      createdAt: '2026-06-12T00:00:00.000Z'
-    },
-    {
-      id: 'prod-seeds-tomato',
-      vendorId: 'usr-vendor-1',
-      categoryId: 'cat-seeds',
-      name: 'Hybrid Tomato Seeds - Arka Rakshak (Triple Resistant)',
-      brand: 'ICAR-IIHR Certified',
-      category: 'SEEDS',
-      images: ['https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=400'],
-      description: 'Landmark F1 hybrid resistant to Tomato Leaf Curl Virus (ToLCV), Bacterial Wilt, and Early Blight. High firm deep red fruits (90-100g) ideal for distant transport.',
-      agriculturalUse: 'Fresh vegetable market and processing. High yield potential of 30-35 tonnes/acre.',
-      applicableCrops: ['Tomato'],
-      packSize: '10 Gram Pack',
-      price: 350.00,
-      mrp: 395.00,
-      stockQuantity: 110,
-      isOrganic: false,
-      dosageGuidance: 'Nursery seed rate: 50-60g per acre. Transplant 25-day old healthy seedlings.',
-      safetyPrecautions: ['Keep in airtight refrigerated storage until planting.'],
-      labelInstructions: 'Tested for high genetic purity and vigor per National Seed Standards.',
-      status: 'APPROVED',
-      createdAt: '2026-06-12T00:00:00.000Z'
-    },
-    {
-      id: 'prod-sprayer',
-      vendorId: 'usr-vendor-1',
-      categoryId: 'cat-equipment',
-      name: 'Balwaan 16-Litre 12V Battery Knapsack Sprayer',
-      brand: 'Balwaan Agri Tools',
-      category: 'EQUIPMENT',
-      images: ['https://images.unsplash.com/photo-1589923188900-85dae523342b?w=400'],
-      description: 'Heavy duty rechargeable battery-powered agricultural sprayer with pressure regulator, stainless steel telescopic lance, and 4 multipurpose nozzles for effortless spraying.',
-      agriculturalUse: 'Uniform application of bio-pesticides, foliar micronutrients, and crop protection formulations.',
-      applicableCrops: ['All Crops'],
-      packSize: '1 Unit (Complete Box)',
-      price: 2400.00,
-      mrp: 2999.00,
-      stockQuantity: 25,
-      isOrganic: true,
-      dosageGuidance: 'Full charge delivers 6-8 hours of continuous operation (20-25 tank sprays).',
-      safetyPrecautions: ['Rinse tank thoroughly with fresh water after every chemical application.'],
-      labelInstructions: 'Includes 1-Year manufacturer warranty card and battery charger.',
-      status: 'APPROVED',
-      createdAt: '2026-06-15T00:00:00.000Z'
-    },
-    {
-      id: 'prod-seeds-chilli',
-      vendorId: 'usr-vendor-1',
-      categoryId: 'cat-seeds',
-      name: 'High-Yield Guntur Teja Chilli Seeds',
-      brand: 'Andhra Hybrid Seeds',
-      category: 'SEEDS',
-      images: ['https://images.unsplash.com/photo-1588252303782-cb80119abd6d?w=400'],
-      description: 'High pungency dry red chilli hybrid with prolific bearing and resistance to powdery mildew. High capsaicin content and lustrous red color.',
-      agriculturalUse: 'Commercial spice cultivation. High yield potential of 25-30 quintals/acre dry pods.',
-      applicableCrops: ['Chilli'],
-      packSize: '50 Gram Pouch',
-      price: 480.00,
-      mrp: 550.00,
-      stockQuantity: 75,
-      isOrganic: false,
-      dosageGuidance: 'Seed rate: 100g/acre for nursery bed sowing. Transplant at 35-40 days.',
-      safetyPrecautions: ['Wash hands after handling chilli seed treatments.'],
-      labelInstructions: 'Certified hybrid seed. Minimum germination 80%.',
-      status: 'APPROVED',
-      createdAt: '2026-06-15T00:00:00.000Z'
-    }
+  // Helper nearby stores reference
+  const nearbyStoresList = [
+    { shopId: 'shop-1', shopName: 'Sri Lakshmi Agri Inputs', distanceKm: 2.3, inStock: true, stockCount: 45, phone: '+91 98490 54321', address: 'Shop #14, Main Bazaar, Kadiri', rating: 4.8 },
+    { shopId: 'shop-2', shopName: 'Kisan Seva Kendra & Fertilizer Hub', distanceKm: 3.1, inStock: true, stockCount: 30, phone: '+91 94411 77889', address: 'Court Road, Opp RBK, Kadiri', rating: 4.6 },
+    { shopId: 'shop-3', shopName: 'Balaji Agro-Chemicals', distanceKm: 4.8, inStock: true, stockCount: 25, phone: '+91 98485 22334', address: 'NH 42 Junction, Tanakal Road, Kadiri', rating: 4.7 },
+    { shopId: 'shop-4', shopName: 'Rythu Mitra Agri Super Center', distanceKm: 6.2, inStock: true, stockCount: 18, phone: '+91 99890 33445', address: 'Mudigubba Road, Kadiri', rating: 4.5 },
+    { shopId: 'shop-5', shopName: 'Sri Venkateswara Krishi Seva Kendra', distanceKm: 7.5, inStock: true, stockCount: 22, phone: '+91 94901 88220', address: 'Market Yard Road, Kadiri', rating: 4.9 }
   ];
+
+  // 6. Product Categories
+  const productCategories: ProductCategory[] = extendedCategories;
+
+  // 7. Packaging-Accurate Products Catalog (128 products across 8 categories)
+  const products: Product[] = comprehensiveProductsCatalog;
 
   // 7. Orders
   const orders: Order[] = [
@@ -536,7 +384,7 @@ export async function seedDatabase() {
         {
           id: 'item-1',
           orderId: 'ord-1001',
-          productId: 'prod-urea',
+          productId: 'prod-urea-iffco',
           productName: 'Urea 46% N (Neem Coated)',
           brand: 'IFFCO',
           price: 266.50,
@@ -1036,7 +884,7 @@ export async function seedDatabase() {
       safetyWarnings: [
         'Avoid excessive Nitrogen application which can attract sucking pests.'
       ],
-      recommendedProductIds: ['prod-npk-19', 'prod-neem-oil'],
+      recommendedProductIds: ['prod-mahadhan-19', 'prod-neem-oil'],
       isExpertReviewed: true,
       expertNotes: 'Optimal nutritional balance observed. Keep monitoring for early whitefly vectors.',
       createdAt: '2026-09-28T08:30:00.000Z'
@@ -1162,7 +1010,8 @@ export async function seedDatabase() {
     expenses,
     messages: [],
     notifications,
-    market_prices: marketPrices
+    market_prices: marketPrices,
+    shops
   });
 
   console.log('✅ Database seeded successfully with all tables and realistic data.');

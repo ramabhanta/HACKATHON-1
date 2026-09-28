@@ -37,7 +37,7 @@ export const ExpertPortal: React.FC<ExpertPortalProps> = ({ setActiveTab }) => {
   const [cases, setCases] = useState([
     {
       id: 'case-301',
-      farmerName: 'Ramesh Patel',
+      farmerName: 'Nani',
       location: 'Kadiri Rural, Sri Sathya Sai (AP)',
       crop: 'Groundnut (Peanut) - Kadiri-6',
       growthStage: 'Flowering & Pegging',

@@ -31,6 +31,8 @@ import {
   FileText
 } from 'lucide-react';
 
+import { CountdownTimer } from '../../components/CountdownTimer';
+
 export const VendorPortal: React.FC = () => {
   const { user } = useAuth();
   const { t } = useLanguage();
@@ -41,6 +43,14 @@ export const VendorPortal: React.FC = () => {
 
   // Status updating state
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
+
+  // Agri Store Booking Management State
+  const [selectedOrderForReject, setSelectedOrderForReject] = useState<any | null>(null);
+  const [orderRejectReason, setOrderRejectReason] = useState<string>('OUT_OF_STOCK');
+  const [orderRejectNotes, setOrderRejectNotes] = useState<string>('');
+  const [isRejectingBooking, setIsRejectingBooking] = useState<boolean>(false);
+  const [acceptingOrderId, setAcceptingOrderId] = useState<string | null>(null);
+  const [orderFilterTab, setOrderFilterTab] = useState<'ALL' | 'PENDING' | 'ACCEPTED' | 'COMPLETED'>('ALL');
 
   // Stock edit state
   const [editingStockProductId, setEditingStockProductId] = useState<string | null>(null);
@@ -163,6 +173,62 @@ export const VendorPortal: React.FC = () => {
       showToast(err.message || 'Error updating order status', 'error');
     } finally {
       setUpdatingOrderId(null);
+    }
+  };
+
+  const handleAcceptBooking = async (orderId: string) => {
+    setAcceptingOrderId(orderId);
+    try {
+      const res = await fetch(`/api/orders/${orderId}/accept`, {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('agri_token')}`
+        }
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        showToast(`🎉 Booking #${updated.orderNumber} accepted! Pickup OTP is ${updated.collectionOtp}.`);
+        await loadData();
+      } else {
+        const err = await res.json();
+        showToast(err.error || 'Failed to accept booking', 'error');
+      }
+    } catch (err: any) {
+      showToast(err.message || 'Error accepting booking', 'error');
+    } finally {
+      setAcceptingOrderId(null);
+    }
+  };
+
+  const handleRejectBookingSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedOrderForReject) return;
+    setIsRejectingBooking(true);
+    try {
+      const res = await fetch(`/api/orders/${selectedOrderForReject.id}/reject`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('agri_token')}`
+        },
+        body: JSON.stringify({
+          rejectionReason: orderRejectReason,
+          rejectionNotes: orderRejectNotes.trim()
+        })
+      });
+      if (res.ok) {
+        showToast(`Booking #${selectedOrderForReject.orderNumber} declined. Farmer notified.`);
+        setSelectedOrderForReject(null);
+        setOrderRejectNotes('');
+        await loadData();
+      } else {
+        const err = await res.json();
+        showToast(err.error || 'Failed to decline booking', 'error');
+      }
+    } catch (err: any) {
+      showToast(err.message || 'Error declining booking', 'error');
+    } finally {
+      setIsRejectingBooking(false);
     }
   };
 
@@ -399,8 +465,10 @@ export const VendorPortal: React.FC = () => {
     return matchesCrop && matchesSearch;
   });
 
-  const totalSales = orders.reduce((acc, o) => (o.status !== 'CANCELLED' ? acc + o.totalAmount : acc), 0);
+  const totalSales = orders.reduce((acc, o) => (o.status !== 'CANCELLED' && o.status !== 'REJECTED' && o.status !== 'EXPIRED_AUTO_CANCELLED' ? acc + o.totalAmount : acc), 0);
   const pendingOrders = orders.filter(o => o.status === 'CONFIRMED' || o.status === 'PROCESSING');
+  const pendingBookings = orders.filter(o => o.status === 'PENDING_OWNER_CONFIRMATION');
+  const acceptedBookings = orders.filter(o => o.status === 'ACCEPTED');
   const pendingFarmerDeals = incomingFarmerDeals.filter(d => d.status === 'PENDING');
 
   return (
@@ -459,7 +527,14 @@ export const VendorPortal: React.FC = () => {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
           <span className="text-[10px] font-extrabold text-gray-400 uppercase">{t('tabIncomingOrders')}</span>
-          <p className="text-xl font-black text-gray-900 mt-1">{orders.length}</p>
+          <div className="flex items-baseline gap-2 mt-1">
+            <p className="text-xl font-black text-gray-900">{orders.length}</p>
+            {pendingBookings.length > 0 && (
+              <span className="text-[10px] font-black text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full animate-pulse">
+                {pendingBookings.length} SLA Active
+              </span>
+            )}
+          </div>
         </div>
         <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
           <span className="text-[10px] font-extrabold text-gray-400 uppercase">{t('tabFarmerDirectOffers')}</span>
@@ -512,6 +587,11 @@ export const VendorPortal: React.FC = () => {
         >
           <ShoppingBag className="w-3.5 h-3.5" />
           <span>{t('tabIncomingOrders')} ({orders.length})</span>
+          {pendingBookings.length > 0 && (
+            <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-rose-500 text-white font-black animate-pulse">
+              {pendingBookings.length}
+            </span>
+          )}
         </button>
 
         <button
@@ -972,54 +1052,410 @@ export const VendorPortal: React.FC = () => {
       )}
 
       {/* ======================================================== */}
-      {/* 3. CUSTOMER ORDERS TAB */}
+      {/* 3. STORE BOOKINGS & CUSTOMER ORDERS TAB */}
       {/* ======================================================== */}
       {activeTab === 'ORDERS' && (
         <div className="space-y-4">
-          <div className="bg-white rounded-3xl p-6 shadow-sm border border-emerald-100 space-y-4">
-            <h3 className="font-extrabold text-base text-gray-900">
-              {t('customerOrdersHeading')} ({orders.length})
-            </h3>
-            {orders.length === 0 ? (
-              <div className="text-center py-8 text-gray-400 text-xs">{t('noOrdersYet')}</div>
-            ) : (
-              <div className="space-y-3">
-                {orders.map(order => (
-                  <div key={order.id} className="p-4 rounded-2xl border border-gray-100 bg-gray-50/50 text-xs space-y-2">
-                    <div className="flex justify-between items-center">
-                      <span className="font-black text-gray-900">{order.orderNumber}</span>
-                      <span className="px-2.5 py-0.5 rounded-full font-bold bg-amber-100 text-amber-900">
-                        {order.status}
-                      </span>
-                    </div>
-                    <div className="text-gray-600">
-                      <span>{t('Total')}: <strong>₹{order.totalAmount}</strong></span> • <span>Payment: <strong>{order.paymentMethod} ({order.paymentStatus})</strong></span>
-                    </div>
-                    <div className="flex gap-2 pt-2">
-                      {order.status === 'PROCESSING' && (
-                        <button
-                          onClick={() => handleUpdateOrderStatus(order.id, 'SHIPPED')}
-                          disabled={updatingOrderId === order.id}
-                          className="px-3 py-1.5 bg-emerald-700 text-white rounded-xl font-bold"
-                        >
-                          {t('dispatchDelivery')}
-                        </button>
-                      )}
-                      {order.status === 'SHIPPED' && (
-                        <button
-                          onClick={() => handleUpdateOrderStatus(order.id, 'DELIVERED')}
-                          disabled={updatingOrderId === order.id}
-                          className="px-3 py-1.5 bg-emerald-700 text-white rounded-xl font-bold"
-                        >
-                          {t('markDelivered')}
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                ))}
+          {/* Orders Sub-Filter Header */}
+          <div className="bg-white rounded-3xl p-5 shadow-sm border border-emerald-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="font-extrabold text-base text-gray-900">
+                  Store Bookings & Orders Desk
+                </h3>
+                {pendingBookings.length > 0 && (
+                  <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-rose-500 text-white animate-pulse">
+                    {pendingBookings.length} SLA ACTION REQUIRED
+                  </span>
+                )}
               </div>
-            )}
+              <p className="text-xs text-gray-500 mt-0.5">
+                Review farmer input reservations within 24h, generate collection OTPs, and manage order fulfillment
+              </p>
+            </div>
+
+            {/* Filter Pills */}
+            <div className="flex bg-gray-100 p-1 rounded-2xl text-xs font-bold overflow-x-auto gap-1">
+              <button
+                onClick={() => setOrderFilterTab('ALL')}
+                className={`px-3 py-1.5 rounded-xl transition ${
+                  orderFilterTab === 'ALL' ? 'bg-white text-emerald-800 shadow-sm font-extrabold' : 'text-gray-600 hover:text-emerald-700'
+                }`}
+              >
+                All ({orders.length})
+              </button>
+              <button
+                onClick={() => setOrderFilterTab('PENDING')}
+                className={`px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 ${
+                  orderFilterTab === 'PENDING' ? 'bg-white text-amber-800 shadow-sm font-extrabold' : 'text-gray-600 hover:text-amber-700'
+                }`}
+              >
+                <span>⏳ 24h Pending</span>
+                {pendingBookings.length > 0 && (
+                  <span className="w-5 h-5 rounded-full bg-amber-500 text-white text-[10px] flex items-center justify-center font-black">
+                    {pendingBookings.length}
+                  </span>
+                )}
+              </button>
+              <button
+                onClick={() => setOrderFilterTab('ACCEPTED')}
+                className={`px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 ${
+                  orderFilterTab === 'ACCEPTED' ? 'bg-white text-emerald-800 shadow-sm font-extrabold' : 'text-gray-600 hover:text-emerald-700'
+                }`}
+              >
+                <span>🔐 Ready Pickup</span>
+                {acceptedBookings.length > 0 && (
+                  <span className="w-5 h-5 rounded-full bg-emerald-600 text-white text-[10px] flex items-center justify-center font-black">
+                    {acceptedBookings.length}
+                  </span>
+                )}
+              </button>
+              <button
+                onClick={() => setOrderFilterTab('COMPLETED')}
+                className={`px-3 py-1.5 rounded-xl transition ${
+                  orderFilterTab === 'COMPLETED' ? 'bg-white text-emerald-800 shadow-sm font-extrabold' : 'text-gray-600 hover:text-emerald-700'
+                }`}
+              >
+                Completed / Archived
+              </button>
+            </div>
           </div>
+
+          {/* Orders List */}
+          {(() => {
+            const filteredOrders = orders.filter(o => {
+              if (orderFilterTab === 'PENDING') return o.status === 'PENDING_OWNER_CONFIRMATION';
+              if (orderFilterTab === 'ACCEPTED') return o.status === 'ACCEPTED';
+              if (orderFilterTab === 'COMPLETED') return o.status === 'DELIVERED' || o.status === 'REJECTED' || o.status === 'EXPIRED_AUTO_CANCELLED' || o.status === 'CANCELLED';
+              return true;
+            });
+
+            if (filteredOrders.length === 0) {
+              return (
+                <div className="bg-white rounded-3xl p-12 text-center border border-gray-100 space-y-3">
+                  <div className="text-4xl">📦</div>
+                  <p className="font-extrabold text-sm text-gray-800">No orders found in this filter view</p>
+                  <p className="text-xs text-gray-500">Incoming farmer bookings and store deliveries will appear here automatically.</p>
+                </div>
+              );
+            }
+
+            return (
+              <div className="space-y-4">
+                {filteredOrders.map(order => {
+                  const isPending = order.status === 'PENDING_OWNER_CONFIRMATION';
+                  const isAccepted = order.status === 'ACCEPTED';
+                  const isRejected = order.status === 'REJECTED';
+                  const isExpired = order.status === 'EXPIRED_AUTO_CANCELLED';
+                  const isDelivered = order.status === 'DELIVERED';
+
+                  return (
+                    <div
+                      key={order.id}
+                      className={`bg-white rounded-3xl p-5 sm:p-6 shadow-sm border transition space-y-4 ${
+                        isPending
+                          ? 'border-amber-300 ring-2 ring-amber-100/80 bg-gradient-to-b from-amber-50/20 to-white'
+                          : isAccepted
+                          ? 'border-emerald-300 bg-gradient-to-b from-emerald-50/20 to-white'
+                          : isRejected
+                          ? 'border-rose-200 bg-gray-50/40'
+                          : isExpired
+                          ? 'border-gray-200 bg-gray-50/30'
+                          : 'border-gray-100'
+                      }`}
+                    >
+                      {/* Top Bar: Order number, date, status */}
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 pb-3">
+                        <div className="flex items-center gap-3">
+                          <span className="font-black text-base text-gray-900 tracking-tight">
+                            #{order.orderNumber}
+                          </span>
+                          {isPending ? (
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-amber-100 text-amber-900 border border-amber-300 animate-pulse">
+                              <Clock className="w-3.5 h-3.5 text-amber-700" />
+                              <span>24h Dealer Confirmation Required</span>
+                            </span>
+                          ) : isAccepted ? (
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-emerald-100 text-emerald-900 border border-emerald-300">
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />
+                              <span>Booking Accepted • Ready for Pickup</span>
+                            </span>
+                          ) : isRejected ? (
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-rose-100 text-rose-800 border border-rose-300">
+                              <XCircle className="w-3.5 h-3.5 text-rose-600" />
+                              <span>Declined by Merchant</span>
+                            </span>
+                          ) : isExpired ? (
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-gray-100 text-gray-700 border border-gray-300">
+                              <AlertTriangle className="w-3.5 h-3.5 text-gray-500" />
+                              <span>24h SLA Auto-Cancelled</span>
+                            </span>
+                          ) : isDelivered ? (
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-emerald-100 text-emerald-800">
+                              <Check className="w-3.5 h-3.5 text-emerald-600" />
+                              <span>Completed & Delivered</span>
+                            </span>
+                          ) : (
+                            <span className="px-3 py-1 rounded-full text-xs font-black bg-blue-100 text-blue-900">
+                              {order.status}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="flex items-center gap-3 text-xs text-gray-500">
+                          <span className="flex items-center gap-1">
+                            <Calendar className="w-3.5 h-3.5 text-gray-400" />
+                            {new Date(order.createdAt).toLocaleDateString()} {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                          <span className="font-black text-gray-900 text-sm">
+                            ₹{order.totalAmount?.toLocaleString('en-IN')}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* 24-Hour Countdown Clock Banner for Pending Bookings */}
+                      {isPending && (
+                        <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-300/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                          <div className="flex items-center gap-2.5">
+                            <div className="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center font-black shadow-sm shrink-0">
+                              ⏳
+                            </div>
+                            <div>
+                              <p className="font-black text-xs text-amber-950">
+                                24-Hour Store Confirmation SLA Window:
+                              </p>
+                              <p className="text-[11px] text-amber-900/80">
+                                Respond before expiry to prevent automatic transfer to nearby alternate dealers.
+                              </p>
+                            </div>
+                          </div>
+                          <div className="shrink-0">
+                            <CountdownTimer expiresAt={order.expiresAt} urgencyThresholdHours={4} />
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Collection OTP Highlight Banner for Accepted Bookings */}
+                      {isAccepted && order.collectionOtp && (
+                        <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-500/15 via-emerald-500/10 to-emerald-500/5 border border-emerald-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-2xl bg-emerald-600 text-white flex items-center justify-center text-lg font-black shadow-sm shrink-0">
+                              🔐
+                            </div>
+                            <div>
+                              <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-800 block">
+                                Farmer Counter Collection OTP
+                              </span>
+                              <div className="text-2xl font-black text-emerald-950 font-mono tracking-widest">
+                                {order.collectionOtp}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="text-xs text-emerald-900 sm:text-right">
+                            <p className="font-bold">Verify this 4-digit code from the farmer upon handover.</p>
+                            <p className="text-[11px] text-emerald-700">Collect payment: <strong>₹{order.totalAmount?.toLocaleString('en-IN')} (Cash/UPI)</strong></p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Rejection / Expiry Notes Banner */}
+                      {isRejected && (
+                        <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-xs text-rose-900 flex items-start gap-2.5">
+                          <XCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                          <div>
+                            <p className="font-black">Declined Reason: {order.rejectionReason?.replace(/_/g, ' ') || 'Out of Stock'}</p>
+                            {order.rejectionNotes && (
+                              <p className="text-gray-600 text-[11px] mt-0.5 italic">"{order.rejectionNotes}"</p>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {isExpired && (
+                        <div className="p-3.5 rounded-2xl bg-gray-50 border border-gray-200 text-xs text-gray-700 flex items-start gap-2.5">
+                          <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                          <div>
+                            <p className="font-black">Auto-Cancelled: 24-Hour Window Expired</p>
+                            <p className="text-gray-500 text-[11px] mt-0.5">Order was automatically released so the farmer could transfer items to another nearby dealer.</p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Farmer Details & Fulfillment Info Grid */}
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3.5 rounded-2xl bg-gray-50/80 border border-gray-100 text-xs">
+                        <div>
+                          <span className="text-gray-400 text-[10px] font-bold block uppercase">Farmer Customer:</span>
+                          <span className="font-black text-gray-900 text-sm block">{order.farmerName || 'Farmer'}</span>
+                          {order.farmerPhone && (
+                            <a
+                              href={`tel:${order.farmerPhone}`}
+                              className="inline-flex items-center gap-1 text-emerald-700 hover:text-emerald-800 font-extrabold text-[11px] mt-1"
+                            >
+                              <Phone className="w-3 h-3 text-emerald-600" />
+                              <span>{order.farmerPhone}</span>
+                            </a>
+                          )}
+                        </div>
+
+                        <div>
+                          <span className="text-gray-400 text-[10px] font-bold block uppercase">Location & Address:</span>
+                          <div className="flex items-center gap-1 font-bold text-gray-800 mt-0.5">
+                            <MapPin className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                            <span>{order.deliveryAddress?.village || 'Kadiri Rural'}, {order.deliveryAddress?.district || 'Sri Sathya Sai'}</span>
+                          </div>
+                          <span className="text-[10px] text-gray-500 block mt-0.5">
+                            Pincode: {order.deliveryAddress?.pincode || '515591'}
+                          </span>
+                        </div>
+
+                        <div>
+                          <span className="text-gray-400 text-[10px] font-bold block uppercase">Fulfillment Preference:</span>
+                          <span className="inline-flex items-center gap-1 font-extrabold text-gray-900 mt-0.5">
+                            {order.pickupPreference === 'STORE_DELIVERY' ? '🚛 Store Home Delivery' : '🏬 Counter Pickup at Store'}
+                          </span>
+                          <span className="text-[10px] text-gray-500 block mt-0.5">
+                            Payment: <strong>Zero Online Debit • Cash/UPI on Pickup</strong>
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Items Table */}
+                      <div className="space-y-2">
+                        <span className="text-[10px] font-extrabold text-gray-400 uppercase tracking-wider block">
+                          Reserved Certified Inputs ({order.items?.length || 0} items):
+                        </span>
+                        <div className="space-y-2">
+                          {order.items?.map((it: any, idx: number) => (
+                            <div
+                              key={it.id || idx}
+                              className="flex items-center justify-between p-3 rounded-2xl bg-white border border-gray-100 hover:border-gray-200 transition text-xs"
+                            >
+                              <div className="flex items-center gap-3">
+                                <div className="w-12 h-12 rounded-xl bg-gray-50 border border-gray-100 overflow-hidden shrink-0">
+                                  <img
+                                    src={it.imageUrl || 'https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?w=200'}
+                                    alt={it.productName}
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
+                                <div>
+                                  <div className="flex items-center gap-2">
+                                    <h5 className="font-extrabold text-gray-900">{it.productName}</h5>
+                                    {it.brandBadge && (
+                                      <span className="px-1.5 py-0.2 rounded text-[10px] font-black bg-emerald-100 text-emerald-800">
+                                        {it.brandBadge}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div className="flex items-center gap-2 text-[11px] text-gray-500 mt-0.5">
+                                    <span>Pack: <strong>{it.packSize}</strong></span>
+                                    <span>•</span>
+                                    <span>Rate: <strong>₹{it.price}</strong> {it.mrp && it.mrp > it.price && <span className="line-through text-gray-400 text-[10px]">₹{it.mrp}</span>}</span>
+                                  </div>
+                                  {it.compositionFormula && (
+                                    <span className="inline-block mt-1 text-[10px] font-mono text-emerald-900 bg-emerald-50/80 px-2 py-0.5 rounded border border-emerald-100">
+                                      🔬 {it.compositionFormula}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+
+                              <div className="text-right shrink-0">
+                                <span className="font-extrabold text-gray-800 text-xs block">
+                                  Qty: <strong className="text-emerald-700 text-sm">{it.quantity}</strong>
+                                </span>
+                                <span className="font-black text-emerald-900 text-sm">
+                                  ₹{(it.price * it.quantity).toLocaleString('en-IN')}
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="pt-3 border-t border-gray-100 flex flex-wrap items-center justify-between gap-3">
+                        <div className="text-xs text-gray-500">
+                          <span>Total Amount to Collect: </span>
+                          <strong className="text-base font-black text-gray-900">
+                            ₹{order.totalAmount?.toLocaleString('en-IN')}
+                          </strong>
+                          <span className="text-[11px] text-emerald-700 font-bold ml-2">
+                            (Zero Commission Deducted)
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          {isPending && (
+                            <>
+                              <button
+                                onClick={() => setSelectedOrderForReject(order)}
+                                className="px-3.5 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 hover:text-rose-800 font-bold text-xs rounded-xl border border-rose-200 transition flex items-center gap-1.5 active:scale-95"
+                              >
+                                <X className="w-3.5 h-3.5" />
+                                <span>Decline Request</span>
+                              </button>
+
+                              <button
+                                onClick={() => handleAcceptBooking(order.id)}
+                                disabled={acceptingOrderId === order.id}
+                                className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs rounded-xl shadow-md transition active:scale-95 flex items-center gap-2"
+                              >
+                                {acceptingOrderId === order.id ? (
+                                  <>
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                    <span>Accepting...</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Check className="w-4 h-4" />
+                                    <span>Accept Booking & Generate OTP</span>
+                                  </>
+                                )}
+                              </button>
+                            </>
+                          )}
+
+                          {isAccepted && (
+                            <button
+                              onClick={() => handleUpdateOrderStatus(order.id, 'DELIVERED')}
+                              disabled={updatingOrderId === order.id}
+                              className="px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs rounded-xl shadow-sm transition active:scale-95 flex items-center gap-1.5"
+                            >
+                              <CheckCircle2 className="w-4 h-4" />
+                              <span>Farmer Collected Goods (Mark Completed)</span>
+                            </button>
+                          )}
+
+                          {order.status === 'PROCESSING' && (
+                            <button
+                              onClick={() => handleUpdateOrderStatus(order.id, 'SHIPPED')}
+                              disabled={updatingOrderId === order.id}
+                              className="px-4 py-2.5 bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs rounded-xl shadow-sm transition flex items-center gap-1.5"
+                            >
+                              <Truck className="w-4 h-4" />
+                              <span>Dispatch Delivery Fleet</span>
+                            </button>
+                          )}
+
+                          {order.status === 'SHIPPED' && (
+                            <button
+                              onClick={() => handleUpdateOrderStatus(order.id, 'DELIVERED')}
+                              disabled={updatingOrderId === order.id}
+                              className="px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-sm transition flex items-center gap-1.5"
+                            >
+                              <Check className="w-4 h-4" />
+                              <span>Confirm Delivery Delivered</span>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })()}
         </div>
       )}
 
@@ -1460,6 +1896,136 @@ export const VendorPortal: React.FC = () => {
                   <span>Publish Product to Store</span>
                 )}
               </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* MODAL: DECLINE / REJECT FARMER BOOKING */}
+      {/* ======================================================== */}
+      {selectedOrderForReject && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-rose-100 relative space-y-4">
+            <button
+              onClick={() => {
+                setSelectedOrderForReject(null);
+                setOrderRejectNotes('');
+              }}
+              className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 text-[10px] font-black uppercase mb-1">
+                <AlertTriangle className="w-3 h-3 text-rose-600" />
+                <span>Decline Booking Request</span>
+              </div>
+              <h3 className="text-lg font-black text-gray-900">
+                Decline Booking #{selectedOrderForReject.orderNumber}
+              </h3>
+              <p className="text-xs text-gray-500">
+                Farmer: <strong>{selectedOrderForReject.farmerName}</strong> • Amount: ₹{selectedOrderForReject.totalAmount?.toLocaleString('en-IN')}
+              </p>
+            </div>
+
+            <form onSubmit={handleRejectBookingSubmit} className="space-y-4 text-xs">
+              <div>
+                <label className="font-extrabold text-gray-700 block mb-2">
+                  Select Reason for Declining *
+                </label>
+                <div className="space-y-2">
+                  {[
+                    {
+                      id: 'OUT_OF_STOCK',
+                      label: 'Out of Stock / Inventory Depleted',
+                      desc: 'Stock exhausted today or reserved for AP Seeds/Rythu Bharosa distribution.'
+                    },
+                    {
+                      id: 'PRICE_REVISION',
+                      label: 'Manufacturer Price Revision',
+                      desc: 'New company billing rate applies from manufacturer.'
+                    },
+                    {
+                      id: 'SHOP_CLOSED',
+                      label: 'Shop Closed / Public Holiday',
+                      desc: 'Dealer storefront closed or staff on leave.'
+                    },
+                    {
+                      id: 'DELIVERY_UNAVAILABLE',
+                      label: 'Delivery to Village Not Feasible',
+                      desc: 'Cannot deliver to remote village location at this time.'
+                    }
+                  ].map(reason => (
+                    <label
+                      key={reason.id}
+                      className={`flex items-start gap-3 p-3 rounded-2xl border cursor-pointer transition ${
+                        orderRejectReason === reason.id
+                          ? 'border-rose-500 bg-rose-50/50 text-rose-950 font-bold'
+                          : 'border-gray-200 bg-gray-50/50 text-gray-700 hover:bg-gray-50'
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="rejectionReason"
+                        value={reason.id}
+                        checked={orderRejectReason === reason.id}
+                        onChange={e => setOrderRejectReason(e.target.value)}
+                        className="mt-0.5 text-rose-600 focus:ring-rose-500"
+                      />
+                      <div>
+                        <div className="font-bold text-xs">{reason.label}</div>
+                        <div className="text-[11px] text-gray-500">{reason.desc}</div>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="font-bold text-gray-700 block mb-1">
+                  Optional Notes for Farmer
+                </label>
+                <textarea
+                  value={orderRejectNotes}
+                  onChange={e => setOrderRejectNotes(e.target.value)}
+                  placeholder="e.g., Fresh shipment arriving on Wednesday morning, or contact Balaji Agro across the road."
+                  rows={2}
+                  className="w-full p-2.5 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-rose-500 text-xs"
+                />
+              </div>
+
+              <div className="p-3 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-[11px] leading-relaxed">
+                💡 <strong>Farmer Re-routing Notice:</strong> Upon declining, the farmer will be immediately notified and provided with a one-click button to transfer their reservation to the next nearest dealer.
+              </div>
+
+              <div className="flex gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedOrderForReject(null);
+                    setOrderRejectNotes('');
+                  }}
+                  className="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl transition text-xs"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isRejectingBooking}
+                  className="flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 disabled:opacity-50 text-white font-bold rounded-xl shadow transition text-xs flex items-center justify-center gap-1.5"
+                >
+                  {isRejectingBooking ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <span>Declining...</span>
+                    </>
+                  ) : (
+                    <span>Confirm Decline</span>
+                  )}
+                </button>
+              </div>
             </form>
           </div>
         </div>

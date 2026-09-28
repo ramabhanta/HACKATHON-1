@@ -19,7 +19,8 @@ import {
   Clock,
   HardDrive,
   Info,
-  Zap
+  Zap,
+  X
 } from 'lucide-react';
 import {
   extractPhotoTelemetry,
@@ -97,6 +98,18 @@ export const DiseaseScan: React.FC<DiseaseScanProps> = ({ setActiveTab }) => {
   const [scanStep, setScanStep] = useState(0);
   const [diagnosis, setDiagnosis] = useState<any>(null);
   const [scanError, setScanError] = useState<string | null>(null);
+  const [confirmedCrop, setConfirmedCrop] = useState<string>('');
+
+  const quickCrops = [
+    { label: '🍅 Tomato', name: 'Tomato' },
+    { label: '🌾 Paddy / Rice', name: 'Paddy' },
+    { label: '🥜 Groundnut', name: 'Groundnut' },
+    { label: '🌿 Cotton', name: 'Cotton' },
+    { label: '🌶️ Chilli', name: 'Chilli' },
+    { label: '🌽 Maize', name: 'Maize' },
+    { label: '🌱 Pulses / Gram', name: 'Bengal Gram' },
+    { label: '🥔 Potato', name: 'Potato' }
+  ];
 
   // Demo sample photos for quick 1-click test
   const sampleLeaves = [
@@ -125,6 +138,7 @@ export const DiseaseScan: React.FC<DiseaseScanProps> = ({ setActiveTab }) => {
       setSelectedImage(URL.createObjectURL(compressed));
       setDiagnosis(null);
       setScanError(null);
+      setConfirmedCrop('');
 
       // Extract real-time date, time, file metrics, and field geolocation
       const telemetry = await extractPhotoTelemetry(compressed, {
@@ -141,13 +155,14 @@ export const DiseaseScan: React.FC<DiseaseScanProps> = ({ setActiveTab }) => {
     setImageFile(null);
     setDiagnosis(null);
     setScanError(null);
+    setConfirmedCrop(sample.crop);
 
     // Provide real-time live telemetry for the sample scan
     const telemetry = createSampleTelemetry(sample.name, sample.crop);
     setPhotoTelemetry(telemetry);
   };
 
-  const handleRunScan = async () => {
+  const handleRunScan = async (overrideCropName?: string) => {
     if (!selectedImage) return;
 
     setIsAnalyzing(true);
@@ -160,13 +175,63 @@ export const DiseaseScan: React.FC<DiseaseScanProps> = ({ setActiveTab }) => {
     }, 400);
 
     try {
-      const formData = new FormData();
-      if (imageFile) {
-        formData.append('image', imageFile);
+      let fileToSend: File | Blob | null = imageFile;
+      if (!fileToSend && selectedImage) {
+        try {
+          const resp = await fetch(selectedImage);
+          const blob = await resp.blob();
+          fileToSend = new File([blob], 'leaf_photo.jpg', { type: blob.type || 'image/jpeg' });
+        } catch (fetchErr) {
+          console.warn('Could not convert sample image to Blob:', fetchErr);
+        }
       }
-      const headers: Record<string, string> = {
-        Authorization: `Bearer ${localStorage.getItem('agri_token') || ''}`
-      };
+
+      if (!fileToSend && !selectedImage) {
+        setScanError('Please select or capture a plant leaf photo first.');
+        setIsAnalyzing(false);
+        setScanStep(0);
+        clearInterval(stepInterval);
+        return;
+      }
+
+      const formData = new FormData();
+      if (fileToSend) {
+        formData.append('image', fileToSend);
+        try {
+          const { uploadToSupabaseStorage } = await import('../../services/supabaseClient');
+          const directUpload = await uploadToSupabaseStorage('crop-scans', fileToSend);
+          if (directUpload.success && directUpload.publicUrl) {
+            formData.append('imageUrl', directUpload.publicUrl);
+          }
+        } catch {
+          // backend will handle upload
+        }
+      }
+      if (selectedImage && !formData.has('imageUrl')) {
+        formData.append('imageUrl', selectedImage);
+      }
+      const targetCrop = overrideCropName || confirmedCrop;
+      if (targetCrop) {
+        formData.append('cropName', targetCrop);
+      }
+      if (user?.id) {
+        formData.append('farmer_id', user.id);
+      }
+      if (photoTelemetry) {
+        formData.append('photoMetadata', JSON.stringify(photoTelemetry));
+      }
+
+      const headers: Record<string, string> = {};
+      const token = localStorage.getItem('agri_token');
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      console.log('[DiseaseScan] Submitting leaf scan to POST /api/ai/crop-disease...', {
+        hasImage: Boolean(fileToSend),
+        cropName: targetCrop,
+        farmerId: user?.id || 'usr-farmer-1'
+      });
 
       const res = await fetch('/api/ai/crop-disease', {
         method: 'POST',
@@ -178,17 +243,24 @@ export const DiseaseScan: React.FC<DiseaseScanProps> = ({ setActiveTab }) => {
 
       if (res.ok) {
         const data = await res.json();
+        console.log('[DiseaseScan] Diagnosis response received:', data);
         setDiagnosis(data);
+        if (data.cropName && !data.cropName.includes('Unknown') && !data.cropName.includes('Non-')) {
+          setConfirmedCrop(data.cropName);
+        }
         setIsAnalyzing(false);
         setScanStep(0);
       } else {
-        const err = await res.json();
-        throw new Error(err.error || 'Scan diagnostic failed');
+        const err = await res.json().catch(() => ({}));
+        const errMsg = err.error || `Scan diagnostic failed (HTTP ${res.status}: ${res.statusText})`;
+        console.error('[DiseaseScan] Server error:', errMsg);
+        throw new Error(errMsg);
       }
     } catch (err: any) {
       clearInterval(stepInterval);
       setIsAnalyzing(false);
       setScanStep(0);
+      console.error('[DiseaseScan] Network or execution failure:', err);
       setScanError(err.message || 'Image processing failed. Please ensure the leaf is clearly visible and retry.');
     }
   };
@@ -311,14 +383,26 @@ export const DiseaseScan: React.FC<DiseaseScanProps> = ({ setActiveTab }) => {
             {/* Scan Button & Step Animation */}
             <div className="pt-2 space-y-2">
               {scanError && (
-                <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-800 text-xs flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 shrink-0" />
-                  <span>{scanError}</span>
+                <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-900 text-xs flex items-start justify-between gap-2.5 shadow-sm animate-in fade-in duration-200">
+                  <div className="flex items-start gap-2">
+                    <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                    <div>
+                      <span className="font-extrabold block text-rose-950">Scan Diagnostic Error</span>
+                      <span className="text-rose-800 leading-relaxed block mt-0.5">{scanError}</span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setScanError(null)}
+                    className="text-rose-400 hover:text-rose-700 p-0.5 rounded-md shrink-0"
+                    title="Dismiss"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
                 </div>
               )}
 
               <button
-                onClick={handleRunScan}
+                onClick={() => handleRunScan()}
                 disabled={!selectedImage || isAnalyzing}
                 className="w-full py-3.5 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-extrabold rounded-2xl shadow-lg transition active:scale-95 flex items-center justify-center gap-2 text-sm"
               >
@@ -450,49 +534,145 @@ export const DiseaseScan: React.FC<DiseaseScanProps> = ({ setActiveTab }) => {
 
       {/* 3. Deep Learning Diagnostic Output */}
       {diagnosis && (
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-emerald-200 space-y-6 animate-in fade-in duration-300">
-          {/* Certified Photo Timestamp & Diagnostic Audit Banner */}
-          <div className="p-3.5 rounded-2xl bg-stone-50 border border-stone-200 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-black text-sm shrink-0">
-                🗓️
+        diagnosis.isCropPlant === false ? (
+          <div className="bg-red-50 border-2 border-red-300 rounded-3xl p-6 text-red-950 space-y-4 shadow-sm animate-in fade-in duration-300">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-red-100 border border-red-200 text-red-700 flex items-center justify-center text-2xl shrink-0">
+                ⚠️
               </div>
-              <div>
-                <span className="text-[10px] font-extrabold text-gray-400 uppercase tracking-wide block">
-                  Certified Photo Timestamp & Diagnostic Audit
-                </span>
-                <span className="font-black text-gray-900">
-                  Photo Analyzed: {diagnosis.photoMetadata?.uploadDateFormatted || photoTelemetry?.uploadDateFormatted || new Date().toLocaleDateString('en-IN')} at {diagnosis.photoMetadata?.uploadTimeFormatted || photoTelemetry?.uploadTimeFormatted || new Date().toLocaleTimeString('en-IN')}
-                </span>
+              <div className="space-y-1">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-red-200/80 text-red-900 mb-1">
+                  Botanical Rejection Alert
+                </div>
+                <h3 className="text-lg sm:text-xl font-black text-red-950">
+                  Non-Agricultural Subject Detected
+                </h3>
+                <p className="text-xs sm:text-sm text-red-900 mt-1 leading-relaxed font-medium">
+                  {diagnosis.notPlantReason || "The uploaded photograph does not appear to be an agricultural plant or crop leaf. Deep vision detected non-plant subjects such as human skin, animals, vehicles, or household objects."}
+                </p>
               </div>
             </div>
-            <div className="text-left sm:text-right text-[11px] text-gray-600">
-              <span className="block font-extrabold text-gray-900">
-                📍 {diagnosis.photoMetadata?.locationName || photoTelemetry?.locationName || 'Kadiri, Sri Sathya Sai (AP)'}
-              </span>
-              <span className="text-[10px] text-gray-400 font-mono">
-                {diagnosis.photoMetadata?.fileName || photoTelemetry?.fileName || 'Field_Leaf_Sample.jpg'} • {diagnosis.photoMetadata?.dimensions || photoTelemetry?.dimensions || '1920 × 1080 px'}
-              </span>
+
+            <div className="bg-white/90 rounded-2xl p-4 border border-red-200 text-xs text-red-950 space-y-2">
+              <p className="font-extrabold flex items-center gap-1.5 text-red-900 text-xs">
+                <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+                Why was this scan rejected?
+              </p>
+              <ul className="list-disc pl-5 space-y-1 text-red-800 text-[11px]">
+                <li>AgroDex AI is strictly trained for agricultural pathology and plant disease identification.</li>
+                <li>Applying agricultural fungicides, bactericides, or insecticides to human skin, pets, or household items is hazardous and illegal.</li>
+                <li>Please take a close-up, sharp photo of the affected crop leaf, stem, or pod in your field.</li>
+              </ul>
+            </div>
+
+            <div className="pt-2 flex justify-end">
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedImage(null);
+                  setImageFile(null);
+                  setDiagnosis(null);
+                  setScanError(null);
+                  setConfirmedCrop('');
+                }}
+                className="px-5 py-2.5 bg-red-700 hover:bg-red-800 text-white font-bold text-xs rounded-xl shadow-xs transition active:scale-95 flex items-center gap-2"
+              >
+                <Camera className="w-4 h-4" />
+                <span>Upload New Crop Leaf Photo</span>
+              </button>
             </div>
           </div>
-
-          {/* Crop Clarification Prompt if Crop is Indistinguishable */}
-          {(diagnosis.clarificationPrompt || diagnosis.cropName?.includes('Unknown') || diagnosis.cropName?.includes('Unclear')) && (
-            <div className="p-4 rounded-2xl bg-amber-50 border-2 border-amber-300 text-amber-950 flex items-start gap-3">
-              <span className="text-xl shrink-0 mt-0.5">🌾</span>
-              <div className="space-y-1">
-                <h4 className="font-extrabold text-xs uppercase tracking-wide text-amber-900">
-                  Crop Clarification Needed
-                </h4>
-                <p className="text-xs text-amber-900 font-bold">
-                  {diagnosis.clarificationPrompt || 'Please tell us which crop this is.'}
-                </p>
-                <p className="text-[11px] text-amber-800">
-                  The leaf condition was identified, but the host crop is ambiguous in this close-up view. For crop-specific pesticide and fertilizer dosages, tell our AI Assistant which crop this leaf belongs to.
-                </p>
+        ) : (
+          <div className="bg-white rounded-3xl p-6 shadow-sm border border-emerald-200 space-y-6 animate-in fade-in duration-300">
+            {/* Certified Photo Timestamp & Diagnostic Audit Banner */}
+            <div className="p-3.5 rounded-2xl bg-stone-50 border border-stone-200 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-black text-sm shrink-0">
+                  🗓️
+                </div>
+                <div>
+                  <span className="text-[10px] font-extrabold text-gray-400 uppercase tracking-wide block">
+                    Certified Photo Timestamp & Diagnostic Audit
+                  </span>
+                  <span className="font-black text-gray-900">
+                    Photo Analyzed: {diagnosis.photoMetadata?.uploadDateFormatted || photoTelemetry?.uploadDateFormatted || new Date().toLocaleDateString('en-IN')} at {diagnosis.photoMetadata?.uploadTimeFormatted || photoTelemetry?.uploadTimeFormatted || new Date().toLocaleTimeString('en-IN')}
+                  </span>
+                </div>
+              </div>
+              <div className="text-left sm:text-right text-[11px] text-gray-600">
+                <span className="block font-extrabold text-gray-900">
+                  📍 {diagnosis.photoMetadata?.locationName || photoTelemetry?.locationName || 'Kadiri, Sri Sathya Sai (AP)'}
+                </span>
+                <span className="text-[10px] text-gray-400 font-mono">
+                  {diagnosis.photoMetadata?.fileName || photoTelemetry?.fileName || 'Field_Leaf_Sample.jpg'} • {diagnosis.photoMetadata?.dimensions || photoTelemetry?.dimensions || '1920 × 1080 px'}
+                </span>
               </div>
             </div>
-          )}
+
+            {/* Interactive Crop Confirmation when Confidence < 75% or Ambiguous */}
+            {(diagnosis.requiresFarmerConfirmation || diagnosis.confidenceScore < 75 || !diagnosis.cropIdentified) && (
+              <div className="p-5 rounded-3xl bg-amber-50/90 border-2 border-amber-300 text-amber-950 space-y-3.5 shadow-sm">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-amber-200 text-amber-900 flex items-center justify-center text-xl shrink-0">
+                    🌾
+                  </div>
+                  <div>
+                    <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-200 text-amber-900 mb-1">
+                      Confirmation Required
+                    </div>
+                    <h4 className="font-black text-sm text-amber-950">
+                      Confirm Crop to Finalize Targeted Medicines
+                    </h4>
+                    <p className="text-xs text-amber-900 mt-0.5 leading-relaxed">
+                      {diagnosis.clarificationPrompt || "Confidence is below 75% or crop species is ambiguous from this angle. Please confirm which crop you are growing so we can verify exact dosage recommendations."}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Quick Select Chips */}
+                <div className="space-y-1.5">
+                  <span className="text-[11px] font-extrabold text-amber-900 uppercase tracking-wide block">
+                    Select Your Field Crop:
+                  </span>
+                  <div className="flex flex-wrap gap-2">
+                    {quickCrops.map(c => (
+                      <button
+                        key={c.name}
+                        type="button"
+                        onClick={() => setConfirmedCrop(c.name)}
+                        className={`px-3 py-1.5 rounded-xl border text-xs font-bold transition active:scale-95 ${
+                          confirmedCrop.toLowerCase() === c.name.toLowerCase()
+                            ? 'bg-amber-700 text-white border-amber-700 shadow-sm'
+                            : 'bg-white text-amber-950 border-amber-300 hover:bg-amber-100'
+                        }`}
+                      >
+                        {c.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Custom Input & Re-run button */}
+                <div className="flex flex-col sm:flex-row gap-2 pt-1">
+                  <input
+                    type="text"
+                    value={confirmedCrop}
+                    onChange={e => setConfirmedCrop(e.target.value)}
+                    placeholder="Or type custom crop (e.g., Watermelon, Bhendi, Onion...)"
+                    className="flex-1 px-3.5 py-2 rounded-xl bg-white border border-amber-300 text-xs text-amber-950 font-bold focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  />
+                  <button
+                    type="button"
+                    disabled={!confirmedCrop.trim() || isAnalyzing}
+                    onClick={() => handleRunScan(confirmedCrop.trim())}
+                    className="px-4 py-2 bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white font-extrabold text-xs rounded-xl shadow-xs transition active:scale-95 whitespace-nowrap flex items-center justify-center gap-1.5"
+                  >
+                    <span>⚡</span>
+                    <span>Re-run Disease Analysis for this Crop</span>
+                  </button>
+                </div>
+              </div>
+            )}
 
           {/* Result Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 pb-4">
@@ -678,7 +858,8 @@ export const DiseaseScan: React.FC<DiseaseScanProps> = ({ setActiveTab }) => {
             </button>
           </div>
         </div>
-      )}
+      )
+    )}
     </div>
   );
 };

@@ -26,11 +26,11 @@ export const CartCheckout: React.FC<CartCheckoutProps> = ({ setActiveTab }) => {
   const { t } = useLanguage();
   const { items, updateQuantity, removeFromCart, clearCart, subtotal, deliveryFee, totalAmount } = useCart();
 
-  const [name, setName] = useState(user?.name || 'Ramesh Patel');
-  const [phone, setPhone] = useState(user?.phone || '+91 98480 12345');
-  const [village, setVillage] = useState(user?.village || 'Kadiri Rural');
-  const [district, setDistrict] = useState(user?.district || 'Sri Sathya Sai');
-  const [state, setState] = useState(user?.state || 'Andhra Pradesh');
+  const [name, setName] = useState(user?.name || '');
+  const [phone, setPhone] = useState(user?.phone || '');
+  const [village, setVillage] = useState(user?.village || '');
+  const [district, setDistrict] = useState(user?.district || '');
+  const [state, setState] = useState(user?.state || '');
   const [pincode, setPincode] = useState('515591');
   const [paymentMethod, setPaymentMethod] = useState<'UPI' | 'CARDS' | 'COD'>('UPI');
   const [isPlacing, setIsPlacing] = useState(false);

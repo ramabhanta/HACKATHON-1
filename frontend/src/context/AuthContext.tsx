@@ -53,6 +53,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   login: (identifier: string, pass: string) => Promise<{ success: boolean; error?: string }>;
   register: (payload: RegisterPayload) => Promise<{ success: boolean; error?: string }>;
+  updateProfile: (updates: Partial<User>) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   switchRole: (newRole: UserRole) => Promise<void>;
   isFarmer: boolean;
@@ -62,27 +63,33 @@ interface AuthContextType {
   isAdmin: boolean;
 }
 
-const DEFAULT_DEMO_USER: User = {
-  id: 'usr-farmer-1',
-  name: 'Ramesh Patel',
-  phone: '+91 98480 12345',
-  email: 'farmer@agriconnect.com',
-  role: 'FARMER',
-  language: 'en',
-  village: 'Kadiri Rural',
-  district: 'Sri Sathya Sai',
-  state: 'Andhra Pradesh'
-};
-
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(() => {
-    const saved = localStorage.getItem('agri_user');
-    return saved ? JSON.parse(saved) : DEFAULT_DEMO_USER;
+    try {
+      const saved = localStorage.getItem('agri_user');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed?.name?.includes('Ramesh Patel') || parsed?.id === 'usr-farmer-1') {
+          localStorage.removeItem('agri_user');
+          localStorage.removeItem('agri_token');
+          return null;
+        }
+        return parsed;
+      }
+    } catch {
+      // ignore parse error
+    }
+    return null;
   });
   const [token, setToken] = useState<string | null>(() => {
-    return localStorage.getItem('agri_token') || 'demo_token_farmer';
+    const savedToken = localStorage.getItem('agri_token');
+    if (savedToken === 'demo_token_farmer') {
+      localStorage.removeItem('agri_token');
+      return null;
+    }
+    return savedToken || null;
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -101,6 +108,53 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.removeItem('agri_token');
     }
   }, [token]);
+
+  useEffect(() => {
+    // If a saved token exists, rehydrate profile fresh from Supabase
+    const savedToken = localStorage.getItem('agri_token');
+    if (savedToken && !savedToken.startsWith('demo_token_')) {
+      fetch('/api/auth/profile', {
+        headers: { Authorization: `Bearer ${savedToken}` }
+      })
+        .then(r => (r.ok ? r.json() : null))
+        .then(data => {
+          if (data?.user) {
+            setUser(data.user);
+          } else {
+            // Token expired or invalid, load active farmer
+            fetch('/api/auth/active-farmer')
+              .then(r => r.json())
+              .then(d => {
+                if (d?.user) {
+                  setUser(d.user);
+                  if (d.token) setToken(d.token);
+                }
+              });
+          }
+        })
+        .catch(() => {
+          fetch('/api/auth/active-farmer')
+            .then(r => r.json())
+            .then(d => {
+              if (d?.user) {
+                setUser(d.user);
+                if (d.token) setToken(d.token);
+              }
+            });
+        });
+    } else {
+      // If no token or demo token, load default active profile
+      fetch('/api/auth/active-farmer')
+        .then(r => r.json())
+        .then(data => {
+          if (data?.user) {
+            setUser(data.user);
+            if (data.token) setToken(data.token);
+          }
+        })
+        .catch(err => console.error('Failed to load active user from Supabase:', err));
+    }
+  }, []);
 
   const login = async (identifier: string, pass: string): Promise<{ success: boolean; error?: string }> => {
     try {
@@ -146,6 +200,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const updateProfile = async (updates: Partial<User>): Promise<{ success: boolean; error?: string }> => {
+    try {
+      setIsLoading(true);
+      const res = await fetch('/api/auth/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token || localStorage.getItem('agri_token')}`
+        },
+        body: JSON.stringify(updates)
+      });
+      const data = await res.json();
+      if (res.ok && data.user) {
+        setUser(data.user);
+        return { success: true };
+      }
+      return { success: false, error: data.error || 'Failed to update profile' };
+    } catch (err: any) {
+      return { success: false, error: err.message || 'Network error while updating profile' };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const logout = () => {
     setUser(null);
     setToken(null);
@@ -186,6 +264,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isAuthenticated,
         login,
         register,
+        updateProfile,
         logout,
         switchRole,
         isFarmer: role === 'FARMER',

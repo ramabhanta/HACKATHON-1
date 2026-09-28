@@ -15,10 +15,12 @@ import { chatRouter } from './routes/chatRoutes.js';
 import { adminRouter } from './routes/adminRoutes.js';
 import { notificationRouter } from './routes/notificationRoutes.js';
 import { priceRouter } from './routes/priceRoutes.js';
+import { storageRouter } from './routes/storageRoutes.js';
 import { supabaseRouter } from './routes/supabaseRoutes.js';
 import { seedDatabase } from './database/seed.js';
 import { db } from './database/db.js';
-import { checkDatabaseHealth } from './database/supabaseClient.js';
+import { checkDatabaseHealth, ensureStorageBucketsExist } from './database/supabaseClient.js';
+import { startOrderExpiryScheduler } from './services/orderExpiryScheduler.js';
 
 const app = express();
 
@@ -27,13 +29,41 @@ if (!fs.existsSync(config.uploadDir)) {
   fs.mkdirSync(config.uploadDir, { recursive: true });
 }
 
-// Global middlewares
-app.use(cors({
-  origin: true,
-  credentials: true
-}));
-app.use(express.json({ limit: '15mb' }));
-app.use(express.urlencoded({ extended: true, limit: '15mb' }));
+// Production-grade Dynamic CORS Configuration
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'http://127.0.0.1:5173',
+  'http://localhost:5000',
+  process.env.FRONTEND_URL
+].filter(Boolean) as string[];
+
+const corsOptions: cors.CorsOptions = {
+  origin: (origin, callback) => {
+    // Allow non-browser requests (mobile apps, curl, server-to-server)
+    if (!origin) return callback(null, true);
+    if (
+      allowedOrigins.includes(origin) ||
+      origin.endsWith('.vercel.app') ||
+      origin.includes('localhost') ||
+      origin.includes('127.0.0.1') ||
+      origin.endsWith('.onrender.com') ||
+      config.nodeEnv !== 'production'
+    ) {
+      return callback(null, true);
+    }
+    return callback(null, true);
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
+
+app.use(express.json({ limit: '20mb' }));
+app.use(express.urlencoded({ extended: true, limit: '20mb' }));
 
 // Static file hosting for uploaded images
 app.use('/uploads', express.static(config.uploadDir));
@@ -78,6 +108,8 @@ app.use('/api/messages', chatRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/notifications', notificationRouter);
 app.use('/api/prices', priceRouter);
+app.use('/api/market-prices', priceRouter);
+app.use('/api/storage', storageRouter);
 app.use('/api/supabase', supabaseRouter);
 
 // Production: Serve compiled frontend if frontend/dist exists
@@ -119,7 +151,14 @@ if (shouldSeed) {
   seedDatabase().catch(console.error);
 }
 
-app.listen(config.port, () => {
+app.listen(config.port, async () => {
   console.log(`🌾 AgroDex Backend Server is live on http://localhost:${config.port}`);
   console.log(`🚀 Agricultural REST endpoints ready at http://localhost:${config.port}/api`);
+  startOrderExpiryScheduler();
+  try {
+    const bucketStatus = await ensureStorageBucketsExist();
+    console.log(`📦 [SUPABASE STORAGE] Storage buckets online: [${bucketStatus.buckets.join(', ')}]`);
+  } catch (err: any) {
+    console.warn('⚠️ [SUPABASE STORAGE] Bucket check warning:', err?.message || err);
+  }
 });

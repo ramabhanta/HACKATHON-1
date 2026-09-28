@@ -312,6 +312,149 @@ ${context.soil ? `- Soil Health Data: pH ${context.soil.ph}, N: ${context.soil.n
   }
 
   /**
+   * Dynamically match diagnosed pathogen / pest / crop disorder with exact registered medicines
+   */
+  public static resolveTargetedProducts(
+    suspectedIssue: string,
+    cropName?: string,
+    chemicalControlSafe?: string[],
+    biologicalControl?: string[]
+  ): string[] {
+    const text = [
+      suspectedIssue,
+      cropName || '',
+      ...(chemicalControlSafe || []),
+      ...(biologicalControl || [])
+    ].join(' ').toLowerCase();
+
+    // 1. Bacterial Diseases (Bacterial Blight, Bacterial Wilt, Canker, Black Rot, Xanthomonas, Ralstonia)
+    if (
+      text.includes('bacteri') ||
+      text.includes('xanthomonas') ||
+      text.includes('ralstonia') ||
+      text.includes('canker') ||
+      text.includes('black rot') ||
+      text.includes('streptocycline') ||
+      text.includes('plantomycin')
+    ) {
+      return ['prod-plantomycin-streptocycline', 'prod-blitox-rallis', 'prod-kasugamycin-biostadt', 'prod-sprayer'];
+    }
+
+    // 2. Oomycetes / Late Blight / Downy Mildew / Damping Off / Phytophthora
+    if (
+      text.includes('late blight') ||
+      text.includes('downy mildew') ||
+      text.includes('phytophthora') ||
+      text.includes('oomycete') ||
+      text.includes('damping off') ||
+      text.includes('ridomil') ||
+      text.includes('metalaxyl')
+    ) {
+      return ['prod-ridomil-gold-syngenta', 'prod-m45-dhanuka', 'prod-blitox-rallis', 'prod-sprayer'];
+    }
+
+    // 3. Fungal Foliar Diseases (Early Blight, Tikka / Cercospora, Blast, Sheath Blight, Rust, Anthracnose, Powdery Mildew)
+    if (
+      text.includes('tikka') ||
+      text.includes('cercospora') ||
+      text.includes('blast') ||
+      text.includes('magnaporthe') ||
+      text.includes('early blight') ||
+      text.includes('alternaria') ||
+      text.includes('rust') ||
+      text.includes('anthracnose') ||
+      text.includes('powdery mildew') ||
+      text.includes('sheath blight') ||
+      text.includes('leaf spot') ||
+      text.includes('fungal') ||
+      text.includes('mancozeb') ||
+      text.includes('carbendazim') ||
+      text.includes('hexaconazole') ||
+      text.includes('azoxystrobin')
+    ) {
+      if (text.includes('tikka') || text.includes('groundnut')) {
+        return ['prod-saaf-500g', 'prod-contaf-plus-rallis', 'prod-priaxor-basf', 'prod-sprayer'];
+      }
+      if (text.includes('blast') || text.includes('paddy') || text.includes('rice')) {
+        return ['prod-nativo-bayer', 'prod-amistar-top-200ml', 'prod-saaf-500g', 'prod-sprayer'];
+      }
+      return ['prod-saaf-500g', 'prod-amistar-top-200ml', 'prod-m45-dhanuka', 'prod-sprayer'];
+    }
+
+    // 4. Sucking Pests & Viral Vectors (Aphids, Thrips, Whiteflies, Jassids, Leaf Curl, Yellow Vein, Mites)
+    if (
+      text.includes('thrip') ||
+      text.includes('whitefl') ||
+      text.includes('aphid') ||
+      text.includes('jassid') ||
+      text.includes('leaf curl') ||
+      text.includes('mosaic') ||
+      text.includes('virus') ||
+      text.includes('mite') ||
+      text.includes('parvispinus') ||
+      text.includes('imidacloprid') ||
+      text.includes('thiamethoxam') ||
+      text.includes('confidor')
+    ) {
+      if (text.includes('thrip') || text.includes('chilli')) {
+        return ['prod-delegate-100ml', 'prod-confidor-100ml', 'prod-neem-oil', 'prod-sprayer'];
+      }
+      if (text.includes('mite')) {
+        return ['prod-oberon-bayer', 'prod-confidor-100ml', 'prod-neem-oil', 'prod-sprayer'];
+      }
+      return ['prod-confidor-100ml', 'prod-alika-100ml', 'prod-neem-oil', 'prod-sprayer'];
+    }
+
+    // 5. Chewing Caterpillars / Borers / Armyworms / Leaf Folders (Spodoptera, Helicoverpa, Borer, Armyworm)
+    if (
+      text.includes('borer') ||
+      text.includes('caterpillar') ||
+      text.includes('bollworm') ||
+      text.includes('armyworm') ||
+      text.includes('spodoptera') ||
+      text.includes('helicoverpa') ||
+      text.includes('leaf folder') ||
+      text.includes('cartap') ||
+      text.includes('coragen')
+    ) {
+      return ['prod-coragen-60ml', 'prod-em1-dhanuka', 'prod-mortar-dhanuka', 'prod-sprayer'];
+    }
+
+    // 6. Planthoppers in Paddy (BPH / WBPH / Hopper burn)
+    if (text.includes('planthopper') || text.includes('bph') || text.includes('hopper burn')) {
+      return ['prod-chess-syngenta', 'prod-anant-rallis', 'prod-sprayer'];
+    }
+
+    // 7. Soil Borne Wilt / Root Rot / Termites / Grubs
+    if (
+      text.includes('wilt') ||
+      text.includes('fusarium') ||
+      text.includes('root rot') ||
+      text.includes('rhizoctonia') ||
+      text.includes('collar rot') ||
+      text.includes('termite') ||
+      text.includes('grub')
+    ) {
+      return ['prod-trichoderma', 'prod-saaf-500g', 'prod-chlorpyrifos-1l', 'prod-sprayer'];
+    }
+
+    // 8. Nutrient Deficiency / Chlorosis / Yellowing
+    if (
+      text.includes('deficiency') ||
+      text.includes('chlorosis') ||
+      text.includes('micronutrient') ||
+      text.includes('zinc') ||
+      text.includes('iron') ||
+      text.includes('boron')
+    ) {
+      return ['prod-zinc-sulphate-iffco', 'prod-chelamin-plus-aries', 'prod-mahadhan-19', 'prod-sprayer'];
+    }
+
+    // General default fallback
+    return ['prod-saaf-500g', 'prod-neem-oil', 'prod-sprayer'];
+  }
+
+  /**
    * Deep Learning Crop Disease Scan with Real Gemini 1.5 Flash Vision Multimodal
    */
   public static async diagnoseDisease(
@@ -374,10 +517,10 @@ ${context.soil ? `- Soil Health Data: pH ${context.soil.ph}, N: ${context.soil.n
             imageBase64 = fs.readFileSync(filePath).toString('base64');
             mimeType = file.mimetype || 'image/jpeg';
           }
-        } else if (imageUrl.startsWith('http')) {
-          // Fetch sample image buffer
+        } else if (rawPhotoMetadata?.imageUrl && rawPhotoMetadata.imageUrl.startsWith('http')) {
+          // Fetch explicit sample image buffer
           try {
-            const imgRes = await fetch(imageUrl, { signal: AbortSignal.timeout(4000) });
+            const imgRes = await fetch(rawPhotoMetadata.imageUrl, { signal: AbortSignal.timeout(4000) });
             if (imgRes.ok) {
               const arrayBuf = await imgRes.arrayBuffer();
               imageBase64 = Buffer.from(arrayBuf).toString('base64');
@@ -391,31 +534,53 @@ ${context.soil ? `- Soil Health Data: pH ${context.soil.ph}, N: ${context.soil.n
         if (imageBase64) {
           const visionResult = await this.callGeminiVision(imageBase64, mimeType, cropNameHint || '');
           if (visionResult) {
-            const identifiedCrop = visionResult.cropName && !visionResult.cropName.includes('Unknown')
+            const isCropPlant = visionResult.isCropPlant !== false;
+            const notPlantReason = !isCropPlant
+              ? (visionResult.notPlantReason || 'The uploaded photograph does not appear to be an agricultural plant or leaf. Please upload a clear photo of an affected plant leaf or crop.')
+              : undefined;
+
+            const identifiedCrop = visionResult.cropName && !visionResult.cropName.includes('Unknown') && !visionResult.cropName.includes('Non-')
               ? visionResult.cropName
               : (cropNameHint || 'Unknown / Unclear');
+
+            const confidenceScore = typeof visionResult.confidenceScore === 'number' ? visionResult.confidenceScore : 94.5;
+            const requiresFarmerConfirmation = isCropPlant && (confidenceScore < 75 || visionResult.requiresFarmerConfirmation === true || visionResult.cropIdentified === false);
+
+            const suspectedIssue = isCropPlant
+              ? (visionResult.suspectedIssue || 'Foliar Plant Leaf Condition')
+              : 'Non-Agricultural Subject Detected';
+
+            const chemicalControlSafe = isCropPlant && Array.isArray(visionResult.chemicalControlSafe) ? visionResult.chemicalControlSafe : [];
+            const biologicalControl = isCropPlant && Array.isArray(visionResult.biologicalControl) ? visionResult.biologicalControl : [];
+
+            const recommendedProductIds = isCropPlant
+              ? this.resolveTargetedProducts(suspectedIssue, identifiedCrop, chemicalControlSafe, biologicalControl)
+              : [];
 
             const diagnosis: AiDiagnosis = {
               id: `diag-${uuidv4().substring(0, 8)}`,
               userId,
               farmId,
-              cropName: identifiedCrop,
+              cropName: isCropPlant ? identifiedCrop : 'Non-Crop Subject',
               imageUrl,
               photoMetadata: resolvedPhotoMetadata,
-              suspectedIssue: visionResult.suspectedIssue || 'Foliar Plant Leaf Condition',
-              confidenceScore: typeof visionResult.confidenceScore === 'number' ? visionResult.confidenceScore : 94.5,
+              suspectedIssue,
+              confidenceScore,
               severity: visionResult.severity || 'MODERATE',
               symptomsEvidence: Array.isArray(visionResult.symptomsEvidence) ? visionResult.symptomsEvidence : [],
-              culturalControl: Array.isArray(visionResult.culturalControl) ? visionResult.culturalControl : [],
-              biologicalControl: Array.isArray(visionResult.biologicalControl) ? visionResult.biologicalControl : [],
-              chemicalControlSafe: Array.isArray(visionResult.chemicalControlSafe) ? visionResult.chemicalControlSafe : [],
+              culturalControl: isCropPlant && Array.isArray(visionResult.culturalControl) ? visionResult.culturalControl : [],
+              biologicalControl,
+              chemicalControlSafe,
               safetyWarnings: Array.isArray(visionResult.safetyWarnings) ? visionResult.safetyWarnings : [],
-              recommendedProductIds: ['prod-trichoderma', 'prod-neem-oil', 'prod-sprayer'],
+              recommendedProductIds,
               isExpertReviewed: true,
               expertNotes: visionResult.rootCause || undefined,
-              clarificationPrompt: visionResult.clarificationPrompt || (visionResult.cropIdentified === false ? 'Please tell us which crop this is.' : undefined),
-              cropIdentified: visionResult.cropIdentified !== false,
-              followUpQuestions: visionResult.followUpQuestions,
+              clarificationPrompt: visionResult.clarificationPrompt || (requiresFarmerConfirmation ? 'Confidence is below 75% or crop species is ambiguous. Please confirm or select your crop below.' : undefined),
+              cropIdentified: isCropPlant && !requiresFarmerConfirmation,
+              requiresFarmerConfirmation,
+              isCropPlant,
+              notPlantReason,
+              followUpQuestions: isCropPlant ? visionResult.followUpQuestions : [],
               createdAt: new Date().toISOString()
             };
 
@@ -430,6 +595,37 @@ ${context.soil ? `- Soil Health Data: pH ${context.soil.ph}, N: ${context.soil.n
 
     // 2. Intelligent Agronomic Fallback with Real Plant Pathology Data
     const crop = cropHint.toLowerCase();
+    const nonPlantKeywords = ['skin', 'face', 'hand', 'arm', 'person', 'car', 'dog', 'cat', 'furniture', 'laptop', 'phone', 'object'];
+    const isNonPlant = nonPlantKeywords.some(w => crop.includes(w));
+
+    if (isNonPlant) {
+      const nonPlantDiag: AiDiagnosis = {
+        id: `diag-${uuidv4().substring(0, 8)}`,
+        userId,
+        farmId,
+        cropName: 'Non-Crop Subject',
+        imageUrl,
+        photoMetadata: resolvedPhotoMetadata,
+        suspectedIssue: 'Non-Agricultural Subject Detected',
+        confidenceScore: 0,
+        severity: 'MILD',
+        symptomsEvidence: ['Uploaded photo does not contain identifiable crop foliage.'],
+        culturalControl: [],
+        biologicalControl: [],
+        chemicalControlSafe: [],
+        safetyWarnings: ['Please upload an authentic photo of crop foliage or plant leaves.'],
+        recommendedProductIds: [],
+        isExpertReviewed: false,
+        isCropPlant: false,
+        notPlantReason: 'The uploaded photograph appears to be human skin, an animal, or a non-agricultural object, not crop foliage. Please photograph an affected crop leaf.',
+        requiresFarmerConfirmation: false,
+        cropIdentified: false,
+        createdAt: new Date().toISOString()
+      };
+      db.insert('ai_diagnoses', nonPlantDiag);
+      return nonPlantDiag;
+    }
+
     let suspectedIssue = 'Early Leaf Spot (Tikka Disease - Cercospora arachidicola)';
     let confidenceScore = 91.5;
     let severity: 'MILD' | 'MODERATE' | 'SEVERE' = 'MODERATE';
@@ -461,7 +657,6 @@ ${context.soil ? `- Soil Health Data: pH ${context.soil.ph}, N: ${context.soil.n
       'Has there been continuous rainfall or heavy morning dew in your field during the past week?',
       'Have you already applied any chemical or organic spray in the last 14 days?'
     ];
-    let matchedProductIds = ['prod-trichoderma', 'prod-neem-oil', 'prod-sprayer'];
 
     if (crop.includes('tomato')) {
       suspectedIssue = 'Early Blight (Alternaria solani)';
@@ -484,7 +679,6 @@ ${context.soil ? `- Soil Health Data: pH ${context.soil.ph}, N: ${context.soil.n
         'Chlorothalonil 75% WP @ 2g/L or Azoxystrobin 23% SC @ 1 ml/L.',
         'Ensure thorough coverage on both upper and lower leaf surfaces.'
       ];
-      matchedProductIds = ['prod-trichoderma', 'prod-neem-oil', 'prod-npk-19'];
     } else if (crop.includes('rice') || crop.includes('paddy')) {
       suspectedIssue = 'Rice Blast (Magnaporthe oryzae)';
       confidenceScore = 90.8;
@@ -506,7 +700,6 @@ ${context.soil ? `- Soil Health Data: pH ${context.soil.ph}, N: ${context.soil.n
         'Tricyclazole 75% WP @ 0.6g/L or Isoprothiolane 40% EC @ 1.5 ml/L.',
         'Spray during early morning or late afternoon when winds are calm.'
       ];
-      matchedProductIds = ['prod-trichoderma', 'prod-neem-oil', 'prod-sprayer'];
     } else if (crop.includes('cotton')) {
       suspectedIssue = 'Bacterial Blight / Angular Leaf Spot (Xanthomonas citri pv. malvacearum)';
       confidenceScore = 92.1;
@@ -528,8 +721,10 @@ ${context.soil ? `- Soil Health Data: pH ${context.soil.ph}, N: ${context.soil.n
         'Copper Oxychloride 50% WP @ 2.5g/L + Streptocycline @ 0.1g/L.',
         'Ensure spray reaches the undersides of leaves where stomata are abundant.'
       ];
-      matchedProductIds = ['prod-trichoderma', 'prod-neem-oil', 'prod-sprayer'];
     }
+
+    const matchedProductIds = this.resolveTargetedProducts(suspectedIssue, cropHint, chemicalControlSafe, biologicalControl);
+    const requiresFarmerConfirmation = confidenceScore < 75 || !cropNameHint || cropNameHint.toLowerCase().includes('unknown');
 
     const diagnosis: AiDiagnosis = {
       id: `diag-${uuidv4().substring(0, 8)}`,
@@ -549,6 +744,10 @@ ${context.soil ? `- Soil Health Data: pH ${context.soil.ph}, N: ${context.soil.n
       recommendedProductIds: matchedProductIds,
       isExpertReviewed: false,
       followUpQuestions,
+      isCropPlant: true,
+      requiresFarmerConfirmation,
+      cropIdentified: !requiresFarmerConfirmation,
+      clarificationPrompt: requiresFarmerConfirmation ? 'Confidence is below 75% or crop species is ambiguous. Please confirm or select your crop below.' : undefined,
       createdAt: new Date().toISOString()
     };
 
@@ -565,25 +764,51 @@ ${context.soil ? `- Soil Health Data: pH ${context.soil.ph}, N: ${context.soil.n
     cropHint: string
   ): Promise<any> {
     const prompt = `You are a Senior Plant Pathologist & Chief Agronomist at the Indian Council of Agricultural Research (ICAR). Analyze this field photograph of an affected plant leaf or crop tissue with high precision deep vision.
-${cropHint ? `Optional crop hint provided: "${cropHint}". ` : ''}
+${cropHint ? `Farmer provided crop hint: "${cropHint}". ` : ''}
 
-Conduct a forensic agronomic diagnosis:
-1. AUTO-IDENTIFY CROP: Examine leaf morphology, venation, leaf margin, stem, fruit/flower (if visible). Determine crop species (e.g., Tomato, Groundnut, Cotton, Chilli, Rice / Paddy, Wheat, Soybean, Potato, Maize, Brinjal, Onion, etc.).
-   - If the crop can be reliably determined: set "cropIdentified": true, "cropName": "<Detected Crop Name>", and "clarificationPrompt": "".
-   - If the crop CANNOT be reliably determined (e.g., generic closeup of an indistinguishable leaf lesion without leaf shape/margins): set "cropIdentified": false, "cropName": "Unknown / Unclear", and "clarificationPrompt": "Please tell us which crop this is."
-2. Exact Disease: Diagnose the exact disease or disorder with common name and scientific pathogen Latin name (e.g. Early Leaf Spot / Tikka - Cercospora arachidicola, Late Blight - Phytophthora infestans, Yellow Vein Mosaic Virus - Begomovirus, etc.).
-3. Severity Level: Classify as 'MILD', 'MODERATE', or 'SEVERE' based on lesion percentage on lamina.
-4. Biological Root Cause: Detail the biological etiology and micro-climate triggers (e.g., fungal spores germinating under >85% relative humidity and 25-30°C temperature, bacterial entry through stomata/wounds during rains, sucking pest vectors like thrips/whiteflies transmitting viral particles, or soil-borne inoculum persisting on stubble).
-5. Verified Organic Solutions with Exact Indian Brands: State verified organic/bio-fungicide brand names in Indian market (e.g. Multiplex Bio-Tech Trichoderma Viride 1% WP, Multiplex Sanjeevani, GreenAgri Pure Cold Pressed Neem Oil 10,000 PPM, Pseudomonas fluorescens) with exact dosage per acre AND per litre of water.
-6. Verified Registered Chemical Solutions with Exact Indian Brands: State registered chemical fungicide/insecticide brand names widely sold across Indian APMC/dealers (e.g. Dhanuka M-45 [Mancozeb 75% WP], Tata Rallis Contaf Plus [Hexaconazole 5% SC], Bayer Nativo [Tebuconazole 50% + Trifloxystrobin 25% WG], Syngenta Amistar Top [Azoxystrobin + Difenoconazole], FMC Coragen, IFFCO 19-19-19) with exact dosage per acre AND per litre of water.
-7. Precautionary Measures: Precise spray timing (early morning or calm evening), personal protective equipment (mask, nitrile gloves), pre-harvest interval (PHI in days), and safety for bees.
-Strictly NO generic advice, NO fake chemicals, and NO vague placeholders.
+MANDATORY BOTANICAL SANITY AUDIT:
+1. Is this photograph an agricultural plant, crop foliage, leaf, or farm crop tissue?
+   - If the image contains human skin, human face, hand, arm, pet, dog, cat, vehicle, household furniture, electronics, computer screen, random object, or anything that is NOT a plant or crop leaf:
+     Set "isCropPlant": false
+     Set "notPlantReason": "The uploaded photograph is not an agricultural plant or leaf. Please upload a clear photo of an affected plant leaf or crop."
+     Set "cropName": "Non-Agricultural Subject"
+     Set "cropIdentified": false
+     Set "confidenceScore": 0
+     Set "requiresFarmerConfirmation": false
+     Set "suspectedIssue": "No Agricultural Plant Detected"
+     Set "severity": "MILD"
+     Set "rootCause": "The submitted photo does not contain identifiable crop foliage or plant tissue."
+     Set "symptomsEvidence": ["Non-botanical subject detected in image frame"]
+     Set "culturalControl": []
+     Set "biologicalControl": []
+     Set "chemicalControlSafe": []
+     Set "safetyWarnings": ["Only upload authentic agricultural crops, leaves, and fruits."]
+     Set "followUpQuestions": []
+   - If the image IS an agricultural plant, leaf, or crop:
+     Set "isCropPlant": true
+     Set "notPlantReason": ""
+
+2. CROP IDENTIFICATION & CONFIDENCE THRESHOLDING:
+   - Carefully examine leaf venation, leaf margins, arrangement, stem, fruit/flower (if visible).
+   - If you are certain (confidence >= 75%): set "cropIdentified": true, "requiresFarmerConfirmation": false, and "cropName": "<Specific Crop Name>".
+   - If confidence is below 75% or the crop species is ambiguous / indistinguishable from the visual angle:
+     set "cropIdentified": false, "requiresFarmerConfirmation": true, and "clarificationPrompt": "Confidence is below 75% or crop species is ambiguous. Please select or enter your crop below to re-run precise diagnosis."
+
+3. Exact Disease & Etiology:
+   Diagnose the exact disease or disorder with common name and scientific Latin pathogen name (e.g. Early Leaf Spot / Tikka - Cercospora arachidicola, Late Blight - Phytophthora infestans, Yellow Vein Mosaic Virus - Begomovirus, etc.).
+
+4. Verified Active Chemical & Biological Ingredients:
+   State verified registered Indian chemical fungicide/insecticide/bactericide brands (e.g., Mancozeb 75% WP, Saaf [Carbendazim + Mancozeb], Amistar Top [Azoxystrobin + Difenoconazole], Contaf Plus [Hexaconazole], Nativo [Tebuconazole + Trifloxystrobin], Ridomil Gold [Metalaxyl-M + Mancozeb], Confidor [Imidacloprid 17.8%], Coragen [Chlorantraniliprole], Plantomycin [Streptomycin + Tetracycline], Blitox [Copper Oxychloride 50%]) with exact dosages per acre and per litre.
+   State organic biologicals (Trichoderma viride, Cold Pressed Neem Oil 10,000 PPM, Pseudomonas fluorescens).
 
 Return your response in STRICT JSON format with EXACTLY these keys:
 {
+  "isCropPlant": true,
+  "notPlantReason": "",
   "cropName": "Identified Crop Name or 'Unknown / Unclear'",
   "cropIdentified": true,
-  "clarificationPrompt": "" or "Please tell us which crop this is.",
+  "requiresFarmerConfirmation": false,
+  "clarificationPrompt": "",
   "suspectedIssue": "Disease / Disorder Common Name (Scientific Pathogen Name)",
   "confidenceScore": 94.5,
   "severity": "MILD" | "MODERATE" | "SEVERE",

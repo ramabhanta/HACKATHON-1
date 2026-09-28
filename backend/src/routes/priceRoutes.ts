@@ -9,11 +9,66 @@ export const priceRouter = Router();
 // Hierarchy of All-India States & Major Agricultural Districts & Mandis
 export const ALL_INDIA_REGIONS: Record<string, { districts: string[]; mandis: string[] }> = {
   'Andhra Pradesh': {
-    districts: ['Sri Sathya Sai', 'Anantapur', 'Guntur', 'Kurnool', 'Chittoor', 'Krishna', 'West Godavari', 'YSR Kadapa', 'Visakhapatnam'],
-    mandis: ['Kadiri Mandi', 'Anantapur Market Yard', 'Guntur Mirchi Yard', 'Kurnool Agricultural Market', 'Madanapalle Tomato Yard', 'Vijayawada Mandi', 'Tirupati Flower Market']
+    districts: [
+      'Sri Sathya Sai',
+      'Anantapur',
+      'Annamayya',
+      'Chittoor',
+      'Tirupati',
+      'YSR Kadapa',
+      'Kurnool',
+      'Nandyal',
+      'Guntur',
+      'Bapatla',
+      'Palnadu',
+      'Krishna',
+      'NTR',
+      'Prakasam',
+      'SPSR Nellore',
+      'West Godavari',
+      'Eluru',
+      'East Godavari',
+      'Kakinada',
+      'Dr. B.R. Ambedkar Konaseema',
+      'Visakhapatnam',
+      'Anakapalli',
+      'Vizianagaram',
+      'Srikakulam',
+      'Parvathipuram Manyam',
+      'Alluri Sitharama Raju'
+    ],
+    mandis: [
+      'Kadiri APMC Mandi',
+      'Anantapur Market Yard',
+      'Madanapalle Tomato APMC',
+      'Guntur Mirchi Yard',
+      'Kurnool Agricultural Mandi',
+      'Tirupati Flower Market',
+      'Adoni Cotton Market',
+      'Hindupur APMC Mandi',
+      'Duggirala Turmeric Yard',
+      'Nellore Rice Market Yard',
+      'Kadiyam Flower Market (Rajahmundry)',
+      'Chittoor Fruit Mandi',
+      'Pulivendula Fruit Yard'
+    ]
   },
   'Telangana': {
-    districts: ['Warangal', 'Nizamabad', 'Khammam', 'Karimnagar', 'Hyderabad', 'Rangareddy', 'Nalgonda', 'Mahabubnagar'],
+    districts: [
+      'Hyderabad',
+      'Warangal',
+      'Nizamabad',
+      'Khammam',
+      'Karimnagar',
+      'Rangareddy',
+      'Nalgonda',
+      'Mahabubnagar',
+      'Medak',
+      'Adilabad',
+      'Suryapet',
+      'Siddipet',
+      'Sangareddy'
+    ],
     mandis: ['Enumamula Warangal Mandi', 'Nizamabad APMC', 'Gudimalkapur Flower Market (Hyd)', 'Bowenpally Market (Hyd)', 'Khammam Market Yard', 'Karimnagar Mandi']
   },
   'Karnataka': {
@@ -455,6 +510,8 @@ const INITIAL_MARKET_PRICES: MarketPrice[] = [
   }
 ];
 
+import { MandiPriceService, normalizeCategory } from '../services/mandiPriceService.js';
+
 // Helper to seed prices into database if table is empty
 function ensurePricesSeeded() {
   const existing = db.getTable('market_prices');
@@ -463,7 +520,7 @@ function ensurePricesSeeded() {
   }
 }
 
-// 1. GET /api/prices/states — Hierarchy of states, districts, and mandis
+// 1. GET /api/prices/states (and /api/market-prices/states) — Hierarchy of states, districts, and mandis
 priceRouter.get('/states', (_req: Request, res: Response) => {
   const regionsList = Object.entries(ALL_INDIA_REGIONS).map(([state, info]) => ({
     state,
@@ -478,28 +535,39 @@ priceRouter.get('/states', (_req: Request, res: Response) => {
   });
 });
 
-// 2. GET /api/prices/summary — Ticker & KPI metrics for flowers, crops, and price trends
+// 2. GET /api/prices/summary (and /api/market-prices/summary) — Ticker & KPI metrics
 priceRouter.get('/summary', (_req: Request, res: Response) => {
-  ensurePricesSeeded();
-  const prices = db.getTable('market_prices');
+  const allPrices = MandiPriceService.getPrices({});
 
-  const flowerCount = prices.filter(p => p.commodityType === 'FLOWER').length;
-  const cropCount = prices.filter(p => p.commodityType !== 'FLOWER').length;
-  const risingCount = prices.filter(p => p.trend === 'UP').length;
+  const flowerCount = allPrices.filter(p => normalizeCategory(p.commodityType) === 'FLOWER').length;
+  const cropCount = allPrices.filter(p => normalizeCategory(p.commodityType) === 'CROP').length;
+  const vegCount = allPrices.filter(p => normalizeCategory(p.commodityType) === 'VEGETABLE').length;
+  const grainCount = allPrices.filter(p => normalizeCategory(p.commodityType) === 'GRAIN').length;
+  const fruitCount = allPrices.filter(p => normalizeCategory(p.commodityType) === 'FRUIT').length;
+  const pulseCount = allPrices.filter(p => normalizeCategory(p.commodityType) === 'PULSE').length;
+  const spiceCount = allPrices.filter(p => normalizeCategory(p.commodityType) === 'SPICE').length;
+  const oilseedCount = allPrices.filter(p => normalizeCategory(p.commodityType) === 'OILSEED').length;
+  const risingCount = allPrices.filter(p => p.trend === 'UP').length;
 
-  const states = Array.from(new Set(prices.map(p => p.state)));
-  const markets = Array.from(new Set(prices.map(p => p.market)));
+  const states = Array.from(new Set(allPrices.map(p => p.state)));
+  const markets = Array.from(new Set(allPrices.map(p => p.market)));
 
   // Top gainers
-  const topGainers = [...prices]
+  const topGainers = [...allPrices]
     .filter(p => (p.changeAmount || 0) > 0)
     .sort((a, b) => (b.changeAmount || 0) - (a.changeAmount || 0))
     .slice(0, 4);
 
   return res.json({
-    totalPrices: prices.length,
+    totalPrices: allPrices.length,
     flowerCount,
     cropCount,
+    vegCount,
+    grainCount,
+    fruitCount,
+    pulseCount,
+    spiceCount,
+    oilseedCount,
     risingCount,
     activeStatesCount: states.length,
     activeMarketsCount: markets.length,
@@ -507,54 +575,64 @@ priceRouter.get('/summary', (_req: Request, res: Response) => {
   });
 });
 
-// 3. GET /api/prices — Search and filter All-India market prices
+// 3. GET /api/prices (and /api/market-prices) — Search, filter, and dynamic district fallback
 priceRouter.get('/', (req: Request, res: Response) => {
-  ensurePricesSeeded();
-  let prices = db.getTable('market_prices');
+  const { state, district, market, commodity, type, category, search, refresh, date } = req.query;
 
-  const { state, district, market, commodity, type, search } = req.query;
+  const effectiveCat = (category || type) as string | undefined;
 
-  if (state && (state as string).trim() !== '' && (state as string).toLowerCase() !== 'all') {
-    const s = (state as string).toLowerCase().trim();
-    prices = prices.filter(p => p.state.toLowerCase() === s);
-  }
+  let prices = MandiPriceService.getPrices({
+    state: state as string,
+    district: district as string,
+    category: effectiveCat,
+    date: date as string,
+    search: (search || commodity) as string,
+    refresh: refresh === 'true'
+  });
 
-  if (district && (district as string).trim() !== '' && (district as string).toLowerCase() !== 'all') {
-    const d = (district as string).toLowerCase().trim();
-    prices = prices.filter(p => p.district.toLowerCase() === d);
-  }
-
+  // If specific market yard requested, filter further
   if (market && (market as string).trim() !== '' && (market as string).toLowerCase() !== 'all') {
     const m = (market as string).toLowerCase().trim();
     prices = prices.filter(p => p.market.toLowerCase().includes(m));
   }
 
-  if (type && (type as string).trim() !== '' && (type as string).toLowerCase() !== 'all') {
-    const t = (type as string).toUpperCase().trim();
-    prices = prices.filter(p => p.commodityType === t);
+  // Include any user-contributed market prices from local db if matching filters
+  const userContributed = db.getTable('market_prices');
+  if (userContributed && userContributed.length > 0) {
+    const extra = userContributed.filter(p => {
+      if (state && (state as string).toLowerCase() !== 'all' && p.state.toLowerCase() !== (state as string).toLowerCase().trim()) return false;
+      if (district && (district as string).toLowerCase() !== 'all' && p.district.toLowerCase() !== (district as string).toLowerCase().trim()) return false;
+      if (effectiveCat && effectiveCat.toLowerCase() !== 'all' && normalizeCategory(p.commodityType) !== normalizeCategory(effectiveCat)) return false;
+      return true;
+    });
+    // Add user contributed if not duplicate
+    for (const u of extra) {
+      if (!prices.some(existing => existing.commodity.toLowerCase() === u.commodity.toLowerCase() && existing.market.toLowerCase() === u.market.toLowerCase())) {
+        prices.unshift({
+          ...u,
+          name: u.commodity,
+          category: u.commodityType,
+          min_price: u.minPrice,
+          max_price: u.maxPrice,
+          modal_price: u.modalPrice,
+          date: u.priceDate
+        });
+      }
+    }
   }
 
-  if (commodity && (commodity as string).trim() !== '') {
-    const c = (commodity as string).toLowerCase().trim();
-    prices = prices.filter(p => p.commodity.toLowerCase().includes(c) || p.variety.toLowerCase().includes(c));
-  }
+  // Ensure every item has both camelCase and snake_case properties for full client compatibility
+  const responseData = prices.map(p => ({
+    ...p,
+    name: p.name || p.commodity,
+    category: p.category || p.commodityType,
+    min_price: p.minPrice,
+    max_price: p.maxPrice,
+    modal_price: p.modalPrice,
+    date: p.priceDate || p.date
+  }));
 
-  if (search && (search as string).trim() !== '') {
-    const q = (search as string).toLowerCase().trim();
-    prices = prices.filter(p =>
-      p.commodity.toLowerCase().includes(q) ||
-      p.variety.toLowerCase().includes(q) ||
-      p.market.toLowerCase().includes(q) ||
-      p.district.toLowerCase().includes(q) ||
-      p.state.toLowerCase().includes(q) ||
-      p.commodityType.toLowerCase().includes(q)
-    );
-  }
-
-  // Sort by latest reported date, then modal price desc
-  prices.sort((a, b) => new Date(b.priceDate).getTime() - new Date(a.priceDate).getTime() || b.modalPrice - a.modalPrice);
-
-  return res.json(prices);
+  return res.json(responseData);
 });
 
 // 4. POST /api/prices — Add new market price entry (Contributed by farmer, trader, or mandi officer)

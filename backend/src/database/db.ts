@@ -20,7 +20,8 @@ import {
   FarmExpense,
   ChatMessage,
   AppNotification,
-  MarketPrice
+  MarketPrice,
+  Shop
 } from '../models/types.js';
 
 const DATA_DIR = path.resolve(process.cwd(), 'data');
@@ -50,6 +51,7 @@ interface DatabaseSchema {
   messages: ChatMessage[];
   notifications: AppNotification[];
   market_prices: MarketPrice[];
+  shops: Shop[];
 }
 
 export class Database {
@@ -90,7 +92,8 @@ export class Database {
       expenses: [],
       messages: [],
       notifications: [],
-      market_prices: []
+      market_prices: [],
+      shops: []
     };
 
 

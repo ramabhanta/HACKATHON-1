@@ -299,15 +299,6 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenV
                 </button>
               </>
             )}
-            <button
-              onClick={() => setActiveTab('login')}
-              className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition flex items-center gap-1 ${
-                activeTab === 'login' ? 'bg-emerald-900/80 text-white' : 'text-emerald-100 hover:bg-emerald-700/50'
-              }`}
-            >
-              <LogIn className="w-3.5 h-3.5" />
-              <span>Login</span>
-            </button>
           </nav>
 
           {/* Right Controls: Voice, Mode Switcher, Language, Role Switcher, Cart, Profile */}
@@ -473,51 +464,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenV
               )}
             </div>
 
-            {/* Role Switcher Pill */}
-            <div className="relative">
-              <button
-                onClick={() => {
-                  setShowRoleMenu(!showRoleMenu);
-                  setShowModeMenu(false);
-                  setShowLangMenu(false);
-                  setShowUserMenu(false);
-                }}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-amber-500/20 text-amber-200 hover:bg-amber-500/30 border border-amber-400/30 text-xs font-semibold transition"
-                title="Switch Demonstration Role"
-              >
-                <UserCheck className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline capitalize">{t('role_' + role.toLowerCase())}</span>
-                <ChevronDown className="w-3 h-3" />
-              </button>
 
-              {showRoleMenu && (
-                <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl py-2 text-gray-800 border border-gray-100 z-50">
-                  <div className="px-3 py-1.5 border-b border-gray-100">
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{t('roleSwitcherTitle')}</p>
-                    <p className="text-[11px] text-gray-500">{t('roleSwitcherSubtitle')}</p>
-                  </div>
-                  {roles.map(r => (
-                    <button
-                      key={r.role}
-                      onClick={() => {
-                        switchRole(r.role);
-                        setShowRoleMenu(false);
-                        setActiveTab(r.defaultTab);
-                      }}
-                      className={`w-full text-left px-3 py-2.5 text-xs hover:bg-emerald-50 flex items-center gap-2.5 transition ${
-                        role === r.role ? 'bg-emerald-50 text-emerald-800 font-bold' : 'text-gray-700'
-                      }`}
-                    >
-                      <span className="text-xl">{r.icon}</span>
-                      <div className="flex-1">
-                        <p className="font-bold text-xs">{r.label}</p>
-                        <p className="text-[10px] text-gray-400">{t('opensWorkspace', { tab: r.defaultTab.replace('-', ' ') })}</p>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
 
 
             {/* User Account / Sign In Dropdown */}

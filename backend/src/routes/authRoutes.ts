@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 import { db } from '../database/db.js';
 import { config } from '../config/index.js';
 import { authenticate, AuthenticatedRequest } from '../middleware/auth.js';
@@ -30,7 +31,7 @@ function cleanPhone(raw: string): { formatted: string; rawDigits: string } {
 }
 
 // ============================================================================
-// 1. SEND SMS OTP (Mobile First + Dev Safeguard Master OTP 123456)
+// 1. SEND DYNAMIC SMS OTP (Cryptographically Secure 6-Digit Generator)
 // ============================================================================
 authRouter.post('/send-otp', async (req: Request, res: Response) => {
   try {
@@ -44,22 +45,21 @@ authRouter.post('/send-otp', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Please enter a valid 10-digit mobile number.' });
     }
 
-    // Generate real 6-digit random OTP
-    const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes
+    // Generate real cryptographically secure 6-digit dynamic random OTP
+    const generatedOtp = crypto.randomInt(100000, 1000000).toString();
+    const expiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes strict TTL
 
-    // Store under multiple keys for resilient lookup
+    // Store under normalized keys for strict lookup
     otpCache.set(rawDigits, { otp: generatedOtp, expiresAt });
     otpCache.set(formatted, { otp: generatedOtp, expiresAt });
 
-    console.log(`📱 [SMS OTP] Generated OTP ${generatedOtp} for ${formatted}. Master testing OTP: 123456`);
+    console.log(`📱 [Real SMS OTP Service] Dynamic OTP generated for ${formatted}: ${generatedOtp} (Expires in 5m)`);
 
     return res.json({
       success: true,
-      message: `6-digit OTP sent to ${formatted}`,
+      message: `6-digit verification OTP sent to ${formatted}`,
       phone: formatted,
-      devOtp: generatedOtp,
-      masterOtp: '123456'
+      devOtp: generatedOtp
     });
   } catch (err: any) {
     return res.status(500).json({ error: err.message || 'Failed to send OTP.' });
@@ -67,7 +67,7 @@ authRouter.post('/send-otp', async (req: Request, res: Response) => {
 });
 
 // ============================================================================
-// 2. VERIFY SMS OTP
+// 2. VERIFY DYNAMIC SMS OTP
 // ============================================================================
 authRouter.post('/verify-otp', async (req: Request, res: Response) => {
   try {
@@ -79,21 +79,11 @@ authRouter.post('/verify-otp', async (req: Request, res: Response) => {
     const { formatted, rawDigits } = cleanPhone(phone);
     const trimmedOtp = otp.toString().trim();
 
-    // Instant Hackathon / Testing Master Bypass: 123456 is ALWAYS valid!
-    if (trimmedOtp === '123456') {
-      return res.json({
-        success: true,
-        verified: true,
-        phone: formatted,
-        message: 'Master OTP verified successfully.'
-      });
-    }
-
-    // Check stored OTP
+    // Check stored dynamic OTP (Strict match required)
     const cached = otpCache.get(rawDigits) || otpCache.get(formatted);
     if (!cached) {
       return res.status(400).json({
-        error: 'OTP expired or not found. Please request a new OTP or use master code 123456.'
+        error: 'OTP expired or not found. Please request a new verification code.'
       });
     }
 
@@ -101,17 +91,17 @@ authRouter.post('/verify-otp', async (req: Request, res: Response) => {
       otpCache.delete(rawDigits);
       otpCache.delete(formatted);
       return res.status(400).json({
-        error: 'OTP has expired. Please request a new OTP or use master code 123456.'
+        error: 'OTP has expired (5-minute limit exceeded). Please request a new code.'
       });
     }
 
     if (cached.otp !== trimmedOtp) {
       return res.status(400).json({
-        error: 'Invalid OTP entered. Please check the code or use master code 123456.'
+        error: 'Invalid OTP entered. Please enter the exact 6-digit code received.'
       });
     }
 
-    // Clear after successful use
+    // Clear after single successful use
     otpCache.delete(rawDigits);
     otpCache.delete(formatted);
 
@@ -127,7 +117,7 @@ authRouter.post('/verify-otp', async (req: Request, res: Response) => {
 });
 
 // ============================================================================
-// 3. LOGIN VIA SMS OTP (Passwordless 1-Click Mobile Login)
+// 3. LOGIN VIA DYNAMIC SMS OTP (Passwordless Mobile Login)
 // ============================================================================
 authRouter.post('/login-otp', async (req: Request, res: Response) => {
   try {
@@ -139,13 +129,12 @@ authRouter.post('/login-otp', async (req: Request, res: Response) => {
     const { formatted, rawDigits } = cleanPhone(phone);
     const trimmedOtp = otp.toString().trim();
 
-    // Verify OTP
-    const isMaster = trimmedOtp === '123456';
+    // Verify dynamic OTP
     const cached = otpCache.get(rawDigits) || otpCache.get(formatted);
     const isValidCached = cached && cached.otp === trimmedOtp && Date.now() <= cached.expiresAt;
 
-    if (!isMaster && !isValidCached) {
-      return res.status(400).json({ error: 'Invalid or expired OTP. Use master code 123456.' });
+    if (!isValidCached) {
+      return res.status(400).json({ error: 'Invalid or expired OTP. Please enter the exact 6-digit verification code.' });
     }
 
     // Clear cached OTP

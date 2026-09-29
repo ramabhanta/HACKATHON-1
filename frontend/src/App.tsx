@@ -27,7 +27,7 @@ import { LoginPage } from './pages/Auth/LoginPage';
 import { MarketPrices } from './pages/MarketPrices/MarketPrices';
 
 function MainApp() {
-  const { role } = useAuth();
+  const { role, user, isAuthenticated } = useAuth();
   const { isSimpleMode, mode } = useDisplayMode();
   const [activeTab, setActiveTab] = useState<string>('home');
   const [isVoiceOpen, setIsVoiceOpen] = useState<boolean>(false);
@@ -39,20 +39,95 @@ function MainApp() {
     setActiveTab('ai');
   };
 
+  // Mandatory Authentication Gate for First-Time / Unauthenticated Visitors
+  if (!isAuthenticated || !user) {
+    return (
+      <div
+        className={`min-h-screen flex flex-col font-sans transition-colors duration-200 selection:bg-emerald-200 ${
+          mode === 'DARK'
+            ? 'bg-slate-950 text-slate-100'
+            : isSimpleMode
+            ? 'bg-amber-50/50 text-stone-900'
+            : 'bg-stone-50 text-gray-900'
+        }`}
+      >
+        <header className="sticky top-0 z-40 bg-emerald-800 text-white shadow-md">
+          <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center border border-white/20">
+                <span className="text-2xl">🌾</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="font-extrabold text-xl tracking-tight text-white">Agro<span className="text-amber-400">Dex</span></span>
+                <span className="text-[10px] bg-amber-400 text-amber-950 font-black px-1.5 py-0.5 rounded shadow-sm uppercase">AI</span>
+              </div>
+            </div>
+            <div className="text-xs text-emerald-200 font-semibold flex items-center gap-1.5">
+              <span>🔒 Farmer & Dealer Gateway</span>
+            </div>
+          </div>
+        </header>
+        <main className="flex-1 w-full max-w-7xl mx-auto px-4 py-6 flex items-center justify-center">
+          <LoginPage setActiveTab={setActiveTab} />
+        </main>
+      </div>
+    );
+  }
+
+  // Enforce role boundaries strictly
   const renderActiveScreen = () => {
+    if (role === 'BUYER') {
+      switch (activeTab) {
+        case 'buyer-portal':
+          return <BuyerPortal setActiveTab={setActiveTab} />;
+        case 'produce':
+          return <ProduceMarket setActiveTab={setActiveTab} />;
+        case 'prices':
+          return <MarketPrices setActiveTab={setActiveTab} />;
+        case 'chat':
+          return <Chat />;
+        default:
+          return <BuyerPortal setActiveTab={setActiveTab} />;
+      }
+    }
+
+    if (role === 'VENDOR') {
+      switch (activeTab) {
+        case 'vendor-portal':
+          return <VendorPortal />;
+        case 'store':
+          return <Marketplace setActiveTab={setActiveTab} />;
+        case 'orders':
+          return <OrderHistory setActiveTab={setActiveTab} />;
+        case 'prices':
+          return <MarketPrices setActiveTab={setActiveTab} />;
+        case 'chat':
+          return <Chat />;
+        default:
+          return <VendorPortal />;
+      }
+    }
+
+    if (role === 'ADMIN') {
+      switch (activeTab) {
+        case 'admin-portal':
+          return <AdminPortal />;
+        case 'prices':
+          return <MarketPrices setActiveTab={setActiveTab} />;
+        default:
+          return <AdminPortal />;
+      }
+    }
+
+    // Default: Farmer Role Boundaries
     switch (activeTab) {
       case 'home':
         if (isSimpleMode) {
           return <SimpleFieldDashboard setActiveTab={setActiveTab} onOpenVoice={() => setIsVoiceOpen(true)} />;
         }
-        if (role === 'BUYER') return <BuyerPortal setActiveTab={setActiveTab} />;
-        if (role === 'VENDOR') return <VendorPortal />;
-        if (role === 'ADMIN') return <AdminPortal />;
         return <Dashboard setActiveTab={setActiveTab} onOpenVoice={() => setIsVoiceOpen(true)} />;
       case 'simple-dashboard':
         return <SimpleFieldDashboard setActiveTab={setActiveTab} onOpenVoice={() => setIsVoiceOpen(true)} />;
-      case 'buyer-portal':
-        return <BuyerPortal setActiveTab={setActiveTab} />;
       case 'ai':
         return <AiAssistant setActiveTab={setActiveTab} onOpenVoice={() => setIsVoiceOpen(true)} />;
       case 'scan':
@@ -75,12 +150,6 @@ function MainApp() {
         return <FarmManager setActiveTab={setActiveTab} />;
       case 'chat':
         return <Chat />;
-      case 'vendor-portal':
-        return <VendorPortal />;
-      case 'admin-portal':
-        return <AdminPortal />;
-      case 'login':
-        return <LoginPage setActiveTab={setActiveTab} />;
       default:
         return <Dashboard setActiveTab={setActiveTab} onOpenVoice={() => setIsVoiceOpen(true)} />;
     }
@@ -107,7 +176,11 @@ function MainApp() {
         {renderActiveScreen()}
       </main>
 
-      <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
+      <BottomNav
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        onOpenVoice={() => setIsVoiceOpen(true)}
+      />
 
       <VoiceAssistantModal
         isOpen={isVoiceOpen}

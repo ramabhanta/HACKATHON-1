@@ -1,6 +1,6 @@
 {
   "name": "agrodex-backend",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "AgroDex AI - Agricultural Super Platform Backend",
   "main": "dist/server.js",
   "scripts": {

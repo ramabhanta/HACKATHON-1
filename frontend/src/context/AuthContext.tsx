@@ -56,7 +56,7 @@ interface AuthContextType {
   role: UserRole;
   isLoading: boolean;
   isAuthenticated: boolean;
-  sendOtp: (phone: string) => Promise<{ success: boolean; devOtp?: string; masterOtp?: string; message?: string; error?: string }>;
+  sendOtp: (phone: string) => Promise<{ success: boolean; devOtp?: string; message?: string; error?: string }>;
   verifyOtp: (phone: string, otp: string) => Promise<{ success: boolean; error?: string }>;
   loginWithOtp: (phone: string, otp: string) => Promise<{ success: boolean; error?: string }>;
   loginWithPassword: (phone: string, pass: string) => Promise<{ success: boolean; error?: string }>;
@@ -129,7 +129,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   /**
    * Request 6-digit SMS OTP for a phone number
    */
-  const sendOtp = async (phone: string): Promise<{ success: boolean; devOtp?: string; masterOtp?: string; message?: string; error?: string }> => {
+  const sendOtp = async (phone: string): Promise<{ success: boolean; devOtp?: string; message?: string; error?: string }> => {
     try {
       setIsLoading(true);
       const res = await fetch('/api/auth/send-otp', {
@@ -142,7 +142,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return {
           success: true,
           devOtp: data.devOtp,
-          masterOtp: data.masterOtp || '123456',
           message: data.message
         };
       }

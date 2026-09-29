@@ -215,7 +215,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
       const res = await sendOtp(loginPhone);
       if (res.success) {
         setLoginOtpSent(true);
-        setDevOtpToast(`OTP Sent! Code: ${res.devOtp || '123456'} (Master: 123456)`);
+        if (res.devOtp) {
+          setDevOtpToast(`SMS Verification Code: ${res.devOtp} (Expires in 5m)`);
+        }
         setCountdown(60);
         setIsTimerRunning(true);
         setTimeout(() => loginOtpRefs.current[0]?.focus(), 100);
@@ -271,7 +273,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
     try {
       const res = await sendOtp(regPhone);
       if (res.success) {
-        setDevOtpToast(`OTP sent to +91 ${regPhone}! Code: ${res.devOtp || '123456'} (Master: 123456)`);
+        if (res.devOtp) {
+          setDevOtpToast(`SMS Verification Code sent to +91 ${regPhone}: ${res.devOtp} (Expires in 5m)`);
+        }
         setRegStep(2);
         setCountdown(60);
         setIsTimerRunning(true);
@@ -428,19 +432,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
   return (
     <div className="min-h-[85vh] flex items-center justify-center p-3 sm:p-6">
       <div className="w-full max-w-lg">
-        {/* Testing / Master OTP Banner Alert */}
-        <div className="mb-4 bg-amber-500/10 border border-amber-300/80 rounded-2xl p-3 flex items-center justify-between text-xs text-amber-900 shadow-sm">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-amber-600 flex-shrink-0" />
-            <span>
-              <strong>Hackathon Test Safeguard:</strong> Master OTP is <code className="bg-amber-100 px-1.5 py-0.5 rounded font-black text-amber-950 font-mono">123456</code>
-            </span>
-          </div>
-          <span className="text-[10px] font-extrabold uppercase bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full">
-            Dev Mode
-          </span>
-        </div>
-
         {/* Dynamic Dev OTP Toast Notice */}
         {devOtpToast && (
           <div className="mb-4 bg-emerald-50 border border-emerald-300 rounded-2xl p-3 text-xs text-emerald-950 flex items-center justify-between animate-in fade-in">
@@ -740,8 +731,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                               <RefreshCw className="w-3.5 h-3.5" /> Resend OTP
                             </button>
                           )}
-                          <span className="text-[11px] text-amber-700 bg-amber-50 px-2 py-0.5 rounded font-mono">
-                            Master: 123456
+                          <span className="text-[11px] text-gray-400 font-medium">
+                            Valid for 5 mins
                           </span>
                         </div>
 
@@ -1009,7 +1000,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                           onClick={() => {
                             sendOtp(regPhone).then(r => {
                               if (r.success) {
-                                setDevOtpToast(`New OTP sent! Code: ${r.devOtp || '123456'} (Master: 123456)`);
+                                if (r.devOtp) {
+                                  setDevOtpToast(`Dynamic SMS Verification Code sent: ${r.devOtp} (Expires in 5m)`);
+                                }
                                 setCountdown(60);
                                 setIsTimerRunning(true);
                               }
@@ -1020,8 +1013,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                           <RefreshCw className="w-3.5 h-3.5" /> Resend OTP
                         </button>
                       )}
-                      <span className="text-[11px] text-amber-700 bg-amber-50 px-2 py-0.5 rounded font-mono">
-                        Master: 123456
+                      <span className="text-[11px] text-gray-400 font-medium">
+                        Valid for 5 mins
                       </span>
                     </div>
 

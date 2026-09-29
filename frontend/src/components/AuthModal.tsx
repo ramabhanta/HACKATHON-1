@@ -145,7 +145,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialTa
     setIsSubmitting(false);
     if (res.success) {
       setLoginOtpSent(true);
-      setDevOtpToast(`OTP Sent! Code: ${res.devOtp || '123456'} (Master: 123456)`);
+      if (res.devOtp) {
+        setDevOtpToast(`Dynamic SMS Code: ${res.devOtp} (Expires in 5m)`);
+      }
       setCountdown(60);
       setIsTimerRunning(true);
       setTimeout(() => loginOtpRefs.current[0]?.focus(), 100);
@@ -185,7 +187,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialTa
     const res = await sendOtp(regPhone);
     setIsSubmitting(false);
     if (res.success) {
-      setDevOtpToast(`OTP sent to +91 ${regPhone}! Code: ${res.devOtp || '123456'} (Master: 123456)`);
+      if (res.devOtp) {
+        setDevOtpToast(`Dynamic SMS Code sent to +91 ${regPhone}: ${res.devOtp} (Expires in 5m)`);
+      }
       setRegStep(2);
       setCountdown(60);
       setIsTimerRunning(true);
@@ -277,12 +281,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialTa
           <p className="text-xs text-gray-500 mt-0.5">
             100% Mobile Phone & SMS OTP progressive authentication
           </p>
-        </div>
-
-        {/* Testing Master OTP Banner */}
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-2.5 text-xs text-amber-900 flex items-center justify-between">
-          <span>Master Testing OTP: <strong className="font-mono bg-amber-100 px-1 py-0.5 rounded">123456</strong></span>
-          <span className="text-[10px] font-black uppercase text-amber-800 bg-amber-200 px-2 py-0.5 rounded">Dev Mode</span>
         </div>
 
         {devOtpToast && (
@@ -439,7 +437,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialTa
                           Resend OTP
                         </button>
                       )}
-                      <span className="text-amber-700">Master: 123456</span>
+                      <span className="text-gray-400">Valid for 5 mins</span>
                     </div>
 
                     <button
@@ -549,7 +547,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialTa
                 </div>
 
                 <div className="flex items-center justify-between text-[11px] text-gray-500 font-bold">
-                  {isTimerRunning ? <span>Resend in {countdown}s</span> : <span>Master OTP: 123456</span>}
+                  {isTimerRunning ? <span>Resend in {countdown}s</span> : <span className="text-gray-400">Valid for 5 mins</span>}
                 </div>
 
                 <button

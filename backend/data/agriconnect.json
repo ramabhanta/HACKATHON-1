@@ -126,6 +126,22 @@
       "longitude": 78.1634,
       "createdAt": "2026-09-28T20:05:23.656Z",
       "updatedAt": "2026-09-28T20:05:23.656Z"
+    },
+    {
+      "id": "usr-81d2a229",
+      "name": "yugandharreddy350@gmail.com",
+      "phone": "+91 80735 38499",
+      "passwordHash": "$2a$10$ulsNAIshOqbOUApP5gdI0uHp9sMVObU7PVftaZYP63FW.mUMFaG8y",
+      "role": "BUYER",
+      "language": "en",
+      "village": "Kadiri Rural",
+      "district": "Sri Sathya Sai",
+      "state": "Andhra Pradesh",
+      "pincode": "515591",
+      "latitude": 14.1165,
+      "longitude": 78.1634,
+      "createdAt": "2026-09-28T20:11:54.330Z",
+      "updatedAt": "2026-09-28T20:11:54.330Z"
     }
   ],
   "farmer_profiles": [
@@ -12290,6 +12306,24 @@
       "operatingRegion": "Rayalaseema Kadiri AP",
       "pincode": "515591",
       "contactPhone": "+91 91234 56780"
+    },
+    {
+      "id": "prof-0ff0588c",
+      "userId": "usr-81d2a229",
+      "companyName": "kisan mandi rates",
+      "panGst": "hfuf.kkjhf",
+      "preferredCrops": [
+        "Groundnut",
+        "Tomato",
+        "Paddy",
+        "Chilli",
+        "Cotton",
+        "Mango",
+        "Maize"
+      ],
+      "operatingRegion": "Rayalaseema / Kadiri AP",
+      "pincode": "515591",
+      "contactPhone": "+91 80735 38499"
     }
   ],
   "vendor_deal_requests": [

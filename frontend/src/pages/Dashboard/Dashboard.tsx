@@ -530,112 +530,112 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
           {/* Ask AI */}
           <button
             onClick={() => setActiveTab('ai')}
-            className="p-4 rounded-2xl bg-white hover:bg-emerald-50 border border-emerald-100 shadow-sm transition hover:shadow-md text-left flex flex-col justify-between group active:scale-95"
+            className="p-4 rounded-2xl bg-white hover:bg-emerald-50 border border-emerald-100 shadow-sm transition hover:shadow-md text-left flex flex-col justify-between group active:scale-95 min-h-[148px] h-full overflow-hidden"
           >
-            <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center text-2xl group-hover:scale-110 transition">
+            <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center text-2xl group-hover:scale-110 transition shrink-0">
               🤖
             </div>
             <div className="mt-3">
-              <span className="text-xs font-bold text-gray-900 block group-hover:text-emerald-800">
+              <span className="text-xs font-bold text-gray-900 block group-hover:text-emerald-800 line-clamp-1">
                 {t('askAiBtn')}
               </span>
-              <span className="text-[10px] text-gray-500">{t('askAiDesc')}</span>
+              <span className="text-[10px] text-gray-500 line-clamp-2 leading-tight mt-0.5">{t('askAiDesc')}</span>
             </div>
           </button>
 
           {/* Scan Crop */}
           <button
             onClick={() => setActiveTab('scan')}
-            className="p-4 rounded-2xl bg-white hover:bg-amber-50 border border-amber-100 shadow-sm transition hover:shadow-md text-left flex flex-col justify-between group active:scale-95"
+            className="p-4 rounded-2xl bg-white hover:bg-amber-50 border border-amber-100 shadow-sm transition hover:shadow-md text-left flex flex-col justify-between group active:scale-95 min-h-[148px] h-full overflow-hidden"
           >
-            <div className="w-12 h-12 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center text-2xl group-hover:scale-110 transition">
+            <div className="w-12 h-12 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center text-2xl group-hover:scale-110 transition shrink-0">
               📷
             </div>
             <div className="mt-3">
-              <span className="text-xs font-bold text-gray-900 block group-hover:text-amber-800">
+              <span className="text-xs font-bold text-gray-900 block group-hover:text-amber-800 line-clamp-1">
                 {t('scanCropBtn')}
               </span>
-              <span className="text-[10px] text-gray-500">{t('scanCropDesc')}</span>
+              <span className="text-[10px] text-gray-500 line-clamp-2 leading-tight mt-0.5">{t('scanCropDesc')}</span>
             </div>
           </button>
 
           {/* Soil Intelligence */}
           <button
             onClick={() => setActiveTab('soil')}
-            className="p-4 rounded-2xl bg-white hover:bg-lime-50 border border-lime-100 shadow-sm transition hover:shadow-md text-left flex flex-col justify-between group active:scale-95"
+            className="p-4 rounded-2xl bg-white hover:bg-lime-50 border border-lime-100 shadow-sm transition hover:shadow-md text-left flex flex-col justify-between group active:scale-95 min-h-[148px] h-full overflow-hidden"
           >
-            <div className="w-12 h-12 rounded-xl bg-lime-100 text-lime-800 flex items-center justify-center text-2xl group-hover:scale-110 transition">
+            <div className="w-12 h-12 rounded-xl bg-lime-100 text-lime-800 flex items-center justify-center text-2xl group-hover:scale-110 transition shrink-0">
               🌱
             </div>
             <div className="mt-3">
-              <span className="text-xs font-bold text-gray-900 block group-hover:text-lime-800">
+              <span className="text-xs font-bold text-gray-900 block group-hover:text-lime-800 line-clamp-1">
                 {t('checkSoilBtn')}
               </span>
-              <span className="text-[10px] text-gray-500">{t('checkSoilDesc')}</span>
+              <span className="text-[10px] text-gray-500 line-clamp-2 leading-tight mt-0.5">{t('checkSoilDesc')}</span>
             </div>
           </button>
 
           {/* Buy Farm Products */}
           <button
             onClick={() => setActiveTab('store')}
-            className="p-4 rounded-2xl bg-white hover:bg-teal-50 border border-teal-100 shadow-sm transition hover:shadow-md text-left flex flex-col justify-between group active:scale-95"
+            className="p-4 rounded-2xl bg-white hover:bg-teal-50 border border-teal-100 shadow-sm transition hover:shadow-md text-left flex flex-col justify-between group active:scale-95 min-h-[148px] h-full overflow-hidden"
           >
-            <div className="w-12 h-12 rounded-xl bg-teal-100 text-teal-800 flex items-center justify-center text-2xl group-hover:scale-110 transition">
+            <div className="w-12 h-12 rounded-xl bg-teal-100 text-teal-800 flex items-center justify-center text-2xl group-hover:scale-110 transition shrink-0">
               🛒
             </div>
             <div className="mt-3">
-              <span className="text-xs font-bold text-gray-900 block group-hover:text-teal-800">
+              <span className="text-xs font-bold text-gray-900 block group-hover:text-teal-800 line-clamp-1">
                 {t('buyInputsBtn')}
               </span>
-              <span className="text-[10px] text-gray-500">{t('buyInputsDesc')}</span>
+              <span className="text-[10px] text-gray-500 line-clamp-2 leading-tight mt-0.5">{t('buyInputsDesc')}</span>
             </div>
           </button>
 
           {/* Nearby Shops */}
           <button
             onClick={() => setActiveTab('shops')}
-            className="p-4 rounded-2xl bg-white hover:bg-indigo-50 border border-indigo-100 shadow-sm transition hover:shadow-md text-left flex flex-col justify-between group active:scale-95"
+            className="p-4 rounded-2xl bg-white hover:bg-indigo-50 border border-indigo-100 shadow-sm transition hover:shadow-md text-left flex flex-col justify-between group active:scale-95 min-h-[148px] h-full overflow-hidden"
           >
-            <div className="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-800 flex items-center justify-center text-2xl group-hover:scale-110 transition">
+            <div className="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-800 flex items-center justify-center text-2xl group-hover:scale-110 transition shrink-0">
               📍
             </div>
             <div className="mt-3">
-              <span className="text-xs font-bold text-gray-900 block group-hover:text-indigo-800">
+              <span className="text-xs font-bold text-gray-900 block group-hover:text-indigo-800 line-clamp-1">
                 {t('findShopsBtn')}
               </span>
-              <span className="text-[10px] text-gray-500">{t('findShopsDesc')}</span>
+              <span className="text-[10px] text-gray-500 line-clamp-2 leading-tight mt-0.5">{t('findShopsDesc')}</span>
             </div>
           </button>
 
           {/* Sell Produce */}
           <button
             onClick={() => setActiveTab('produce')}
-            className="p-4 rounded-2xl bg-white hover:bg-orange-50 border border-orange-100 shadow-sm transition hover:shadow-md text-left flex flex-col justify-between group active:scale-95"
+            className="p-4 rounded-2xl bg-white hover:bg-orange-50 border border-orange-100 shadow-sm transition hover:shadow-md text-left flex flex-col justify-between group active:scale-95 min-h-[148px] h-full overflow-hidden"
           >
-            <div className="w-12 h-12 rounded-xl bg-orange-100 text-orange-800 flex items-center justify-center text-2xl group-hover:scale-110 transition">
+            <div className="w-12 h-12 rounded-xl bg-orange-100 text-orange-800 flex items-center justify-center text-2xl group-hover:scale-110 transition shrink-0">
               📦
             </div>
             <div className="mt-3">
-              <span className="text-xs font-bold text-gray-900 block group-hover:text-orange-800">
+              <span className="text-xs font-bold text-gray-900 block group-hover:text-orange-800 line-clamp-1">
                 {t('sellProduceBtn')}
               </span>
-              <span className="text-[10px] text-gray-500">{t('sellProduceDesc')}</span>
+              <span className="text-[10px] text-gray-500 line-clamp-2 leading-tight mt-0.5">{t('sellProduceDesc')}</span>
             </div>
           </button>
 
           {/* Mandi & Flower Prices */}
           <button
             onClick={() => setActiveTab('prices')}
-            className="p-4 rounded-2xl bg-white hover:bg-pink-50 border border-pink-100 shadow-sm transition hover:shadow-md text-left flex flex-col justify-between group active:scale-95"
+            className="p-4 rounded-2xl bg-white hover:bg-pink-50 border border-pink-100 shadow-sm transition hover:shadow-md text-left flex flex-col justify-between group active:scale-95 min-h-[148px] h-full overflow-hidden"
           >
-            <div className="w-12 h-12 rounded-xl bg-pink-100 text-pink-800 flex items-center justify-center text-2xl group-hover:scale-110 transition">
+            <div className="w-12 h-12 rounded-xl bg-pink-100 text-pink-800 flex items-center justify-center text-2xl group-hover:scale-110 transition shrink-0">
               🌸
             </div>
             <div className="mt-3">
-              <span className="text-xs font-bold text-gray-900 block group-hover:text-pink-800">
+              <span className="text-xs font-bold text-gray-900 block group-hover:text-pink-800 line-clamp-1">
                 {t('mandiPricesCard')}
               </span>
-              <span className="text-[10px] text-gray-500">{t('mandiPricesCardDesc')}</span>
+              <span className="text-[10px] text-gray-500 line-clamp-2 leading-tight mt-0.5">{t('mandiPricesCardDesc')}</span>
             </div>
           </button>
         </div>

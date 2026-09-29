@@ -375,7 +375,7 @@ export const OrderHistory: React.FC<OrderHistoryProps> = ({ setActiveTab }) => {
           <p className="text-xs text-gray-500">
             {activeFilter === 'PENDING'
               ? 'You have no pending dealer confirmations right now.'
-              : 'Reserve subsidized fertilizers, certified seeds, and equipment from verified Kadiri dealers with zero upfront debit.'}
+              : 'Reserve subsidized fertilizers, certified seeds, and equipment from verified local dealers with zero upfront debit.'}
           </p>
           <button
             onClick={() => setActiveTab('store')}
@@ -522,7 +522,7 @@ export const OrderHistory: React.FC<OrderHistoryProps> = ({ setActiveTab }) => {
                           )}
                         </span>
                         <p className="text-emerald-100 text-[11px] mt-0.5">
-                          {order.shopDetails?.address || 'Main Bazaar, Near Old Bus Stand, Kadiri'}
+                          {order.shopDetails?.address || 'Certified Krishi Kendra Depot'}
                         </p>
                       </div>
 
@@ -538,7 +538,7 @@ export const OrderHistory: React.FC<OrderHistoryProps> = ({ setActiveTab }) => {
                         )}
 
                         <a
-                          href={order.shopDetails?.mapUrl || `https://maps.google.com/?q=${encodeURIComponent(shopName + ' Kadiri')}`}
+                          href={order.shopDetails?.mapUrl || `https://maps.google.com/?q=${encodeURIComponent(shopName)}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="px-4 py-2 bg-amber-400 hover:bg-amber-300 text-amber-950 font-black rounded-xl transition flex items-center gap-1.5 text-xs shadow-md"
@@ -723,8 +723,8 @@ export const OrderHistory: React.FC<OrderHistoryProps> = ({ setActiveTab }) => {
                     <MapPin className="w-4 h-4 text-emerald-700 shrink-0" />
                     <span>
                       {order.pickupPreference === 'STORE_DELIVERY'
-                        ? `Delivery to: ${order.deliveryAddress?.village || 'Kadiri Rural'}, ${order.deliveryAddress?.district || 'Sri Sathya Sai'}`
-                        : `Pickup at: ${shopName} (Kadiri)`}
+                        ? `Delivery to: ${order.deliveryAddress?.village || user?.village || 'Your Village'}, ${order.deliveryAddress?.district || user?.district || 'Your District'}`
+                        : `Pickup at: ${shopName}`}
                     </span>
                   </div>
                   <span className="font-extrabold text-emerald-800">

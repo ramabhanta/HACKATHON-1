@@ -34,6 +34,7 @@ import {
 import { subscribeToTable } from '../../services/supabaseClient';
 import { AgriculturalPackshot } from '../../components/AgriculturalPackshot';
 import { exportOrderInvoicePDF } from '../../utils/reportExport';
+import { calculateDistance, getCachedLocation } from '../../services/geolocationService';
 
 interface MarketplaceProps {
   setActiveTab: (tab: string) => void;
@@ -42,6 +43,12 @@ interface MarketplaceProps {
 export const Marketplace: React.FC<MarketplaceProps> = ({ setActiveTab }) => {
   const { t, language } = useLanguage();
   const { user } = useAuth();
+
+  const cached = getCachedLocation();
+  const userLat = user?.latitude || cached?.latitude || cached?.lat || 13.9890;
+  const userLng = user?.longitude || cached?.longitude || cached?.lng || 77.7712;
+  const userVillage = user?.village || cached?.village || 'Gorantla';
+  const userDistrict = user?.district || cached?.district || 'Sri Sathya Sai';
 
   const [products, setProducts] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
@@ -56,9 +63,9 @@ export const Marketplace: React.FC<MarketplaceProps> = ({ setActiveTab }) => {
 
   // Booking form state
   const [bookingQty, setBookingQty] = useState<number>(1);
-  const [selectedShopId, setSelectedShopId] = useState<string>('shop-1');
+  const [selectedShopId, setSelectedShopId] = useState<string>('shop-gorantla-1');
   const [pickupPreference, setPickupPreference] = useState<'COUNTER_PICKUP' | 'STORE_DELIVERY'>('COUNTER_PICKUP');
-  const [farmerVillage, setFarmerVillage] = useState<string>(user?.village || 'Kadiri Rural');
+  const [farmerVillage, setFarmerVillage] = useState<string>(user?.village || userVillage);
   const [farmerPhone, setFarmerPhone] = useState<string>(user?.phone || '+91 9951518699');
   const [bookingNotes, setBookingNotes] = useState<string>('');
   const [isSubmittingBooking, setIsSubmittingBooking] = useState<boolean>(false);
@@ -71,14 +78,31 @@ export const Marketplace: React.FC<MarketplaceProps> = ({ setActiveTab }) => {
   useEffect(() => {
     async function fetchCatalog() {
       try {
+        const queryParams = new URLSearchParams({
+          lat: userLat.toString(),
+          lon: userLng.toString(),
+          radius: '50',
+          district: userDistrict,
+          village: userVillage
+        });
         const [pRes, cRes, sRes] = await Promise.all([
           fetch('/api/products'),
           fetch('/api/products/categories'),
-          fetch('/api/shops/nearby')
+          fetch(`/api/shops/nearby?${queryParams.toString()}`)
         ]);
         if (pRes.ok) setProducts(await pRes.json());
         if (cRes.ok) setCategories(await cRes.json());
-        if (sRes.ok) setNearbyShops(await sRes.json());
+        if (sRes.ok) {
+          const rawShops = await sRes.json();
+          const mapped = rawShops.map((s: any) => ({
+            ...s,
+            distanceKm: calculateDistance(userLat, userLng, s.latitude, s.longitude)
+          })).sort((a: any, b: any) => a.distanceKm - b.distanceKm);
+          setNearbyShops(mapped);
+          if (mapped.length > 0) {
+            setSelectedShopId(mapped[0].id || mapped[0].shopId);
+          }
+        }
       } catch (err) {
         console.error('Failed to load marketplace products:', err);
       } finally {
@@ -119,7 +143,7 @@ export const Marketplace: React.FC<MarketplaceProps> = ({ setActiveTab }) => {
     setBookingQty(1);
     setSelectedShopId(product.preferredShopId || 'shop-1');
     setPickupPreference('COUNTER_PICKUP');
-    setFarmerVillage(user?.village || 'Kadiri Rural');
+    setFarmerVillage(user?.village || userVillage || 'Your Village');
     setFarmerPhone(user?.phone || '+91 9951518699');
     setBookingNotes('');
     setBookingSuccessOrder(null);
@@ -231,11 +255,12 @@ export const Marketplace: React.FC<MarketplaceProps> = ({ setActiveTab }) => {
         const orderNumber = `AGRO-2026-${randNum}`;
         const activeShop = (bookingModalProduct.nearbyShops && bookingModalProduct.nearbyShops.find((s: any) => (s.shopId || s.id) === selectedShopId)) 
           || nearbyShops.find((s: any) => (s.shopId || s.id) === selectedShopId) 
+          || nearbyShops[0]
           || {
             id: selectedShopId,
-            name: 'Sri Lakshmi Agri Inputs & Seeds Depot',
-            address: 'Shop #14, Main Bazaar, Near Old Bus Stand, Kadiri',
-            distanceKm: 2.3,
+            name: `Sri Balaji Krishi Seva Kendra (${userDistrict || 'Regional Hub'})`,
+            address: `Main Market Road, ${userVillage || userDistrict || 'Regional Mandi'}`,
+            distanceKm: 3.2,
             phone: '+91 98490 54321'
           };
         const total = itemPrice * bookingQty;
@@ -246,14 +271,14 @@ export const Marketplace: React.FC<MarketplaceProps> = ({ setActiveTab }) => {
           farmerId: user?.id || 'usr-farmer-local',
           farmerName: user?.name || 'Farmer',
           farmerPhone,
-          vendorName: activeShop.shopName || activeShop.name || 'Sri Lakshmi Agri Inputs & Seeds Depot',
+          vendorName: activeShop.shopName || activeShop.name || 'Certified Agri Input Depot',
           shopDetails: {
             id: selectedShopId,
-            name: activeShop.shopName || activeShop.name || 'Sri Lakshmi Agri Inputs & Seeds Depot',
-            address: activeShop.address || 'Shop #14, Main Bazaar, Near Old Bus Stand, Kadiri',
-            distanceKm: activeShop.distanceKm || 2.3,
+            name: activeShop.shopName || activeShop.name || 'Certified Agri Input Depot',
+            address: activeShop.address || `Main Market Road, ${userVillage || userDistrict || 'Regional Hub'}`,
+            distanceKm: activeShop.distanceKm || 3.2,
             phone: activeShop.phone || '+91 98490 54321',
-            mapUrl: `https://maps.google.com/?q=${encodeURIComponent(activeShop.address || 'Kadiri APMC')}`
+            mapUrl: `https://maps.google.com/?q=${encodeURIComponent(activeShop.address || activeShop.shopName || 'Agri Input Store')}`
           },
           items: [
             {
@@ -1230,7 +1255,7 @@ export const Marketplace: React.FC<MarketplaceProps> = ({ setActiveTab }) => {
 
                 <div className="mt-3 text-xs text-gray-600 flex items-center gap-2 bg-emerald-50/60 p-2 rounded-xl border border-emerald-100">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-                  <span>Available at <strong>{activeProductModal.vendorName || 'Sri Lakshmi Agri Inputs'}</strong> (2.3 km away, Kadiri)</span>
+                  <span>Available at <strong>{activeProductModal.vendorName || activeProductModal.nearbyShops?.[0]?.shopName || 'Certified Krishi Kendra'}</strong> ({activeProductModal.nearbyShops?.[0]?.distanceKm || '2.3'} km away, {activeProductModal.nearbyShops?.[0]?.town || userDistrict || 'Local Market'})</span>
                 </div>
               </div>
             </div>
@@ -1313,7 +1338,7 @@ export const Marketplace: React.FC<MarketplaceProps> = ({ setActiveTab }) => {
               {activeProductModal.nearbyShops && activeProductModal.nearbyShops.length > 0 && (
                 <div className="space-y-2 pt-1">
                   <h4 className="font-black text-gray-900 uppercase tracking-wider text-xs flex items-center gap-1.5">
-                    <Store className="w-3.5 h-3.5 text-emerald-700" /> Nearby Retailers with Verified Stock in Kadiri:
+                    <Store className="w-3.5 h-3.5 text-emerald-700" /> Nearby Certified Retailers with Verified Stock ({userDistrict || userVillage || 'Your Region'}):
                   </h4>
                   <div className="space-y-1.5 max-h-36 overflow-y-auto pr-1">
                     {activeProductModal.nearbyShops.map((shop: any, sIdx: number) => (

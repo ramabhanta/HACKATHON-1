@@ -211,7 +211,7 @@ export const CartCheckout: React.FC<CartCheckoutProps> = ({ setActiveTab }) => {
         <div>
           <h1 className="text-xl sm:text-2xl font-black text-gray-900">Shopping Cart & Checkout</h1>
           <p className="text-xs text-gray-500 mt-0.5">
-            {items.length} item(s) from Sri Lakshmi Agri Inputs (Kadiri)
+            {items.length} item(s) from Certified Agricultural Input Dealers
           </p>
         </div>
         <button

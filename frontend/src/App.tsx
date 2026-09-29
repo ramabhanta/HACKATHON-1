@@ -7,6 +7,7 @@ import { Navbar } from './components/Navbar';
 import { BottomNav } from './components/BottomNav';
 import { VoiceAssistantModal } from './components/VoiceAssistantModal';
 import { AuthModal } from './components/AuthModal';
+import { UserProfileModal } from './components/UserProfileModal';
 
 import { Dashboard } from './pages/Dashboard/Dashboard';
 import { SimpleFieldDashboard } from './components/SimpleFieldDashboard';
@@ -32,6 +33,7 @@ function MainApp() {
   const [activeTab, setActiveTab] = useState<string>('home');
   const [isVoiceOpen, setIsVoiceOpen] = useState<boolean>(false);
   const [isAuthOpen, setIsAuthOpen] = useState<boolean>(false);
+  const [isProfileOpen, setIsProfileOpen] = useState<boolean>(false);
   const [prefilledAiQuery, setPrefilledAiQuery] = useState<string>('');
 
   const handleVoiceQuery = (query: string) => {
@@ -170,6 +172,7 @@ function MainApp() {
         setActiveTab={setActiveTab}
         onOpenVoice={() => setIsVoiceOpen(true)}
         onOpenAuth={() => setIsAuthOpen(true)}
+        onOpenProfile={() => setIsProfileOpen(true)}
       />
 
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 pb-24 md:pb-8">
@@ -180,6 +183,7 @@ function MainApp() {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         onOpenVoice={() => setIsVoiceOpen(true)}
+        onOpenProfile={() => setIsProfileOpen(true)}
       />
 
       <VoiceAssistantModal
@@ -191,6 +195,11 @@ function MainApp() {
       <AuthModal
         isOpen={isAuthOpen}
         onClose={() => setIsAuthOpen(false)}
+      />
+
+      <UserProfileModal
+        isOpen={isProfileOpen}
+        onClose={() => setIsProfileOpen(false)}
       />
     </div>
   );

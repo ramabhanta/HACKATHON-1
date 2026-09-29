@@ -33,9 +33,10 @@ interface NavbarProps {
   setActiveTab: (tab: string) => void;
   onOpenVoice: () => void;
   onOpenAuth: () => void;
+  onOpenProfile?: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenVoice, onOpenAuth }) => {
+export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenVoice, onOpenAuth, onOpenProfile }) => {
   const { user, role, switchRole, logout, isAuthenticated, updateProfile } = useAuth();
   const { language, setLanguage, t, languages, currentLangMeta } = useLanguage();
   const { totalItems } = useCart();
@@ -516,8 +517,12 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenV
                   onClick={() => setShowUserMenu(!showUserMenu)}
                   className="flex items-center gap-1.5 p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg bg-emerald-700/60 hover:bg-emerald-700 text-white transition text-xs font-semibold"
                 >
-                  <div className="w-6 h-6 rounded-full bg-emerald-600 border border-emerald-400 flex items-center justify-center text-[11px] font-black text-white">
-                    {user.name.charAt(0)}
+                  <div className="w-6 h-6 rounded-full bg-emerald-600 border border-emerald-400 flex items-center justify-center text-[11px] font-black text-white overflow-hidden shrink-0">
+                    {user.avatarUrl ? (
+                      <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
+                    ) : (
+                      user.name.charAt(0).toUpperCase()
+                    )}
                   </div>
                   <span className="hidden md:inline max-w-[100px] truncate">{user.name.split(' ')[0]}</span>
                   <ChevronDown className="w-3 h-3 text-emerald-300" />
@@ -534,15 +539,40 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenV
 
               {/* User Dropdown Menu */}
               {showUserMenu && user && (
-                <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl p-3 text-gray-800 border border-gray-100 z-50 space-y-2">
-                  <div className="border-b border-gray-100 pb-2">
-                    <p className="font-extrabold text-xs text-gray-900">{user.name}</p>
-                    <p className="text-[11px] font-mono font-bold text-emerald-800 truncate">{user.phone}</p>
-                    <div className="flex items-center gap-1.5 mt-1">
+                <div className="absolute right-0 mt-2 w-68 bg-white rounded-2xl shadow-2xl p-3 text-gray-800 border border-gray-100 z-50 space-y-2">
+                  <div
+                    onClick={() => {
+                      setShowUserMenu(false);
+                      onOpenProfile?.();
+                    }}
+                    className="border-b border-gray-100 pb-2 cursor-pointer hover:bg-emerald-50/60 p-2 rounded-xl transition group"
+                    title="Click to edit profile & avatar"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-10 h-10 rounded-xl bg-emerald-600 border border-emerald-400 flex items-center justify-center text-xs font-black text-white overflow-hidden shrink-0 shadow-xs">
+                        {user.avatarUrl ? (
+                          <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
+                        ) : (
+                          user.name.charAt(0).toUpperCase()
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between">
+                          <p className="font-extrabold text-xs text-gray-900 truncate group-hover:text-emerald-800 transition">{user.name}</p>
+                          <span className="text-[10px] text-emerald-700 font-bold bg-emerald-100 px-1.5 py-0.2 rounded-md">Edit ✏️</span>
+                        </div>
+                        <p className="text-[11px] font-mono text-gray-500 truncate">{user.phone || user.email}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5 mt-2">
                       <span className="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-100 text-emerald-800">
                         {user.role}
                       </span>
+                      {user.bio && (
+                        <p className="text-[10px] text-gray-500 line-clamp-1 italic">"{user.bio}"</p>
+                      )}
                     </div>
+
                     {/* Live Location interactive badge */}
                     <div className="flex items-center justify-between gap-1.5 mt-2 bg-emerald-50 p-2 rounded-xl border border-emerald-100">
                       <div className="flex items-center gap-1.5 min-w-0">
@@ -552,7 +582,10 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenV
                         </span>
                       </div>
                       <button
-                        onClick={handleRetargetNavbarGPS}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRetargetNavbarGPS(e);
+                        }}
                         disabled={isDetectingGps}
                         className="p-1 rounded-lg bg-white hover:bg-emerald-100 text-emerald-700 shadow-xs border border-emerald-200 transition shrink-0"
                         title="Detect & Retarget Live GPS Location"
@@ -566,12 +599,23 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenV
                     <button
                       onClick={() => {
                         setShowUserMenu(false);
+                        onOpenProfile?.();
+                      }}
+                      className="w-full text-left px-2.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100/80 text-xs text-emerald-950 font-bold flex items-center gap-2 transition"
+                    >
+                      <User className="w-3.5 h-3.5 text-emerald-700" />
+                      <span>Edit Profile & Avatar</span>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        setShowUserMenu(false);
                         setActiveTab('login');
                       }}
                       className="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-gray-50 text-xs text-gray-700 flex items-center gap-2"
                     >
-                      <User className="w-3.5 h-3.5 text-gray-500" />
-                      <span>Login / Switch Account</span>
+                      <UserCheck className="w-3.5 h-3.5 text-gray-500" />
+                      <span>Switch Account</span>
                     </button>
 
                     <button

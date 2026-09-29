@@ -465,16 +465,18 @@ const handleProfileUpdate = async (req: AuthenticatedRequest, res: Response) => 
   try {
     if (!req.user) return res.status(401).json({ error: 'Not authenticated' });
 
-    const { name, phone, village, district, state, pincode, avatarUrl, language, latitude, longitude } = req.body;
+    const { name, village, district, state, pincode, avatarUrl, bio, language, latitude, longitude, companyName, shopName } = req.body;
     const user = req.user;
 
-    if (name) user.name = name;
-    if (phone) user.phone = cleanPhone(phone).formatted;
-    if (village) user.village = village;
-    if (district) user.district = district;
-    if (state) user.state = state;
-    if (pincode) user.pincode = pincode;
-    if (avatarUrl) user.avatarUrl = avatarUrl;
+    if (name) user.name = name.trim();
+    if (village) user.village = village.trim();
+    if (district) user.district = district.trim();
+    if (state) user.state = state.trim();
+    if (pincode) user.pincode = pincode.trim();
+    if (avatarUrl !== undefined) user.avatarUrl = avatarUrl;
+    if (bio !== undefined) user.bio = bio.slice(0, 250);
+    if (companyName) user.companyName = companyName.trim();
+    if (shopName) user.shopName = shopName.trim();
     if (language) user.language = language;
     if (latitude !== undefined && latitude !== null) user.latitude = parseFloat(latitude);
     if (longitude !== undefined && longitude !== null) user.longitude = parseFloat(longitude);
@@ -490,6 +492,12 @@ const handleProfileUpdate = async (req: AuthenticatedRequest, res: Response) => 
         if (req.body.primaryCrops) existingFarmer.primaryCrops = Array.isArray(req.body.primaryCrops) ? req.body.primaryCrops : [req.body.primaryCrops];
         if (req.body.farmingType) existingFarmer.farmingType = req.body.farmingType;
         db.update('farmer_profiles', existingFarmer.id, existingFarmer);
+      }
+    } else if (user.role === 'VENDOR' && shopName) {
+      const existingVendor = await SupabaseDataService.getVendorProfile(user.id);
+      if (existingVendor) {
+        existingVendor.shopName = shopName;
+        db.update('vendor_profiles', existingVendor.id, existingVendor);
       }
     }
 

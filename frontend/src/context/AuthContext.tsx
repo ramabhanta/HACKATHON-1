@@ -27,6 +27,12 @@ export interface User {
   pincode?: string;
   latitude?: number;
   longitude?: number;
+  avatarUrl?: string;
+  bio?: string;
+  companyName?: string;
+  shopName?: string;
+  totalAcreage?: number;
+  primaryCrops?: string[];
 }
 
 export interface RegisterPayload {

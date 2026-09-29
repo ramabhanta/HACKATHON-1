@@ -33,9 +33,10 @@ interface BottomNavProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
   onOpenVoice?: () => void;
+  onOpenProfile?: () => void;
 }
 
-export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab, onOpenVoice }) => {
+export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab, onOpenVoice, onOpenProfile }) => {
   const { t, language, setLanguage, languages, currentLangMeta } = useLanguage();
   const { totalItems } = useCart();
   const { role, user, logout } = useAuth();
@@ -325,20 +326,49 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab, o
               </div>
             </div>
 
-            {/* Drawer Footer with Sign Out */}
-            <div className="p-3 bg-gray-50 dark:bg-slate-800/80 border-t border-gray-100 dark:border-slate-800 flex items-center justify-between">
-              <span className="text-[11px] text-gray-500 dark:text-gray-400 font-mono">
-                {user?.phone || 'Guest User'}
-              </span>
+            {/* Drawer Footer with Interactive User Profile & Sign Out */}
+            <div className="p-3 bg-gray-50 dark:bg-slate-800/80 border-t border-gray-100 dark:border-slate-800 flex items-center justify-between gap-2">
+              {user ? (
+                <div
+                  onClick={() => {
+                    setIsDrawerOpen(false);
+                    onOpenProfile?.();
+                  }}
+                  className="flex items-center gap-2 cursor-pointer hover:bg-emerald-50 dark:hover:bg-slate-700/60 p-1.5 rounded-xl transition flex-1 min-w-0"
+                  title="Edit Profile & Avatar"
+                >
+                  <div className="w-8 h-8 rounded-xl bg-emerald-600 border border-emerald-400 flex items-center justify-center text-xs font-black text-white overflow-hidden shrink-0 shadow-xs">
+                    {user.avatarUrl ? (
+                      <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
+                    ) : (
+                      user.name.charAt(0).toUpperCase()
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs font-extrabold text-gray-900 dark:text-white truncate flex items-center gap-1">
+                      <span>{user.name}</span>
+                      <span className="text-[10px] text-emerald-600 font-bold">✏️</span>
+                    </p>
+                    <p className="text-[10px] text-gray-500 dark:text-gray-400 font-mono truncate">
+                      {user.role} • {user.village || 'Kadiri'}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <span className="text-[11px] text-gray-500 dark:text-gray-400 font-mono">
+                  Guest User
+                </span>
+              )}
+
               <button
                 onClick={() => {
                   setIsDrawerOpen(false);
                   logout();
                 }}
-                className="px-3.5 py-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs flex items-center gap-1.5 transition active:scale-95 border border-red-200"
+                className="px-3 py-1.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs flex items-center gap-1 transition active:scale-95 border border-red-200 shrink-0"
               >
                 <LogOut className="w-3.5 h-3.5" />
-                <span>Sign Out</span>
+                <span className="hidden sm:inline">Sign Out</span>
               </button>
             </div>
           </div>

@@ -15,6 +15,11 @@ export interface User {
   latitude?: number;
   longitude?: number;
   avatarUrl?: string;
+  bio?: string;
+  companyName?: string;
+  shopName?: string;
+  totalAcreage?: number;
+  primaryCrops?: string[];
   createdAt: string;
   updatedAt: string;
 }

@@ -522,10 +522,26 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
               <RefreshCw className={`w-3.5 h-3.5 ${isDetectingGps ? 'animate-spin text-amber-400' : ''}`} />
             </button>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-            {formatGreeting(user?.name, user?.role)}
-          </h1>
-          <p className="text-emerald-100 text-sm sm:text-base mt-2">
+          <div className="flex items-center gap-3.5 my-2">
+            {user?.avatarUrl ? (
+              <img
+                src={user.avatarUrl}
+                alt={user.name}
+                className="w-13 h-13 rounded-2xl object-cover border-2 border-emerald-400 shadow-md shrink-0"
+              />
+            ) : null}
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+                {formatGreeting(user?.name, user?.role)}
+              </h1>
+              {user?.bio && (
+                <p className="text-emerald-200 text-xs sm:text-sm italic mt-0.5 line-clamp-1">
+                  "{user.bio}"
+                </p>
+              )}
+            </div>
+          </div>
+          <p className="text-emerald-100 text-sm sm:text-base mt-1">
             {t('subGreeting')}
           </p>
 

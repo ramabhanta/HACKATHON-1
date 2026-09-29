@@ -93,7 +93,7 @@ aiRouter.post('/chat/stream', optionalAuthenticate, async (req: AuthenticatedReq
 
     // Emit matched certified inputs and smart follow-up suggestions before stream completion
     const matchedProducts = AiService.findMatchingProducts(message, fullReply);
-    const suggestedActions = AiService.generateSmartActions(message, crop?.cropName);
+    const suggestedActions = AiService.generateSmartActions(message, crop?.cropName, fullReply);
     res.write(`data: ${JSON.stringify({ meta: { matchedProducts, suggestedActions } })}\n\n`);
 
     res.write('data: [DONE]\n\n');

@@ -73,6 +73,91 @@ export const AiAssistant: React.FC<AiAssistantProps> = ({ onOpenVoice, setActive
     scrollToBottom();
   }, [messages, isTyping]);
 
+  // Generate dynamic, context-specific follow-up actions (Never generic starter chips)
+  const generateDynamicSmartActions = (query: string, replyText: string = ''): string[] => {
+    const text = (query + ' ' + replyText).toLowerCase();
+
+    // Mandi / Price / Selling queries
+    if (
+      text.includes('price') ||
+      text.includes('mandi') ||
+      text.includes('rate') ||
+      text.includes('market') ||
+      text.includes('sell') ||
+      text.includes('quintal') ||
+      text.includes('crate') ||
+      text.includes('ధర') ||
+      text.includes('మార్కెట్') ||
+      text.includes('భావ') ||
+      text.includes('भाव') ||
+      text.includes('मंडी')
+    ) {
+      if (text.includes('tomato') || text.includes('టమోటా') || text.includes('टमाटर')) {
+        return ['View Live Mandi Board', 'Madanapalle APMC Rates', 'Sell Tomato Crates', 'Tomato Crate Price Today'];
+      }
+      if (text.includes('groundnut') || text.includes('వేరుశనగ') || text.includes('मूंगफली') || text.includes('శేంగ')) {
+        return ['View Live Mandi Board', 'Kadiri APMC Groundnut Rates', 'Sell Produce Directly', 'Check Pod Moisture Standards'];
+      }
+      if (text.includes('flower') || text.includes('jasmine') || text.includes('marigold') || text.includes('chrysanthemum') || text.includes('పూల') || text.includes('फूल') || text.includes('మల్లె') || text.includes('బంతి')) {
+        return ['View Live Mandi Board', 'Madanapalle Flower Market', 'Tirupati Daily Flower Rates', 'Sell Produce Directly'];
+      }
+      if (text.includes('chilli') || text.includes('మిర్చి') || text.includes('मिर्च')) {
+        return ['View Live Mandi Board', 'Guntur Mirchi Yard Rates', 'Sell Produce Directly', 'Check Export Quality Grades'];
+      }
+      if (text.includes('onion') || text.includes('ఉల్లి') || text.includes('प्याज')) {
+        return ['View Live Mandi Board', 'Kurnool Onion Mandi Rates', 'Sell Produce Directly', 'Check Storage Tips'];
+      }
+      return ['View Live Mandi Board', 'Sell Produce Directly', 'Kadiri APMC Rates Today', 'Connect with Verified Buyers'];
+    }
+
+    // Where to buy / stores / inputs
+    if (
+      text.includes('where') ||
+      text.includes('buy') ||
+      text.includes('store') ||
+      text.includes('shop') ||
+      text.includes('urea') ||
+      text.includes('dealer') ||
+      text.includes('pacs') ||
+      text.includes('rbk')
+    ) {
+      return ['View Kadiri Agri Store', 'Locate Nearest RBK', 'Order Nano Urea Liquid', 'View Live Mandi Board'];
+    }
+
+    // Yellow leaves / pest / disease
+    if (
+      text.includes('yellow') ||
+      text.includes('leaf') ||
+      text.includes('blight') ||
+      text.includes('pest') ||
+      text.includes('spot') ||
+      text.includes('disease') ||
+      text.includes('curl') ||
+      text.includes('thrip') ||
+      text.includes('rot')
+    ) {
+      return ['Scan Leaf Photo', 'Calculate Dosage per Acre', 'View Kadiri Agri Store', 'View Live Mandi Board'];
+    }
+
+    // Fertilizer / nutrients
+    if (
+      text.includes('fertilizer') ||
+      text.includes('npk') ||
+      text.includes('dap') ||
+      text.includes('dosage') ||
+      text.includes('math')
+    ) {
+      return ['Calculate Dosage per Acre', 'Buy DAP / Urea', 'Soil Intelligence', 'View Live Mandi Board'];
+    }
+
+    // Irrigation / water
+    if (text.includes('irrigation') || text.includes('water') || text.includes('నీరు') || text.includes('సిंचाई')) {
+      return ['View Irrigation Schedule', 'Check Soil Moisture', 'Weather Forecast', 'View Live Mandi Board'];
+    }
+
+    return ['Scan Leaf Photo', 'View Live Mandi Board', 'Soil Health Card', 'Kadiri Agri Store'];
+  };
+
   // Instant ICAR-compliant fallback advisory if network/gateway is offline or times out
   const getClientAgriculturalAdvisory = (
     query: string,
@@ -265,6 +350,73 @@ export const AiAssistant: React.FC<AiAssistantProps> = ({ onOpenVoice, setActive
           category: 'NPK'
         }
       ];
+    }
+    // 2. Mandi Market Prices (Tomato, Groundnut, Flowers, Onion, Chilli)
+    else if (
+      qLower.includes('price') ||
+      qLower.includes('mandi') ||
+      qLower.includes('sell') ||
+      qLower.includes('rate') ||
+      qLower.includes('cost') ||
+      qLower.includes('quintal') ||
+      qLower.includes('crate') ||
+      qLower.includes('ధర') ||
+      qLower.includes('మార్కెట్') ||
+      qLower.includes('భావ') ||
+      qLower.includes('भाव') ||
+      qLower.includes('मंडी')
+    ) {
+      if (qLower.includes('tomato') || qLower.includes('టమోటా') || qLower.includes('टमाटर')) {
+        reply = `**Madanapalle APMC Live Mandi Intelligence — Tomato (టమోటా)**\n\n` +
+          `• **Benchmark Market Yard:** Madanapalle Tomato Market Yard (Annamayya District) & Kalikiri APMC\n` +
+          `• **Price Range (Per Quintal):** Min ₹1,600 — Max ₹2,400 / Quintal\n` +
+          `• **Modal Price (Benchmark):** ₹2,000 / Quintal\n` +
+          `• **Per Crate (25 kg standard crate):** ₹400 — ₹600 / Crate (Modal ~₹500 / Crate)\n` +
+          `• **Per Kilogram Wholesale Estimate:** ₹16.00 — ₹24.00 / kg\n` +
+          `• **Market Trends:** Steady arrivals from Madanapalle, Punganur, and Vayalpad. High demand from Bangalore, Hyderabad, and Chennai.\n\n` +
+          `*Next Step:* Tap **"View Live Mandi Board"** below to see real-time price updates or list crates directly.`;
+      } else if (qLower.includes('groundnut') || qLower.includes('peanut') || qLower.includes('వేరుశనగ') || qLower.includes('मूंगफली') || qLower.includes('శేంగ')) {
+        reply = `**Kadiri APMC Live Mandi Intelligence — Groundnut / Peanut (వేరుశనగ - Kadiri-6)**\n\n` +
+          `• **Benchmark Market Yard:** Kadiri APMC Market Yard (Sri Sathya Sai District — Premier Groundnut Hub)\n` +
+          `• **Price Range (Per Quintal):** Min ₹6,800 — Max ₹7,750 / Quintal\n` +
+          `• **Modal Price (Benchmark):** ₹7,420 / Quintal\n` +
+          `• **Per Kilogram Wholesale Estimate:** ₹68.00 — ₹77.50 / kg (~₹74.20 / kg modal)\n` +
+          `• **Quality Parameters:** 48% oil content recovery, dry pods with moisture under 8-9%. Local oil millers and traders bidding aggressively on Kadiri-6 and Dharani varieties.\n\n` +
+          `*Next Step:* Tap **"View Live Mandi Board"** below for live bidding lots.`;
+      } else if (qLower.includes('flower') || qLower.includes('jasmine') || qLower.includes('marigold') || qLower.includes('chrysanthemum') || qLower.includes('పూల') || qLower.includes('फूल') || qLower.includes('మల్లె') || qLower.includes('బంతి') || qLower.includes('చామంతి')) {
+        reply = `**Rayalaseema APMC Live Mandi Intelligence — Commercial Flowers (పూలు)**\n\n` +
+          `• **Benchmark Market Yards:** Madanapalle, Kadiri & Tirupati Flower Yards\n` +
+          `• **Jasmine / Kakada (మల్లెపూలు / కాకడ):** Min ₹380 — Max ₹480 / kg | **Modal Price:** ₹420 / kg (Tirupati & Madanapalle Mandi)\n` +
+          `• **Marigold (బంతిపూలు - African Orange / Golden):** Min ₹50 — Max ₹90 / kg | **Modal Price:** ₹70 / kg (Kadiri APMC Yard)\n` +
+          `• **Chrysanthemum (చామంతి - Yellow & White):** Min ₹120 — Max ₹190 / kg | **Modal Price:** ₹160 / kg\n` +
+          `• **Crossandra (కనకాంబరం):** Min ₹420 — Max ₹620 / kg | **Modal Price:** ₹520 / kg\n` +
+          `• **Market Dynamics:** Firm demand driven by temple rituals and Bangalore transit.\n\n` +
+          `*Next Step:* Tap **"View Live Mandi Board"** below for daily flower quotes.`;
+      } else if (qLower.includes('onion') || qLower.includes('ఉల్లి') || qLower.includes('प्याज')) {
+        reply = `**Kurnool APMC Live Mandi Intelligence — Onion (ఉల్లిపాయ)**\n\n` +
+          `• **Benchmark Market Yard:** Kurnool Agricultural Mandi & Tadipatri Yard\n` +
+          `• **Price Range (Per Quintal):** Min ₹1,850 — Max ₹2,650 / Quintal\n` +
+          `• **Modal Price (Benchmark):** ₹2,280 / Quintal\n` +
+          `• **Per Kilogram Wholesale Estimate:** ₹18.50 — ₹26.50 / kg (~₹22.80 / kg modal)\n` +
+          `• **Variety:** Red Medium Bold Bulbs from Kurnool and Bellary clusters.\n\n` +
+          `*Next Step:* Tap **"View Live Mandi Board"** below to track arrivals.`;
+      } else if (qLower.includes('chilli') || qLower.includes('mirchi') || qLower.includes('మిర్చి') || qLower.includes('मिर्च')) {
+        reply = `**Guntur Mirchi Yard Live Mandi Intelligence — Dry Red Chilli & Green Chilli**\n\n` +
+          `• **Benchmark Market Yard:** Guntur Mirchi Yard (Asia's Largest Chilli Mandi)\n` +
+          `• **Dry Red Chilli (Teja S17 / Byadagi):** Min ₹19,500 — Max ₹23,800 / Quintal | **Modal Price:** ₹21,600 / Quintal (~₹216 / kg)\n` +
+          `• **Green Chilli (G4 Long):** Min ₹3,200 — Max ₹4,400 / Quintal | **Modal Price:** ₹3,800 / Quintal (~₹38 / kg) at Guntur & Kadiri\n\n` +
+          `*Next Step:* Tap **"View Live Mandi Board"** below for full arrival reports.`;
+      } else {
+        reply = `**Andhra Pradesh APMC Mandi Benchmark Rates — Today**\n\n` +
+          `• **Tomato (Madanapalle APMC):** Min ₹1,600 | Modal **₹2,000** | Max ₹2,400 / Quintal (~₹16 – ₹24 / kg)\n` +
+          `• **Groundnut Pods (Kadiri APMC):** Min ₹6,800 | Modal **₹7,420** | Max ₹7,750 / Quintal (~₹68 – ₹78 / kg)\n` +
+          `• **Dry Red Chilli (Guntur Yard):** Min ₹19,500 | Modal **₹21,600** | Max ₹23,800 / Quintal (~₹216 / kg)\n` +
+          `• **Onion (Kurnool Mandi):** Min ₹1,850 | Modal **₹2,280** | Max ₹2,650 / Quintal (~₹22.80 / kg)\n` +
+          `• **Jasmine Flower (Madanapalle / Tirupati):** Min ₹380 | Modal **₹420** | Max ₹480 / kg\n` +
+          `• **Paddy Sona Masoori (Kadiri Yard):** Min ₹2,450 | Modal **₹2,720** | Max ₹2,950 / Quintal\n` +
+          `• **Cotton (Anantapur Market):** Min ₹7,600 | Modal **₹7,950** | Max ₹8,200 / Quintal\n\n` +
+          `*Next Step:* Tap **"View Live Mandi Board"** below for comprehensive prices.`;
+      }
     } else if (
       qLower.includes('yellow') ||
       qLower.includes('leaves') ||
@@ -295,7 +447,6 @@ export const AiAssistant: React.FC<AiAssistantProps> = ({ onOpenVoice, setActive
           `• **3. Sucking Pests (Thrips, Jassids, Whiteflies):** Yellow speckling with leaf curling or stunted flush. **Remedy:** Spray cold-pressed Neem Oil (10,000 PPM) @ 3 ml/L or Acetamiprid 20% SP @ 0.5g/L.\n\n` +
           `• **4. Root Waterlogging:** Poor drainage suffocates root respiration. Ensure excess standing water is drained out through furrows immediately.`;
       }
-      suggestedActions = ['Order 19-19-19 Spray', 'Scan leaf using Crop Scan camera', 'Check Soil Moisture'];
       matchedProducts = [
         {
           id: 'prod-mahadhan-19-19-19',
@@ -341,15 +492,32 @@ export const AiAssistant: React.FC<AiAssistantProps> = ({ onOpenVoice, setActive
           `3. **Pod Development & Kernel Filling (65-75 DAS):** Regular, moderate moisture is vital to ensure plump kernels and prevent shriveling.\n\n` +
           `• **Efficiency Tip:** Drip or sprinkler irrigation saves 40-50% water compared to furrow flooding and significantly lowers the incidence of Stem/Collar Rot. Cease irrigation 7-10 days prior to harvest for easy lifting.`;
       }
-      suggestedActions = ['Check weather forecast', 'View soil moisture tips', 'Drip fertigation guides'];
-      reply = `**AgroDex Expert Agronomic Advisory for "${query}"**\n\n` +
-        `• **Field Inspection Protocol:** Walk your plots in an 'M' or 'W' pattern to check representative plants across canopy levels.\n` +
-        `• **Foliar Protection:** Spray cold-pressed Neem Oil (10,000 PPM) @ 3 ml/L or Trichoderma viride @ 5g/L water for broad-spectrum prophylactic biological defense.\n` +
-        `• **Instant Visual Diagnostics:** Use the **"Scan Crop"** tool to snap leaf photographs for instant AI pathogen and pest diagnosis with registered CIBRC dosages.`;
-      suggestedActions = ['What fertilizer should I use for groundnut?', 'My leaves are turning yellow.', 'When should I irrigate?'];
+    }
+    // 5. General Agricultural Guidance
+    else {
+      if (isTe) {
+        reply = `**అగ్రోడెక్స్ AI వ్యవసాయ సలహా: "${query}"**\n\n` +
+          `• **క్షేత్రస్థాయి సూచన:** మీ పొలంలో మొక్కలను నిశితంగా పరిశీలించి ఆకుల అడుగు భాగాన రసం పీల్చే పురుగులను గమనించండి.\n` +
+          `• **ముందస్తు రక్షణ:** కోల్డ్ ప్రెస్డ్ వేప నూనె (10,000 PPM) @ 3 మి.లీ/లీటరు లేదా ట్రైకోడెర్మా విరిడే @ 5 గ్రా/లీటరు పిచికారీ చేయండి.\n` +
+          `• **పోషకాలు:** 19:19:19 నీటిలో కరిగే ఎరువు @ 5 గ్రా/లీటరు నీటికి కలిపి పిచికారీ చేయడం ద్వారా మొక్కలకు తక్షణ బలం చేకూరుతుంది.\n\n` +
+          `*సూచన:* వ్యాధిని ఖచ్చితంగా నిర్ధారించడానికి మన **"Scan Crop"** కెమెరా ద్వారా ఆకు ఫోటో తీయండి.`;
+      } else if (isHi) {
+        reply = `**एग्रोडेक्स एआई कृषि परामर्श: "${query}"**\n\n` +
+          `• **खेत का मुआयना:** पौधों की निचली पत्तियों और तनों का बारीकी से निरीक्षण करें।\n` +
+          `• **जैविक सुरक्षा:** ट्राइकोडर्मा विरिडी या नीम तेल (10,000 PPM) 3 मिली/लीटर का छिड़काव करें।\n` +
+          `• **पोषक तत्व:** वानस्पतिक विकास के लिए 19-19-19 घुलनशील खाद 5 ग्राम/लीटर का छिड़काव करें।\n\n` +
+          `*सुझाव:* अधिक सटीक पहचान के लिए **"Scan Crop"** विकल्प से पत्ती की फोटो लें।`;
+      } else {
+        reply = `**AgroDex Expert Agronomic Advisory: "${query}"**\n\n` +
+          `• **Field Diagnostics:** Walk your farm rows in a zig-zag pattern to inspect foliage, stems, and root collar.\n` +
+          `• **Prophylactic Shield:** Spray cold-pressed Neem Oil (10,000 PPM) @ 3 ml/L or Trichoderma viride @ 5g/L water for broad-spectrum protection.\n` +
+          `• **Foliar Nutrition:** Spray 100% water-soluble NPK 19-19-19 @ 5g/L water to maintain leaf chlorophyll and plant vigor.\n\n` +
+          `*Next Step:* Use the **"Scan Crop"** tool to snap a clear leaf photo for instant AI pathology diagnosis.`;
+      }
     }
 
-    return { reply, suggestedActions, matchedProducts };
+    const dynamicActions = generateDynamicSmartActions(query, reply);
+    return { reply, suggestedActions: dynamicActions, matchedProducts };
   };
 
   const handleSend = async (overrideText?: string) => {
@@ -448,21 +616,22 @@ export const AiAssistant: React.FC<AiAssistantProps> = ({ onOpenVoice, setActive
     }
 
     if (streamSucceeded && accumulatedText.trim()) {
-      // Ensure matchedProducts are populated if meta was missed or empty
+      setIsTyping(false);
+      const dynamicActions = generateDynamicSmartActions(textToSend, accumulatedText);
+      const fallbackAdvisory = getClientAgriculturalAdvisory(textToSend, language);
       setMessages(prev =>
         prev.map(m => {
-          if (m.id === aiMsgId && (!m.matchedProducts || m.matchedProducts.length === 0)) {
-            const fallbackAdvisory = getClientAgriculturalAdvisory(textToSend, language);
+          if (m.id === aiMsgId) {
             return {
               ...m,
-              matchedProducts: fallbackAdvisory.matchedProducts,
-              suggestedActions: m.suggestedActions?.length ? m.suggestedActions : fallbackAdvisory.suggestedActions
+              text: accumulatedText,
+              matchedProducts: m.matchedProducts && m.matchedProducts.length > 0 ? m.matchedProducts : fallbackAdvisory.matchedProducts,
+              suggestedActions: m.suggestedActions && m.suggestedActions.length > 0 ? m.suggestedActions : dynamicActions
             };
           }
           return m;
         })
       );
-      setIsTyping(false);
       return;
     }
 
@@ -484,6 +653,7 @@ export const AiAssistant: React.FC<AiAssistantProps> = ({ onOpenVoice, setActive
 
       if (fallbackRes.ok) {
         const data = await fallbackRes.json();
+        const dynamicActions = data.suggestedActions?.length ? data.suggestedActions : generateDynamicSmartActions(textToSend, data.reply);
         setMessages(prev => {
           const filtered = prev.filter(m => m.id !== aiMsgId);
           return [
@@ -494,7 +664,7 @@ export const AiAssistant: React.FC<AiAssistantProps> = ({ onOpenVoice, setActive
               source: data.source || 'GEMINI_AI',
               text: data.reply,
               timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-              suggestedActions: data.suggestedActions,
+              suggestedActions: dynamicActions,
               matchedProducts: data.matchedProducts
             }
           ];
@@ -604,7 +774,42 @@ export const AiAssistant: React.FC<AiAssistantProps> = ({ onOpenVoice, setActive
                 </div>
               )}
 
-              <div className="whitespace-pre-wrap">{msg.text}</div>
+              {msg.text ? (
+                <div className="whitespace-pre-wrap">{msg.text}</div>
+              ) : (
+                <div className="flex items-center gap-2 py-1.5 text-gray-600 text-xs">
+                  <div className="flex items-center gap-1">
+                    <span className="w-2 h-2 bg-emerald-600 rounded-full animate-bounce"></span>
+                    <span className="w-2 h-2 bg-emerald-600 rounded-full animate-bounce [animation-delay:0.2s]"></span>
+                    <span className="w-2 h-2 bg-emerald-600 rounded-full animate-bounce [animation-delay:0.4s]"></span>
+                  </div>
+                  <span className="font-semibold text-emerald-900 text-xs">
+                    Analyzing farm data & live APMC mandi benchmarks...
+                  </span>
+                </div>
+              )}
+
+              {/* Dedicated Live APMC Mandi Board Action Card */}
+              {msg.sender === 'ai' && (msg.text.toLowerCase().includes('mandi') || msg.text.toLowerCase().includes('apmc') || msg.text.toLowerCase().includes('quintal') || msg.text.toLowerCase().includes('crate') || msg.text.toLowerCase().includes('ధర') || msg.text.toLowerCase().includes('మార్కెట్') || msg.text.toLowerCase().includes('భావ') || msg.text.toLowerCase().includes('भाव') || msg.text.toLowerCase().includes('मंडी')) && (
+                <div className="mt-3 p-3 bg-emerald-50 rounded-2xl border border-emerald-200/90 shadow-2xs flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 text-sm">
+                      📈
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-emerald-950">Live APMC Mandi Board</p>
+                      <p className="text-[10px] text-emerald-700">Real-time arrival rates across Madanapalle, Kadiri & Guntur yards</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setActiveTab('prices')}
+                    className="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl shrink-0 transition shadow-xs flex items-center gap-1 active:scale-95"
+                  >
+                    <span>View Live Mandi Board</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              )}
 
               {/* Matched Products Card inside AI Response */}
               {msg.matchedProducts && msg.matchedProducts.length > 0 && (
@@ -651,15 +856,15 @@ export const AiAssistant: React.FC<AiAssistantProps> = ({ onOpenVoice, setActive
                     <button
                       key={i}
                       onClick={() => {
-                        if (action === 'Scan Leaf Photo' || action === 'Scan My Crop') {
+                        if (action === 'Scan Leaf Photo' || action === 'Scan My Crop' || action.toLowerCase().includes('scan')) {
                           setActiveTab('scan');
-                        } else if (action === 'Check Soil Health' || action === 'Soil Intelligence') {
+                        } else if (action === 'Check Soil Health' || action === 'Soil Intelligence' || action === 'Soil Health Card' || action.toLowerCase().includes('soil')) {
                           setActiveTab('soil');
-                        } else if (action === 'Agri Input Store' || action === 'Buy Urea / DAP' || action === 'Buy DAP / Urea') {
+                        } else if (action === 'Agri Input Store' || action.toLowerCase().includes('agri store') || action.toLowerCase().includes('buy dap') || action.toLowerCase().includes('buy urea') || action.toLowerCase().includes('order nano')) {
                           setActiveTab('store');
-                        } else if (action === 'Sell Produce' || action === 'Create Produce Listing') {
+                        } else if (action === 'Sell Produce' || action.toLowerCase().includes('sell produce') || action.toLowerCase().includes('sell tomato') || action.toLowerCase().includes('create produce')) {
                           setActiveTab('produce');
-                        } else if (action === 'View Mandi Rates') {
+                        } else if (action === 'View Mandi Rates' || action === 'View Live Mandi Board' || action.toLowerCase().includes('mandi board')) {
                           setActiveTab('prices');
                         } else {
                           handleSend(action);

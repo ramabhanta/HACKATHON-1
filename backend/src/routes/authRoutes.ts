@@ -281,6 +281,8 @@ authRouter.post('/register', async (req: Request, res: Response) => {
       district = 'Sri Sathya Sai',
       state = 'Andhra Pradesh',
       pincode = '515591',
+      latitude,
+      longitude,
       // Farmer Details
       totalAcreage = 3.0,
       primaryCrops = ['Groundnut'],
@@ -325,8 +327,8 @@ authRouter.post('/register', async (req: Request, res: Response) => {
       district: district || 'Sri Sathya Sai',
       state: state || 'Andhra Pradesh',
       pincode: pincode || '515591',
-      latitude: 14.1165,
-      longitude: 78.1634,
+      latitude: latitude !== undefined && latitude !== null ? parseFloat(latitude) : 14.1165,
+      longitude: longitude !== undefined && longitude !== null ? parseFloat(longitude) : 78.1634,
       createdAt: existingUser?.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
@@ -463,7 +465,7 @@ const handleProfileUpdate = async (req: AuthenticatedRequest, res: Response) => 
   try {
     if (!req.user) return res.status(401).json({ error: 'Not authenticated' });
 
-    const { name, phone, village, district, state, pincode, avatarUrl, language } = req.body;
+    const { name, phone, village, district, state, pincode, avatarUrl, language, latitude, longitude } = req.body;
     const user = req.user;
 
     if (name) user.name = name;
@@ -474,6 +476,8 @@ const handleProfileUpdate = async (req: AuthenticatedRequest, res: Response) => 
     if (pincode) user.pincode = pincode;
     if (avatarUrl) user.avatarUrl = avatarUrl;
     if (language) user.language = language;
+    if (latitude !== undefined && latitude !== null) user.latitude = parseFloat(latitude);
+    if (longitude !== undefined && longitude !== null) user.longitude = parseFloat(longitude);
     user.updatedAt = new Date().toISOString();
 
     db.update('users', user.id, user);

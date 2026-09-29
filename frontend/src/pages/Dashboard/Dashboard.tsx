@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { apiUrl } from '../../services/api';
+import { detectLocation, getCachedLocation } from '../../services/geolocationService';
 import {
   CloudSun,
   Bot,
@@ -53,8 +54,26 @@ interface DashboardProps {
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice }) => {
-  const { user } = useAuth();
+  const { user, updateProfile } = useAuth();
   const { t, language, formatGreeting } = useLanguage();
+
+  const [currentLocation, setCurrentLocation] = useState<{
+    village?: string;
+    district?: string;
+    state?: string;
+    latitude?: number;
+    longitude?: number;
+  }>(() => {
+    const cached = getCachedLocation();
+    return {
+      village: user?.village || cached?.village || 'Kadiri Mandal',
+      district: user?.district || cached?.district || 'Sri Sathya Sai',
+      state: user?.state || cached?.state || 'Andhra Pradesh',
+      latitude: user?.latitude || cached?.lat || 14.1165,
+      longitude: user?.longitude || cached?.lng || 78.1634
+    };
+  });
+  const [isDetectingGps, setIsDetectingGps] = useState(false);
 
   const [weather, setWeather] = useState<any>(null);
   const [tasks, setTasks] = useState<any[]>([]);
@@ -67,7 +86,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
   const [mandiPrices, setMandiPrices] = useState<any[]>([]);
   const [priceRegions, setPriceRegions] = useState<any[]>([]);
   const [dashState, setDashState] = useState<string>('ALL');
-  const [dashDistrict, setDashDistrict] = useState<string>('ALL');
+  const [dashDistrict, setDashDistrict] = useState<string>(() => {
+    return user?.district || getCachedLocation()?.district || 'ALL';
+  });
   const [dashCategory, setDashCategory] = useState<string>('ALL');
 
   // Modals state
@@ -110,8 +131,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
 
   const loadData = async () => {
     try {
+      const lat = currentLocation.latitude ?? 14.1165;
+      const lon = currentLocation.longitude ?? 78.1634;
+      const locStr = encodeURIComponent(`${currentLocation.village || 'Kadiri'}, ${currentLocation.district || 'Andhra Pradesh'}`);
       const [wRes, tRes, fRes, pRes, sRes] = await Promise.all([
-        fetch(apiUrl('/api/ai/weather?lat=14.1165&lon=78.1634&location=Kadiri,%20Andhra%20Pradesh')),
+        fetch(apiUrl(`/api/ai/weather?lat=${lat}&lon=${lon}&location=${locStr}`)),
         fetch(apiUrl('/api/farm/tasks'), { headers: { Authorization: `Bearer ${localStorage.getItem('agri_token')}` } }),
         fetch(apiUrl('/api/farms'), { headers: { Authorization: `Bearer ${localStorage.getItem('agri_token')}` } }),
         fetch(apiUrl('/api/prices')),
@@ -185,10 +209,29 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
     fetchDashPrices();
   }, [dashState, dashDistrict]);
 
-  const refreshWeather = async () => {
+  useEffect(() => {
+    if (user?.district || user?.village) {
+      setCurrentLocation(prev => ({
+        ...prev,
+        village: user.village || prev.village,
+        district: user.district || prev.district,
+        state: user.state || prev.state,
+        latitude: user.latitude || prev.latitude,
+        longitude: user.longitude || prev.longitude
+      }));
+      if (user.district && dashDistrict === 'ALL') {
+        setDashDistrict(user.district);
+      }
+    }
+  }, [user]);
+
+  const refreshWeather = async (lat?: number, lon?: number, locName?: string) => {
     setWeatherRefreshing(true);
     try {
-      const res = await fetch(apiUrl('/api/ai/weather?lat=14.1165&lon=78.1634&location=Kadiri,%20Andhra%20Pradesh'));
+      const latitude = lat ?? currentLocation.latitude ?? 14.1165;
+      const longitude = lon ?? currentLocation.longitude ?? 78.1634;
+      const place = locName || `${currentLocation.village || 'Kadiri'}, ${currentLocation.district || 'Andhra Pradesh'}`;
+      const res = await fetch(apiUrl(`/api/ai/weather?lat=${latitude}&lon=${longitude}&location=${encodeURIComponent(place)}`));
       if (res.ok) {
         setWeather(await res.json());
         showToast('Live weather and agricultural advisory updated!');
@@ -197,6 +240,44 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
       console.error(err);
     } finally {
       setWeatherRefreshing(false);
+    }
+  };
+
+  const handleRefreshGPS = async () => {
+    setIsDetectingGps(true);
+    try {
+      const geo = await detectLocation();
+      const locName = `${geo.village || geo.taluk || 'My Village'}, ${geo.district || 'District'}`;
+      const newLoc = {
+        village: geo.village || geo.taluk || currentLocation.village,
+        district: geo.district || currentLocation.district,
+        state: geo.state || currentLocation.state,
+        latitude: geo.lat,
+        longitude: geo.lng
+      };
+      setCurrentLocation(newLoc);
+
+      if (updateProfile) {
+        await updateProfile({
+          village: newLoc.village,
+          district: newLoc.district,
+          state: newLoc.state,
+          latitude: newLoc.latitude,
+          longitude: newLoc.longitude
+        });
+      }
+
+      if (newLoc.district) {
+        setDashDistrict(newLoc.district);
+      }
+
+      await refreshWeather(newLoc.latitude, newLoc.longitude, locName);
+      showToast(`📍 GPS updated: ${locName}`);
+    } catch (err: any) {
+      console.error('GPS retarget error:', err);
+      showToast(err.message || 'Location access denied or unavailable.', 'error');
+    } finally {
+      setIsDetectingGps(false);
     }
   };
 
@@ -427,8 +508,19 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
           🌾
         </div>
         <div className="relative z-10 max-w-2xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-900/40 border border-emerald-400/30 text-emerald-200 text-xs font-semibold mb-3">
-            <span>📍 {user?.village || 'Kadiri Mandal'}, {user?.district || 'Sri Sathya Sai'}</span>
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-900/50 backdrop-blur-md border border-emerald-400/40 text-emerald-100 text-xs font-semibold mb-3 shadow-sm">
+            <span className="flex items-center gap-1.5">
+              <span>📍</span>
+              <span>{currentLocation.village || 'Kadiri Mandal'}, {currentLocation.district || 'Sri Sathya Sai'}</span>
+            </span>
+            <button
+              onClick={handleRefreshGPS}
+              disabled={isDetectingGps}
+              className="p-1 rounded-full bg-emerald-800/80 hover:bg-emerald-700 text-amber-300 hover:text-white transition disabled:opacity-50 flex items-center justify-center ml-1"
+              title="Detect & Retarget Live GPS Location"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isDetectingGps ? 'animate-spin text-amber-400' : ''}`} />
+            </button>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
             {formatGreeting(user?.name, user?.role)}
@@ -496,7 +588,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
                 </div>
               </div>
               <button
-                onClick={refreshWeather}
+                onClick={() => refreshWeather()}
                 disabled={weatherRefreshing}
                 className="p-2.5 text-gray-400 hover:text-emerald-700 hover:bg-emerald-50 rounded-xl transition shrink-0 ml-1"
                 title={t('refreshWeather')}

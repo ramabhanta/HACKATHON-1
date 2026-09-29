@@ -18,6 +18,7 @@ import { notificationRouter } from './routes/notificationRoutes.js';
 import { priceRouter } from './routes/priceRoutes.js';
 import { storageRouter } from './routes/storageRoutes.js';
 import { supabaseRouter } from './routes/supabaseRoutes.js';
+import { geoRouter } from './routes/geoRoutes.js';
 import { seedDatabase } from './database/seed.js';
 import { db } from './database/db.js';
 import { checkDatabaseHealth, ensureStorageBucketsExist } from './database/supabaseClient.js';
@@ -101,6 +102,7 @@ app.use('/api/mandi', priceRouter);
 app.use('/api/mandi-prices', priceRouter);
 app.use('/api/storage', storageRouter);
 app.use('/api/supabase', supabaseRouter);
+app.use('/api/geo', geoRouter);
 
 // Top-level Crop Disease Diagnosis Endpoints (Supports /api/diagnose, /api/scan, /api/crop-disease)
 const diagnosisEndpoints = [

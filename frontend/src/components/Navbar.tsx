@@ -23,8 +23,10 @@ import {
   Layers,
   Sparkles,
   Eye,
-  Search
+  Search,
+  RefreshCw
 } from 'lucide-react';
+import { detectLocation, getCachedLocation } from '../services/geolocationService';
 
 interface NavbarProps {
   activeTab: string;
@@ -34,7 +36,7 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenVoice, onOpenAuth }) => {
-  const { user, role, switchRole, logout, isAuthenticated } = useAuth();
+  const { user, role, switchRole, logout, isAuthenticated, updateProfile } = useAuth();
   const { language, setLanguage, t, languages, currentLangMeta } = useLanguage();
   const { totalItems } = useCart();
   const { mode, setMode, isSimpleMode, isDarkMode } = useDisplayMode();
@@ -46,6 +48,28 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenV
   const [showModeMenu, setShowModeMenu] = useState(false);
   const [showNotifMenu, setShowNotifMenu] = useState(false);
   const [notifications, setNotifications] = useState<any[]>([]);
+  const [isDetectingGps, setIsDetectingGps] = useState(false);
+
+  const handleRetargetNavbarGPS = async (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    setIsDetectingGps(true);
+    try {
+      const geo = await detectLocation();
+      if (updateProfile) {
+        await updateProfile({
+          village: geo.village || geo.taluk || user?.village,
+          district: geo.district || user?.district,
+          state: geo.state || user?.state,
+          latitude: geo.lat,
+          longitude: geo.lng
+        });
+      }
+    } catch (err) {
+      console.error('GPS retarget error in Navbar:', err);
+    } finally {
+      setIsDetectingGps(false);
+    }
+  };
 
 
   const fetchNotifications = async () => {
@@ -467,6 +491,24 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenV
 
 
 
+            {/* Live Location Pill (Header Display) */}
+            {isAuthenticated && user && (
+              <div className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-700/60 border border-emerald-500/40 text-emerald-100 text-xs font-semibold shadow-xs">
+                <MapPin className="w-3.5 h-3.5 text-amber-300 shrink-0" />
+                <span className="max-w-[120px] truncate">
+                  {user.village || getCachedLocation()?.village || 'Kadiri'}, {user.district || getCachedLocation()?.district || 'Sri Sathya Sai'}
+                </span>
+                <button
+                  onClick={handleRetargetNavbarGPS}
+                  disabled={isDetectingGps}
+                  className="p-1 rounded-full hover:bg-emerald-600/80 text-amber-300 hover:text-white transition disabled:opacity-50"
+                  title="Detect & Retarget Live GPS Location"
+                >
+                  <RefreshCw className={`w-3 h-3 ${isDetectingGps ? 'animate-spin text-amber-400' : ''}`} />
+                </button>
+              </div>
+            )}
+
             {/* User Account / Sign In Dropdown */}
             <div className="relative">
               {isAuthenticated && user ? (
@@ -500,9 +542,23 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenV
                       <span className="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-100 text-emerald-800">
                         {user.role}
                       </span>
-                      <span className="text-[10px] text-gray-400">
-                        {user.village || 'Kadiri'}, {user.district || 'Andhra Pradesh'}
-                      </span>
+                    </div>
+                    {/* Live Location interactive badge */}
+                    <div className="flex items-center justify-between gap-1.5 mt-2 bg-emerald-50 p-2 rounded-xl border border-emerald-100">
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <MapPin className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+                        <span className="text-[11px] font-bold text-emerald-950 truncate">
+                          {user.village || getCachedLocation()?.village || 'Kadiri'}, {user.district || getCachedLocation()?.district || 'Sri Sathya Sai'}
+                        </span>
+                      </div>
+                      <button
+                        onClick={handleRetargetNavbarGPS}
+                        disabled={isDetectingGps}
+                        className="p-1 rounded-lg bg-white hover:bg-emerald-100 text-emerald-700 shadow-xs border border-emerald-200 transition shrink-0"
+                        title="Detect & Retarget Live GPS Location"
+                      >
+                        <RefreshCw className={`w-3 h-3 ${isDetectingGps ? 'animate-spin text-emerald-600' : ''}`} />
+                      </button>
                     </div>
                   </div>
 

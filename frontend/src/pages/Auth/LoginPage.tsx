@@ -23,8 +23,10 @@ import {
   Wheat,
   Building2,
   RefreshCw,
-  KeyRound
+  KeyRound,
+  Crosshair
 } from 'lucide-react';
+import { detectLocation } from '../../services/geolocationService';
 
 interface LoginPageProps {
   setActiveTab: (tab: string) => void;
@@ -98,6 +100,35 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
   const [shopName, setShopName] = useState('');
   const [shopLicense, setShopLicense] = useState('');
   const [shopAddress, setShopAddress] = useState('Shop #14, Main Bazaar, Kadiri');
+
+  // GPS Geolocation & Reverse Geocoding states
+  const [isDetectingLocation, setIsDetectingLocation] = useState(false);
+  const [detectedBadge, setDetectedBadge] = useState<string | null>(null);
+  const [showManualLocation, setShowManualLocation] = useState(false);
+  const [regCoords, setRegCoords] = useState<{ lat?: number; lon?: number }>({});
+  const [locationToast, setLocationToast] = useState<string | null>(null);
+
+  const handleDetectLocation = async () => {
+    setIsDetectingLocation(true);
+    setLocationToast(null);
+    setError(null);
+    try {
+      const loc = await detectLocation();
+      setRegVillage(loc.village);
+      setRegDistrict(loc.district);
+      setRegState(loc.state);
+      setRegPincode(loc.pincode);
+      setRegCoords({ lat: loc.latitude, lon: loc.longitude });
+      setDetectedBadge(`📍 Detected: ${loc.village}, ${loc.district}`);
+      setShowManualLocation(false);
+    } catch (err: any) {
+      const msg = err?.message || 'Location access denied. Please select or type your district/village manually.';
+      setLocationToast(msg);
+      setShowManualLocation(true);
+    } finally {
+      setIsDetectingLocation(false);
+    }
+  };
 
   // OTP inputs refs
   const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -345,7 +376,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
         village: regVillage,
         district: regDistrict,
         state: regState,
-        pincode: regPincode
+        pincode: regPincode,
+        latitude: regCoords.lat,
+        longitude: regCoords.lon
       };
 
       if (selectedRole === 'FARMER') {
@@ -1141,66 +1174,127 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                     {/* FARMER FIELDS */}
                     {selectedRole === 'FARMER' && (
                       <div className="space-y-3">
-                        <div className="grid grid-cols-2 gap-2.5">
-                          <div>
-                            <label className="block text-[11px] font-bold text-gray-700 mb-1">
-                              Village / Town
-                            </label>
-                            <input
-                              type="text"
-                              value={regVillage}
-                              onChange={e => setRegVillage(e.target.value)}
-                              placeholder="Kadiri Rural"
-                              className="w-full rounded-xl border border-gray-300 px-3 py-2 text-xs font-bold outline-none focus:border-emerald-600"
-                            />
+                        {/* Automatic GPS Location Detection & Reverse Geocoding */}
+                        <div className="p-3 bg-stone-50 rounded-2xl border border-stone-200/90 space-y-2.5">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[11px] font-black uppercase text-gray-700 tracking-wider flex items-center gap-1.5">
+                              <MapPin className="w-3.5 h-3.5 text-emerald-600" />
+                              Location Setup
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => setShowManualLocation(!showManualLocation)}
+                              className="text-[11px] font-bold text-emerald-700 hover:underline"
+                            >
+                              {showManualLocation ? 'Hide Manual Entry' : 'Enter Location Manually'}
+                            </button>
                           </div>
-                          <div>
-                            <label className="block text-[11px] font-bold text-gray-700 mb-1">
-                              District
-                            </label>
-                            <input
-                              type="text"
-                              value={regDistrict}
-                              onChange={e => setRegDistrict(e.target.value)}
-                              placeholder="Sri Sathya Sai"
-                              className="w-full rounded-xl border border-gray-300 px-3 py-2 text-xs font-bold outline-none focus:border-emerald-600"
-                            />
-                          </div>
+
+                          {locationToast && (
+                            <div className="p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs font-semibold flex items-center gap-2">
+                              <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                              <span>{locationToast}</span>
+                            </div>
+                          )}
+
+                          {detectedBadge ? (
+                            <div className="p-2.5 rounded-xl bg-emerald-100 border border-emerald-300 text-emerald-900 flex items-center justify-between text-xs font-black">
+                              <span className="flex items-center gap-1.5">
+                                <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
+                                {detectedBadge}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={handleDetectLocation}
+                                disabled={isDetectingLocation}
+                                className="text-[10px] text-emerald-800 underline hover:text-emerald-950 font-bold ml-2"
+                              >
+                                Retarget
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={handleDetectLocation}
+                              disabled={isDetectingLocation}
+                              className="w-full py-2.5 px-3 rounded-xl bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-extrabold text-xs shadow-sm flex items-center justify-center gap-2 transition active:scale-95"
+                            >
+                              {isDetectingLocation ? (
+                                <>
+                                  <Loader2 className="w-4 h-4 animate-spin text-emerald-200" />
+                                  <span>Detecting GPS Coordinates...</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Crosshair className="w-4 h-4 text-amber-300" />
+                                  <span>📍 Detect My Current Location</span>
+                                </>
+                              )}
+                            </button>
+                          )}
+
+                          {/* Manual Fields: Shown when toggled OR when location is detected to allow editing */}
+                          {(showManualLocation || detectedBadge) && (
+                            <div className="pt-2 border-t border-stone-200 space-y-2 animate-in fade-in text-left">
+                              <div className="grid grid-cols-2 gap-2">
+                                <div>
+                                  <label className="text-[10px] font-bold text-gray-500 block mb-0.5">Village / Town</label>
+                                  <input
+                                    type="text"
+                                    value={regVillage}
+                                    onChange={e => setRegVillage(e.target.value)}
+                                    className="w-full px-2.5 py-1.5 rounded-xl border border-gray-200 text-xs font-bold outline-none"
+                                    placeholder="Kadiri Rural"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-[10px] font-bold text-gray-500 block mb-0.5">District</label>
+                                  <input
+                                    type="text"
+                                    value={regDistrict}
+                                    onChange={e => setRegDistrict(e.target.value)}
+                                    className="w-full px-2.5 py-1.5 rounded-xl border border-gray-200 text-xs font-bold outline-none"
+                                    placeholder="Sri Sathya Sai"
+                                  />
+                                </div>
+                              </div>
+                              <div className="grid grid-cols-2 gap-2">
+                                <div>
+                                  <label className="text-[10px] font-bold text-gray-500 block mb-0.5">State</label>
+                                  <input
+                                    type="text"
+                                    value={regState}
+                                    onChange={e => setRegState(e.target.value)}
+                                    className="w-full px-2.5 py-1.5 rounded-xl border border-gray-200 text-xs font-bold outline-none"
+                                    placeholder="Andhra Pradesh"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-[10px] font-bold text-gray-500 block mb-0.5">PIN Code</label>
+                                  <input
+                                    type="text"
+                                    value={regPincode}
+                                    onChange={e => setRegPincode(e.target.value)}
+                                    className="w-full px-2.5 py-1.5 rounded-xl border border-gray-200 text-xs font-bold outline-none"
+                                    placeholder="515591"
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          )}
                         </div>
 
-                        <div className="grid grid-cols-2 gap-2.5">
-                          <div>
-                            <label className="block text-[11px] font-bold text-gray-700 mb-1">
-                              State & PIN Code
-                            </label>
-                            <div className="flex gap-1.5">
-                              <input
-                                type="text"
-                                value={regState}
-                                onChange={e => setRegState(e.target.value)}
-                                className="w-2/3 rounded-xl border border-gray-300 px-2.5 py-2 text-xs font-bold outline-none"
-                              />
-                              <input
-                                type="text"
-                                value={regPincode}
-                                onChange={e => setRegPincode(e.target.value)}
-                                className="w-1/3 rounded-xl border border-gray-300 px-2 py-2 text-xs font-bold outline-none"
-                              />
-                            </div>
-                          </div>
-
-                          <div>
-                            <label className="block text-[11px] font-bold text-gray-700 mb-1">
-                              Total Land Area (Acres)
-                            </label>
-                            <input
-                              type="number"
-                              step="0.5"
-                              value={regAcreage}
-                              onChange={e => setRegAcreage(e.target.value)}
-                              className="w-full rounded-xl border border-gray-300 px-3 py-2 text-xs font-bold outline-none focus:border-emerald-600"
-                            />
-                          </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-gray-700 mb-1">
+                            Total Land Area (Acres)
+                          </label>
+                          <input
+                            type="number"
+                            step="0.5"
+                            value={regAcreage}
+                            onChange={e => setRegAcreage(e.target.value)}
+                            className="w-full rounded-xl border border-gray-300 px-3 py-2 text-xs font-bold outline-none focus:border-emerald-600"
+                          />
                         </div>
 
                         <div>

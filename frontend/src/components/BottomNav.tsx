@@ -250,15 +250,15 @@ export const BottomNav: React.FC<BottomNavProps> = ({
             {/* Drawer Header */}
             <div className="p-4 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-black text-lg">
-                  🌾
+                <div className="w-10 h-10 rounded-xl bg-white p-1 border border-gray-200 dark:border-slate-700 shadow-sm flex items-center justify-center shrink-0 overflow-hidden">
+                  <img src="/agrodex-symbol.png" alt="AgroDex Logo" className="w-full h-full object-contain" />
                 </div>
                 <div>
                   <h3 className="font-black text-sm text-gray-900 dark:text-white leading-tight">
-                    AgroDex Super Platform
+                    AgroDex <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">AI Platform</span>
                   </h3>
                   <p className="text-[11px] text-gray-500 dark:text-gray-400">
-                    {user?.name || 'Farmer'} • {user?.village || 'Kadiri Rural'} ({role})
+                    {user?.name || 'Farmer'} • {user?.village || 'Local Area'} ({role})
                   </p>
                 </div>
               </div>

@@ -184,8 +184,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                   else setActiveTab(isSimpleMode ? 'simple-dashboard' : 'home');
                 }}
               >
-                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/10 flex items-center justify-center border border-white/20 shadow-inner shrink-0">
-                  <span className="text-xl sm:text-2xl">🌾</span>
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white p-1 flex items-center justify-center border border-white/20 shadow-sm shrink-0 overflow-hidden">
+                  <img src="/agrodex-symbol.png" alt="AgroDex" className="w-full h-full object-contain" />
                 </div>
                 <div>
                   <div className="flex items-center gap-1.5">

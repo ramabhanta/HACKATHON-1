@@ -518,8 +518,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
 
       {/* 1. Header Greeting & Rural Welcome */}
       <div className="bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800 rounded-3xl p-5 sm:p-8 text-white shadow-xl relative overflow-hidden">
-        <div className="absolute -right-10 -bottom-10 opacity-10 text-white pointer-events-none select-none text-[180px]">
-          🌾
+        <div className="absolute -right-4 -bottom-4 opacity-15 pointer-events-none select-none w-48 h-48 sm:w-60 sm:h-60 flex items-center justify-center">
+          <img src="/agrodex-symbol.png" alt="" className="w-full h-full object-contain filter brightness-200" />
         </div>
         <div className="relative z-10 max-w-3xl">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-900/50 backdrop-blur-md border border-emerald-400/40 text-emerald-100 text-xs font-semibold mb-3 shadow-sm">

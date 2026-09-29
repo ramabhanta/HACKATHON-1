@@ -698,8 +698,8 @@ export const AiAssistant: React.FC<AiAssistantProps> = ({ onOpenVoice, setActive
       {/* Header bar */}
       <div className="bg-emerald-800 text-white p-3.5 sm:p-4 flex items-center justify-between border-b border-emerald-900">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center text-2xl border border-white/20">
-            🤖
+          <div className="w-10 h-10 rounded-2xl bg-white p-1 flex items-center justify-center border border-white/20 shadow-sm shrink-0 overflow-hidden">
+            <img src="/agrodex-symbol.png" alt="AgroDex AI" className="w-full h-full object-contain" />
           </div>
           <div>
             <div className="flex items-center gap-2">
@@ -710,7 +710,7 @@ export const AiAssistant: React.FC<AiAssistantProps> = ({ onOpenVoice, setActive
               </span>
             </div>
             <p className="text-[11px] text-emerald-200 truncate max-w-xs sm:max-w-md">
-              Sri Venkateswara Farm • Kadiri (Groundnut & Tomato)
+              {user?.name || 'Farmer'} • {user?.village || 'Regional Cluster'} (Standing Crops Advisory)
             </p>
           </div>
         </div>
@@ -745,13 +745,13 @@ export const AiAssistant: React.FC<AiAssistantProps> = ({ onOpenVoice, setActive
             className={`flex items-start gap-2.5 ${msg.sender === 'user' ? 'flex-row-reverse' : ''}`}
           >
             <div
-              className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-sm font-bold shadow-xs ${
+              className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-sm font-bold shadow-xs overflow-hidden ${
                 msg.sender === 'user'
                   ? 'bg-amber-500 text-white'
-                  : 'bg-emerald-700 text-white'
+                  : 'bg-white border border-emerald-200 p-0.5'
               }`}
             >
-              {msg.sender === 'user' ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
+              {msg.sender === 'user' ? <User className="w-4 h-4" /> : <img src="/agrodex-symbol.png" alt="AI" className="w-full h-full object-contain" />}
             </div>
 
             <div

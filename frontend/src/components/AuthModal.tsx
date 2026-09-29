@@ -360,16 +360,16 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialTa
 
         {/* Modal Header */}
         <div className="text-center pt-2">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-800 text-2xl mb-2">
-            🌱
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white p-1.5 shadow-md border border-emerald-100 mb-2 overflow-hidden">
+            <img src="/agrodex-symbol.png" alt="AgroDex Logo" className="w-full h-full object-contain" />
           </div>
           <h2 className="text-xl font-black text-gray-900 tracking-tight">
-            {mode === 'LOGIN' && 'Sign In to AgriConnect'}
-            {mode === 'REGISTER' && 'Create Your Agri Account'}
-            {mode === 'FORGOT_PASSWORD' && 'Reset Your Password'}
+            {mode === 'LOGIN' && 'Sign In to AgroDex'}
+            {mode === 'REGISTER' && 'Create Your AgroDex Account'}
+            {mode === 'FORGOT_PASSWORD' && 'Reset Your AgroDex Password'}
           </h2>
           <p className="text-xs text-gray-500 mt-0.5">
-            {mode === 'LOGIN' && '100% Email & Password Authentication'}
+            {mode === 'LOGIN' && 'AgroDex — Cultivating Intelligence'}
             {mode === 'REGISTER' && 'Join thousands of Farmers, Buyers, and Agro Shops'}
             {mode === 'FORGOT_PASSWORD' && 'Secure self-service verification via Email OTP'}
           </p>

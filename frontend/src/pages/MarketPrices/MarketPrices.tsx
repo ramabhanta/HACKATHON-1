@@ -785,7 +785,7 @@ export const MarketPrices: React.FC<MarketPricesProps> = ({ setActiveTab }) => {
   };
 
   return (
-    <div className="space-y-6 pb-16">
+    <div className="w-full max-w-7xl mx-auto space-y-6 pb-20 md:pb-8 overflow-x-hidden">
       {/* Toast Notification */}
       {successToast && (
         <div className="fixed top-20 right-4 z-50 max-w-md bg-emerald-900 text-white px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 border border-emerald-700 animate-in fade-in slide-in-from-top-4 duration-300">

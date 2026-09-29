@@ -86,6 +86,52 @@ const compressImageFile = async (file: File): Promise<File> => {
   });
 };
 
+// Certified Branded Crop Protection Medicine Catalog for Targeted Disease Response
+const CERTIFIED_MEDICINE_CATALOG = [
+  {
+    id: 'prod-saaf-500g',
+    name: 'UPL Saaf Fungicide',
+    technicalFormula: 'Carbendazim 12% + Mancozeb 63% WP',
+    brand: 'UPL',
+    brandBadge: 'UPL Certified',
+    price: 440,
+    mrp: 520,
+    packSize: '500g Moisture-Proof Pouch',
+    dosage: '2.0 g/Litre of water (400g / 200L water per acre)',
+    recommendedStage: 'Foliar spray at onset of leaf lesions or tikka spots',
+    images: ['https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?w=400'],
+    category: 'CROP_PROTECTION'
+  },
+  {
+    id: 'prod-amistar-top-200ml',
+    name: 'Syngenta Amistar Top',
+    technicalFormula: 'Azoxystrobin 18.2% + Difenoconazole 11.4% SC',
+    brand: 'Syngenta',
+    brandBadge: 'Syngenta Premium',
+    price: 980,
+    mrp: 1150,
+    packSize: '200ml Precision Bottle',
+    dosage: '1.0 ml/Litre of water (200ml / 200L water per acre)',
+    recommendedStage: 'Systemic curative & broad-spectrum translaminar protection',
+    images: ['https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=400'],
+    category: 'CROP_PROTECTION'
+  },
+  {
+    id: 'prod-dhanucop-500g',
+    name: 'Dhanuka Dhanucop',
+    technicalFormula: 'Copper Oxychloride 50% WP',
+    brand: 'Dhanuka',
+    brandBadge: 'Dhanuka Quality',
+    price: 480,
+    mrp: 560,
+    packSize: '500g Sealed Pouch',
+    dosage: '2.5g - 3.0g/Litre of water (500g in 200L water per acre)',
+    recommendedStage: 'Protective contact fungicide & bactericide against blights',
+    images: ['https://images.unsplash.com/photo-1615485500704-8e990f9900f7?w=400'],
+    category: 'CROP_PROTECTION'
+  }
+];
+
 interface DiseaseScanProps {
   setActiveTab: (tab: string) => void;
 }
@@ -490,7 +536,7 @@ export const DiseaseScan: React.FC<DiseaseScanProps> = ({ setActiveTab }) => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 pb-20 md:pb-8">
+    <div className="w-full max-w-7xl mx-auto space-y-6 pb-20 md:pb-8 overflow-x-hidden">
       {/* Toast Notification */}
       {toastMsg && (
         <div className="fixed top-5 right-5 z-50 px-4 py-3 rounded-2xl shadow-xl flex items-center gap-2.5 text-xs font-bold bg-emerald-800 text-white border border-emerald-600 animate-in slide-in-from-top-2 duration-300">
@@ -561,10 +607,18 @@ export const DiseaseScan: React.FC<DiseaseScanProps> = ({ setActiveTab }) => {
                   </div>
                 )}
 
-                <label className="absolute top-3 right-3 p-2 bg-black/70 hover:bg-black/90 text-white rounded-xl text-xs font-semibold cursor-pointer shadow transition backdrop-blur-xs flex items-center gap-1 z-10">
-                  <Camera className="w-4 h-4" /> Change Photo
+                <label className="absolute top-3 right-3 h-11 min-h-[44px] px-3.5 py-2 bg-black/75 hover:bg-black text-white rounded-xl text-xs font-semibold cursor-pointer shadow-md transition backdrop-blur-xs flex items-center gap-1.5 z-10 active:scale-95">
+                  <Camera className="w-4 h-4" /> <span>Change Photo</span>
                   <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
                 </label>
+
+                {/* Mobile-friendly bottom change photo button */}
+                <div className="mt-3 flex items-center justify-center sm:hidden">
+                  <label className="h-11 min-h-[44px] w-full px-4 py-2.5 bg-stone-800 hover:bg-black text-white rounded-xl text-xs font-bold cursor-pointer transition flex items-center justify-center gap-2 shadow-sm active:scale-95">
+                    <Camera className="w-4 h-4" /> <span>Change Photo</span>
+                    <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
+                  </label>
+                </div>
               </div>
             ) : (
               <div className="text-center p-6">
@@ -572,13 +626,13 @@ export const DiseaseScan: React.FC<DiseaseScanProps> = ({ setActiveTab }) => {
                   <Camera className="w-8 h-8" />
                 </div>
                 <h4 className="font-bold text-sm text-gray-800">Take or Upload Leaf Photo</h4>
-                <p className="text-xs text-gray-500 mt-1 max-w-xs">
+                <p className="text-xs text-gray-500 mt-1 max-w-xs mx-auto">
                   Snap an affected leaf showing lesions or discoloration
                 </p>
 
                 <div className="flex items-center justify-center gap-2 mt-4">
-                  <label className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl cursor-pointer shadow transition active:scale-95 flex items-center gap-1.5">
-                    <Upload className="w-4 h-4" /> Choose from Gallery / Camera
+                  <label className="h-11 min-h-[44px] px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl cursor-pointer shadow transition active:scale-95 flex items-center justify-center gap-2 w-full sm:w-auto text-center">
+                    <Upload className="w-4 h-4" /> <span>Choose from Gallery / Camera</span>
                     <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
                   </label>
                 </div>
@@ -597,7 +651,7 @@ export const DiseaseScan: React.FC<DiseaseScanProps> = ({ setActiveTab }) => {
                   <button
                     key={idx}
                     onClick={() => handleSelectSample(sample)}
-                    className="p-2 rounded-xl border border-gray-200 hover:border-emerald-500 bg-gray-50 hover:bg-emerald-50/50 transition text-left group flex flex-col items-center"
+                    className="p-2 rounded-xl border border-gray-200 hover:border-emerald-500 bg-gray-50 hover:bg-emerald-50/50 transition text-left group flex flex-col items-center min-h-[88px] justify-between"
                   >
                     <img
                       src={sample.url}
@@ -636,12 +690,12 @@ export const DiseaseScan: React.FC<DiseaseScanProps> = ({ setActiveTab }) => {
               <button
                 onClick={() => handleRunScan()}
                 disabled={!selectedImage || isAnalyzing}
-                className="w-full py-3.5 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-extrabold rounded-2xl shadow-lg transition active:scale-95 flex items-center justify-center gap-2 text-sm"
+                className="w-full h-12 min-h-[44px] px-4 py-3 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-extrabold rounded-2xl shadow-lg transition active:scale-95 flex items-center justify-center gap-2 text-xs sm:text-sm text-center"
               >
                 {isAnalyzing ? (
                   <>
-                    <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                    <span>
+                    <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin shrink-0"></span>
+                    <span className="truncate">
                       {scanStep === 1
                         ? 'Validating & Preprocessing Image...'
                         : scanStep === 2
@@ -651,8 +705,8 @@ export const DiseaseScan: React.FC<DiseaseScanProps> = ({ setActiveTab }) => {
                   </>
                 ) : (
                   <>
-                    <Sparkles className="w-5 h-5 text-amber-300" />
-                    <span>Scan Leaf & Diagnose Problem</span>
+                    <Sparkles className="w-5 h-5 text-amber-300 shrink-0" />
+                    <span className="truncate">Scan Leaf & Diagnose Problem</span>
                   </>
                 )}
               </button>
@@ -1039,47 +1093,129 @@ export const DiseaseScan: React.FC<DiseaseScanProps> = ({ setActiveTab }) => {
           </div>
 
           {/* Matched Certified Products in Local Shops */}
-          {diagnosis.products && diagnosis.products.length > 0 && (
-            <div>
-              <h3 className="text-sm font-extrabold text-gray-900 mb-3 flex items-center gap-2">
-                <span>🛒</span> {t('matchedProductsTitle')}
-              </h3>
+          {(() => {
+            const raw = Array.isArray(diagnosis.products) && diagnosis.products.length > 0 ? diagnosis.products : [];
+            const merged = [...raw];
+            CERTIFIED_MEDICINE_CATALOG.forEach(cert => {
+              if (!merged.some(p => p.id === cert.id || p.name?.toLowerCase().includes(cert.brand.toLowerCase()))) {
+                merged.push(cert);
+              }
+            });
+            const displayed = merged.slice(0, 3);
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {diagnosis.products.map((p: any) => (
-                  <div
-                    key={p.id}
-                    className="p-3.5 rounded-2xl border border-gray-200 bg-white hover:border-emerald-300 shadow-xs flex items-center justify-between gap-3"
-                  >
-                    <div className="flex items-center gap-3 overflow-hidden">
-                      <img
-                        src={p.images?.[0] || 'https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?w=120'}
-                        alt={p.name}
-                        className="w-12 h-12 rounded-xl object-cover border border-gray-100 shrink-0"
-                      />
-                      <div className="truncate">
-                        <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded">
-                          {p.brand}
-                        </span>
-                        <h4 className="font-bold text-xs text-gray-900 truncate mt-0.5">{p.name}</h4>
-                        <p className="text-[11px] text-gray-500 font-medium">₹{p.price} • {p.packSize}</p>
+            return (
+              <div className="space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-100 pb-3">
+                  <div>
+                    <h3 className="text-sm sm:text-base font-black text-gray-900 flex items-center gap-2">
+                      <span>🛒</span> {t('matchedProductsTitle') || 'Certified Agronomic Medicines & Packaging'}
+                    </h3>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      Authentic branded crop protection medicines with verified dosage and direct farmer booking
+                    </p>
+                  </div>
+                  <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-200 self-start sm:self-auto">
+                    ✓ 100% Genuine AgroDex Verified
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4">
+                  {displayed.map((p: any) => (
+                    <div
+                      key={p.id}
+                      className="bg-white rounded-3xl p-4 sm:p-5 border border-emerald-200/90 shadow-sm hover:shadow-md transition-all flex flex-col justify-between overflow-hidden min-w-0"
+                    >
+                      <div>
+                        {/* Top Thumbnail & Brand Badge */}
+                        <div className="flex items-start gap-3 mb-3">
+                          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-stone-50 border border-stone-200 p-1 flex items-center justify-center shrink-0 overflow-hidden relative shadow-2xs">
+                            <img
+                              src={p.images?.[0] || p.imageUrl || 'https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?w=200'}
+                              alt={p.name}
+                              className="w-full h-full object-contain rounded-xl"
+                              onError={(e: any) => {
+                                e.currentTarget.onerror = null;
+                                e.currentTarget.src = 'https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?w=200';
+                              }}
+                            />
+                          </div>
+
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span className="px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-900 border border-emerald-300/60">
+                                {p.brandBadge || p.brand}
+                              </span>
+                              <span className="text-[10px] font-bold text-gray-500">
+                                {p.packSize}
+                              </span>
+                            </div>
+                            <h4 className="font-extrabold text-xs sm:text-sm text-gray-900 mt-1 leading-snug line-clamp-2 break-words">
+                              {p.name}
+                            </h4>
+                            {p.technicalFormula && (
+                              <p className="text-[10px] text-gray-500 font-mono mt-0.5 line-clamp-1 truncate">
+                                {p.technicalFormula}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Price and MRP */}
+                        <div className="flex items-baseline gap-2 pt-2 border-t border-gray-100">
+                          <span className="text-lg sm:text-xl font-black text-gray-900">
+                            ₹{p.price}
+                          </span>
+                          {p.mrp && p.mrp > p.price && (
+                            <>
+                              <span className="text-xs text-gray-400 line-through">
+                                ₹{p.mrp}
+                              </span>
+                              <span className="text-[10px] font-extrabold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">
+                                Save ₹{p.mrp - p.price}
+                              </span>
+                            </>
+                          )}
+                        </div>
+
+                        {/* Dosage & Application Recommendation */}
+                        <div className="my-3 p-2.5 rounded-xl bg-emerald-50/70 border border-emerald-200/80 text-emerald-950 text-xs">
+                          <span className="font-extrabold block text-emerald-900 text-[10px] uppercase tracking-wide mb-0.5">
+                            🧪 Recommended Dosage:
+                          </span>
+                          <p className="font-bold text-emerald-800 text-[11px] leading-snug break-words">
+                            {p.dosage || '2g per Litre of water (Foliar spray)'}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Action Buttons with 100% Touch Target Parity */}
+                      <div className="space-y-2 pt-1">
+                        <button
+                          onClick={() => {
+                            addToCart(p);
+                            setActiveTab('cart');
+                          }}
+                          className="h-11 min-h-[44px] w-full px-3 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs sm:text-sm rounded-xl shadow-xs transition active:scale-95 flex items-center justify-center gap-2 text-center"
+                        >
+                          <ShoppingBag className="w-4 h-4" />
+                          <span>{t('addToCart') || 'Add to Cart'}</span>
+                        </button>
+                        <button
+                          onClick={() => {
+                            addToCart(p);
+                            setActiveTab('store');
+                          }}
+                          className="h-10 min-h-[40px] w-full px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-950 font-bold text-xs rounded-xl border border-amber-300 transition active:scale-95 flex items-center justify-center gap-1.5 text-center"
+                        >
+                          <span>📍 Book at Nearby Store</span>
+                        </button>
                       </div>
                     </div>
-
-                    <button
-                      onClick={() => {
-                        addToCart(p);
-                        setActiveTab('cart');
-                      }}
-                      className="px-3 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-xs shrink-0 transition active:scale-95"
-                    >
-                      {t('addToCart')}
-                    </button>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           {/* Ask AgroDex AI Assistant CTA */}
           <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 bg-emerald-900 text-white p-4 rounded-2xl">

@@ -29,7 +29,7 @@ export const SimpleFieldDashboard: React.FC<SimpleFieldDashboardProps> = ({
   const { setMode } = useDisplayMode();
 
   return (
-    <div className="space-y-6 pb-20 md:pb-8 max-w-4xl mx-auto">
+    <div className="w-full max-w-7xl mx-auto space-y-6 pb-20 md:pb-8 overflow-x-hidden">
       {/* Mode Indicator & Switcher Banner */}
       <div className="bg-amber-100 border-2 border-amber-300 rounded-3xl p-4 flex items-center justify-between gap-3 text-amber-950">
         <div className="flex items-center gap-2.5">
@@ -57,7 +57,7 @@ export const SimpleFieldDashboard: React.FC<SimpleFieldDashboardProps> = ({
         </div>
         <button
           onClick={() => setMode('PRO')}
-          className="px-3.5 py-2 rounded-xl bg-emerald-800 text-white font-black text-xs shadow-md transition active:scale-95 shrink-0"
+          className="h-11 min-h-[44px] px-3.5 py-2 rounded-xl bg-emerald-800 text-white font-black text-xs shadow-md transition active:scale-95 shrink-0 flex items-center justify-center"
         >
           {language === 'kn'
             ? 'ಪ್ರೊ ಮೋಡ್‌ಗೆ ಬದಲಾಯಿಸಿ 📊'

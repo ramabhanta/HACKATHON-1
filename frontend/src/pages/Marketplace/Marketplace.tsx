@@ -378,7 +378,7 @@ export const Marketplace: React.FC<MarketplaceProps> = ({ setActiveTab }) => {
   });
 
   return (
-    <div className="space-y-6 pb-20 md:pb-8">
+    <div className="w-full max-w-7xl mx-auto space-y-6 pb-20 md:pb-8 overflow-x-hidden">
       {/* Toast Notification */}
       {addedToast && (
         <div className="fixed top-20 right-4 z-50 bg-emerald-800 text-white px-4 py-3 rounded-2xl shadow-xl flex items-center gap-2 border border-emerald-600 animate-in slide-in-from-top duration-200">
@@ -642,7 +642,7 @@ export const Marketplace: React.FC<MarketplaceProps> = ({ setActiveTab }) => {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setActiveProductModal(p)}
-                    className="p-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 transition"
+                    className="h-11 min-h-[44px] w-11 min-w-[44px] flex items-center justify-center rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 transition shrink-0"
                     title="View Agricultural Guidelines"
                   >
                     <Info className="w-4 h-4" />
@@ -650,7 +650,7 @@ export const Marketplace: React.FC<MarketplaceProps> = ({ setActiveTab }) => {
 
                   <button
                     onClick={() => openBookingModal(p)}
-                    className="flex-1 py-2.5 px-3 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-black shadow-sm transition active:scale-95 flex items-center justify-center gap-1.5"
+                    className="flex-1 h-11 min-h-[44px] py-2.5 px-3 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-black shadow-sm transition active:scale-95 flex items-center justify-center gap-1.5"
                   >
                     <ShoppingBag className="w-3.5 h-3.5" />
                     <span>{t('Book at Nearby Store')}</span>

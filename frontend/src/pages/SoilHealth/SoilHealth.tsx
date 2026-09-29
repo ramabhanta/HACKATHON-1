@@ -129,7 +129,7 @@ export const SoilHealth: React.FC<SoilHealthProps> = ({ setActiveTab }) => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 pb-20 md:pb-8">
+    <div className="w-full max-w-7xl mx-auto space-y-6 pb-20 md:pb-8 overflow-x-hidden">
       {/* Toast Notification */}
       {toast && (
         <div className="fixed top-5 right-5 z-50 px-4 py-3 rounded-2xl shadow-xl flex items-center gap-2.5 text-xs font-bold bg-emerald-800 text-white border border-emerald-600 animate-in slide-in-from-top-2 duration-300">
@@ -139,7 +139,7 @@ export const SoilHealth: React.FC<SoilHealthProps> = ({ setActiveTab }) => {
       )}
 
       {/* Title */}
-      <div className="bg-white rounded-3xl p-6 shadow-sm border border-emerald-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-emerald-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-lime-50 text-lime-800 text-xs font-bold border border-lime-200 mb-2">
             <span>🌱 Soil Intelligence & Fertilizer Balancer</span>

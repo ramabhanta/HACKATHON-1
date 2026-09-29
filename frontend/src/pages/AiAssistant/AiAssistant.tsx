@@ -694,7 +694,7 @@ export const AiAssistant: React.FC<AiAssistantProps> = ({ onOpenVoice, setActive
   };
 
   return (
-    <div className="max-w-4xl mx-auto flex flex-col h-[calc(100vh-140px)] md:h-[calc(100vh-120px)] bg-white rounded-3xl shadow-sm border border-emerald-100 overflow-hidden">
+    <div className="w-full max-w-7xl mx-auto flex flex-col h-[calc(100vh-150px)] md:h-[calc(100vh-120px)] bg-white rounded-3xl shadow-sm border border-emerald-100 overflow-hidden">
       {/* Header bar */}
       <div className="bg-emerald-800 text-white p-3.5 sm:p-4 flex items-center justify-between border-b border-emerald-900">
         <div className="flex items-center gap-3">

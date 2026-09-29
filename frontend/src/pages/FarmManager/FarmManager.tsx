@@ -373,7 +373,7 @@ export const FarmManager: React.FC<FarmManagerProps> = ({ setActiveTab }) => {
   const availableCrops = currentFarm?.crops || [];
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 pb-20 md:pb-8">
+    <div className="w-full max-w-7xl mx-auto space-y-6 pb-20 md:pb-8 overflow-x-hidden">
       {/* Toast Alert Notification */}
       {toast && (
         <div
@@ -389,7 +389,7 @@ export const FarmManager: React.FC<FarmManagerProps> = ({ setActiveTab }) => {
       )}
 
       {/* Header */}
-      <div className="bg-white rounded-3xl p-6 shadow-sm border border-emerald-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-emerald-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-bold border border-emerald-200 mb-2">
             <span>📊 {currentFarm?.name || 'Sri Venkateswara Farm'} ({currentFarm?.totalArea || 5.5} Acres)</span>
@@ -402,18 +402,18 @@ export const FarmManager: React.FC<FarmManagerProps> = ({ setActiveTab }) => {
           </p>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={openNewTaskModal}
-            className="px-3.5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-xs transition active:scale-95 flex items-center gap-1.5"
+            className="h-11 min-h-[44px] px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs sm:text-sm rounded-xl shadow-xs transition active:scale-95 flex items-center justify-center gap-1.5 flex-1 sm:flex-initial"
           >
-            <Plus className="w-4 h-4" /> Add Task
+            <Plus className="w-4 h-4" /> <span>Add Task</span>
           </button>
           <button
             onClick={openNewExpenseModal}
-            className="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl shadow-xs transition active:scale-95 flex items-center gap-1.5"
+            className="h-11 min-h-[44px] px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-extrabold text-xs sm:text-sm rounded-xl shadow-xs transition active:scale-95 flex items-center justify-center gap-1.5 flex-1 sm:flex-initial"
           >
-            <DollarSign className="w-4 h-4" /> Record Cost
+            <DollarSign className="w-4 h-4" /> <span>Record Cost</span>
           </button>
         </div>
       </div>

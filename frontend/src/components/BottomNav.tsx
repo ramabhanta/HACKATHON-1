@@ -122,7 +122,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab, o
             : 'bg-white/95 border-t border-gray-200 text-gray-800'
         }`}
       >
-        <div className="flex items-center justify-around h-15">
+        <div className="flex items-center justify-around h-16">
           {navItems.map(item => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
@@ -167,7 +167,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab, o
               <button
                 key={item.id}
                 onClick={() => handleItemClick(item.id)}
-                className={`flex flex-col items-center justify-center py-1 px-2.5 relative min-w-[48px] min-h-[48px] transition active:scale-95 ${
+                className={`flex flex-col items-center justify-center py-1 px-2.5 relative min-w-[52px] min-h-[44px] h-12 transition active:scale-95 ${
                   isActive
                     ? isDarkMode
                       ? 'text-emerald-400 font-black'
@@ -224,7 +224,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab, o
               </div>
               <button
                 onClick={() => setIsDrawerOpen(false)}
-                className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-slate-800 text-gray-500 hover:text-gray-900 flex items-center justify-center transition active:scale-95 border border-gray-200 dark:border-slate-700"
+                className="w-10 h-10 min-w-[40px] min-h-[40px] rounded-xl bg-gray-100 dark:bg-slate-800 text-gray-500 hover:text-gray-900 flex items-center justify-center transition active:scale-95 border border-gray-200 dark:border-slate-700"
                 aria-label="Close drawer"
               >
                 <X className="w-5 h-5" />
@@ -240,9 +240,9 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab, o
                     setIsDrawerOpen(false);
                     onOpenVoice();
                   }}
-                  className="px-3 py-1.5 rounded-xl bg-emerald-700 text-amber-300 font-bold text-xs flex items-center gap-1.5 whitespace-nowrap shadow-xs"
+                  className="h-11 min-h-[44px] px-3.5 py-2 rounded-xl bg-emerald-700 text-amber-300 font-bold text-xs flex items-center gap-1.5 whitespace-nowrap shadow-xs"
                 >
-                  <Volume2 className="w-3.5 h-3.5" />
+                  <Volume2 className="w-4 h-4" />
                   <span>Voice Advisory</span>
                 </button>
               )}
@@ -250,7 +250,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab, o
               {/* Display Mode Toggle */}
               <button
                 onClick={() => setMode(mode === 'DARK' ? 'PRO' : mode === 'PRO' ? 'SIMPLE' : 'DARK')}
-                className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 text-xs font-bold flex items-center gap-1.5 whitespace-nowrap text-gray-700 dark:text-gray-200"
+                className="h-11 min-h-[44px] px-3.5 py-2 rounded-xl bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 text-xs font-bold flex items-center gap-1.5 whitespace-nowrap text-gray-700 dark:text-gray-200"
               >
                 {mode === 'DARK' ? <Moon className="w-3.5 h-3.5 text-amber-400" /> : mode === 'SIMPLE' ? <Layout className="w-3.5 h-3.5 text-emerald-600" /> : <Sun className="w-3.5 h-3.5 text-amber-500" />}
                 <span>Mode: {mode}</span>
@@ -259,11 +259,40 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab, o
               {/* Language Switcher */}
               <button
                 onClick={() => setShowLangPicker(!showLangPicker)}
-                className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 text-xs font-bold flex items-center gap-1.5 whitespace-nowrap text-gray-700 dark:text-gray-200"
+                className="h-11 min-h-[44px] px-3.5 py-2 rounded-xl bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 text-xs font-bold flex items-center gap-1.5 whitespace-nowrap text-gray-700 dark:text-gray-200"
               >
                 <Globe className="w-3.5 h-3.5 text-emerald-600" />
                 <span>{currentLangMeta?.nativeName || language.toUpperCase()}</span>
               </button>
+            </div>
+
+            {/* 1-Tap Quick Action Grid for Core Tools */}
+            <div className="p-4 pb-2 border-b border-gray-100 dark:border-slate-800">
+              <p className="text-[10px] font-black uppercase tracking-wider text-emerald-700 dark:text-emerald-400 mb-2 flex items-center gap-1.5">
+                <span>⚡</span> <span>1-Tap Instant Quick Actions</span>
+              </p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {[
+                  { id: 'scan', label: 'AI Disease Scan', icon: '📷', bg: 'bg-amber-50 hover:bg-amber-100 text-amber-950 border-amber-200' },
+                  { id: 'soil', label: 'Soil Health Card', icon: '🌱', bg: 'bg-lime-50 hover:bg-lime-100 text-lime-950 border-lime-200' },
+                  { id: 'store', label: 'Agro Store', icon: '🛒', bg: 'bg-teal-50 hover:bg-teal-100 text-teal-950 border-teal-200' },
+                  { id: 'prices', label: 'Mandi Rates', icon: '📈', bg: 'bg-blue-50 hover:bg-blue-100 text-blue-950 border-blue-200' },
+                  { id: 'farm-manager', label: 'Farm Manager', icon: '🚜', bg: 'bg-emerald-50 hover:bg-emerald-100 text-emerald-950 border-emerald-200' },
+                  { id: 'produce', label: 'Sell Produce', icon: '📦', bg: 'bg-purple-50 hover:bg-purple-100 text-purple-950 border-purple-200' },
+                ].map(item => (
+                  <button
+                    key={item.id}
+                    onClick={() => {
+                      setActiveTab(item.id);
+                      setIsDrawerOpen(false);
+                    }}
+                    className={`h-11 min-h-[44px] px-3 py-2 rounded-xl border font-bold text-xs flex items-center gap-2 transition active:scale-95 shadow-2xs ${item.bg}`}
+                  >
+                    <span className="text-base">{item.icon}</span>
+                    <span className="truncate">{item.label}</span>
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Inline Language Picker Popup in Drawer */}

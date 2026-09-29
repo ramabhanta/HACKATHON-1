@@ -86,15 +86,49 @@ export const OrderHistory: React.FC<OrderHistoryProps> = ({ setActiveTab }) => {
 
   const loadOrders = async () => {
     try {
-      const res = await fetch('/api/orders', {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('agri_token')}`
+      let serverOrders: any[] = [];
+      try {
+        const res = await fetch('/api/orders', {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('agri_token')}`
+          }
+        });
+        if (res.ok) {
+          serverOrders = await res.json();
+        }
+      } catch (fetchErr) {
+        console.warn('Backend orders fetch failed, using local orders cache:', fetchErr);
+      }
+
+      let localBookings: any[] = [];
+      try {
+        const b = JSON.parse(localStorage.getItem('agri_bookings') || '[]');
+        const o = JSON.parse(localStorage.getItem('agri_orders') || '[]');
+        localBookings = [...b, ...o];
+      } catch (e) {}
+
+      const orderMap = new Map<string, any>();
+      (serverOrders || []).forEach(item => {
+        if (item && (item.id || item.orderNumber)) {
+          orderMap.set(item.id || item.orderNumber, item);
         }
       });
-      if (res.ok) {
-        const data = await res.json();
-        setOrders(data);
-      }
+      (localBookings || []).forEach(item => {
+        if (item && (item.id || item.orderNumber)) {
+          const key = item.id || item.orderNumber;
+          if (!orderMap.has(key) && !orderMap.has(item.orderNumber) && !orderMap.has(item.id)) {
+            orderMap.set(key, item);
+          }
+        }
+      });
+
+      const merged = Array.from(orderMap.values()).sort((a, b) => {
+        const da = new Date(a.createdAt || 0).getTime();
+        const db = new Date(b.createdAt || 0).getTime();
+        return db - da;
+      });
+
+      setOrders(merged);
     } catch (err) {
       console.error('Failed to load orders:', err);
     } finally {

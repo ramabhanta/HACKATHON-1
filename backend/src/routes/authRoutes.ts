@@ -5,7 +5,7 @@ import crypto from 'crypto';
 import { db } from '../database/db.js';
 import { config } from '../config/index.js';
 import { authenticate, AuthenticatedRequest } from '../middleware/auth.js';
-import { User, UserRole } from '../models/types.js';
+import { User, UserRole, ProcurementVendor } from '../models/types.js';
 import { v4 as uuidv4 } from 'uuid';
 import { SupabaseDataService } from '../database/supabaseDataService.js';
 
@@ -374,17 +374,34 @@ authRouter.post('/register', async (req: Request, res: Response) => {
       });
     } else if (registeredUser.role === 'BUYER') {
       // Produce Procurement Wholesaler
-      const buyerProf = {
-        id: `prof-${uuidv4().substring(0, 8)}`,
-        userId: registeredUser.id,
-        companyName: companyName || `${name} Agri Mandi Trades`,
-        panGst: panGst || '',
-        preferredCrops: Array.isArray(preferredCrops) ? preferredCrops : ['Groundnut', 'Tomato', 'Paddy'],
-        operatingRegion: operatingRegion || `${district}, ${state}`,
-        pincode: pincode || '515591',
-        contactPhone: formatted
+      const crops = Array.isArray(preferredCrops) && preferredCrops.length > 0 ? preferredCrops : ['Groundnut', 'Tomato', 'Paddy', 'Chilli'];
+      const buyerProf: ProcurementVendor = {
+        id: `proc-ven-${uuidv4().substring(0, 8)}`,
+        vendorId: registeredUser.id,
+        vendorName: name,
+        businessName: companyName || `${name} Wholesale Mandi Hub`,
+        phone: formatted,
+        avatarUrl: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=150',
+        cropsBought: crops,
+        buyingRates: crops.map(c => ({
+          crop: c,
+          rate: c.toLowerCase().includes('groundnut') ? 7450 : c.toLowerCase().includes('tomato') ? 520 : c.toLowerCase().includes('chilli') ? 19500 : 2400,
+          unit: (c.toLowerCase().includes('tomato') ? 'CRATE' : 'QUINTAL') as any,
+          note: 'Direct procurement at APMC benchmark rate'
+        })),
+        minQuantity: 10,
+        maxQuantity: 1000,
+        unit: 'QUINTAL',
+        village: village || 'Kadiri',
+        district: district || 'Sri Sathya Sai',
+        state: state || 'Andhra Pradesh',
+        paymentTerms: 'Instant Bank Transfer / Cash upon weighment',
+        pickupAvailable: true,
+        qualityPreference: 'Grade A FAQ produce, clean & sorted',
+        rating: 4.8,
+        verified: true
       };
-      db.insert('procurement_vendors' as any, buyerProf);
+      db.insert('procurement_vendors', buyerProf);
     }
 
     const token = jwt.sign(

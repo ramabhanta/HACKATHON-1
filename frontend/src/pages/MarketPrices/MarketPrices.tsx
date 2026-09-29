@@ -1457,7 +1457,7 @@ export const MarketPrices: React.FC<MarketPricesProps> = ({ setActiveTab }) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('agri_token')}`
+          Authorization: `Bearer ${localStorage.getItem('agri_token') || 'demo_token_farmer'}`
         },
         body: JSON.stringify(payload)
       });

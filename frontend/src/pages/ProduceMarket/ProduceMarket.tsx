@@ -34,6 +34,207 @@ import {
 import { extractPhotoTelemetry, PhotoTelemetryInfo } from '../../utils/photoTelemetry';
 import { exportProcurementVoucherPDF } from '../../utils/reportExport';
 import { subscribeToTable } from '../../services/supabaseClient';
+import { apiUrl } from '../../services/api';
+
+const PRELOADED_PROCUREMENT_VENDORS = [
+  {
+    id: "proc-ven-1",
+    vendorId: "usr-vendor-1",
+    vendorName: "Sri Lakshmi Agri Traders & Oil Mills",
+    businessName: "Sri Lakshmi Agri Procurement Yard & Oil Expellers",
+    phone: "+91 98490 54321",
+    avatarUrl: "https://images.unsplash.com/photo-1542838132-92c53300491e?w=150",
+    cropsBought: ["Groundnut", "Groundnut (Pod)", "Paddy", "Maize", "Sunflower", "Cotton"],
+    buyingRates: [
+      { crop: "Groundnut", rate: 7450, unit: "QUINTAL", note: "Sun-dried pods, moisture < 8%" },
+      { crop: "Paddy", rate: 2380, unit: "QUINTAL", note: "Grade A Sona Masoori" },
+      { crop: "Maize", rate: 2180, unit: "QUINTAL", note: "Clean yellow corn" },
+      { crop: "Sunflower", rate: 5600, unit: "QUINTAL", note: "Oil content > 38%" }
+    ],
+    minQuantity: 10,
+    maxQuantity: 500,
+    unit: "QUINTAL",
+    village: "Kadiri Town",
+    district: "Sri Sathya Sai",
+    state: "Andhra Pradesh",
+    paymentTerms: "Spot Cash / Instant UPI at Farm Gate",
+    pickupAvailable: true,
+    qualityPreference: "Grade A pods, clean sun-dried, foreign matter < 1%",
+    rating: 4.9,
+    verified: true,
+    activeRequestsCount: 0
+  },
+  {
+    id: "proc-ven-2",
+    vendorId: "usr-buyer-1",
+    vendorName: "Kisan Mandi Wholesalers & Cold Chain",
+    businessName: "Kisan Mandi Multi-Commodity Procure Hub",
+    phone: "+91 94400 98765",
+    avatarUrl: "https://images.unsplash.com/photo-1578575437130-527eed3abbec?w=150",
+    cropsBought: ["Tomato", "Chilli", "Onion", "Mango", "Watermelon", "Vegetables"],
+    buyingRates: [
+      { crop: "Tomato", rate: 520, unit: "CRATE", note: "25kg firm red-ripe hybrid" },
+      { crop: "Chilli", rate: 19500, unit: "QUINTAL", note: "Guntur Teja dry red" },
+      { crop: "Onion", rate: 2850, unit: "QUINTAL", note: "Medium-Large Nashik Red" },
+      { crop: "Mango", rate: 48000, unit: "TONNE", note: "Banganapalli grade 1" }
+    ],
+    minQuantity: 20,
+    maxQuantity: 1000,
+    unit: "CRATE",
+    district: "Bengaluru Urban",
+    state: "Karnataka",
+    paymentTerms: "Same-day Bank Transfer post weighment",
+    pickupAvailable: true,
+    qualityPreference: "Uniform ripeness, export carton grade, zero fruit borer",
+    rating: 4.8,
+    verified: true,
+    activeRequestsCount: 0
+  },
+  {
+    id: "proc-ven-ninja",
+    vendorId: "usr-vendor-ninja",
+    vendorName: "Ninjacart Agri Sourcing Team",
+    businessName: "Ninjacart Direct FarmGate Collection Hub",
+    phone: "+91 80088 12345",
+    avatarUrl: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=150",
+    cropsBought: ["Tomato", "Carrot", "Potato", "Chilli", "Onion", "Vegetables"],
+    buyingRates: [
+      { crop: "Tomato", rate: 540, unit: "CRATE", note: "Grade A Crate (25kg), Bangalore Direct" },
+      { crop: "Carrot", rate: 3200, unit: "QUINTAL", note: "Washed Ooty/Karnataka hybrid" },
+      { crop: "Potato", rate: 2350, unit: "QUINTAL", note: "Graded table variety" }
+    ],
+    minQuantity: 15,
+    maxQuantity: 2500,
+    unit: "CRATE",
+    district: "Kolar",
+    state: "Karnataka",
+    paymentTerms: "T+1 Automated NEFT / Direct UPI",
+    pickupAvailable: true,
+    qualityPreference: "Pre-sorted crates, farm-gate digital tare weighing",
+    rating: 4.9,
+    verified: true,
+    activeRequestsCount: 0
+  },
+  {
+    id: "proc-ven-reliance",
+    vendorId: "usr-vendor-reliance",
+    vendorName: "Reliance Retail Fresh FarmGate",
+    businessName: "Reliance Fresh Direct Sourcing Hub",
+    phone: "+91 87654 32100",
+    avatarUrl: "https://images.unsplash.com/photo-1542838132-92c53300491e?w=150",
+    cropsBought: ["Tomato", "Groundnut", "Onion", "Maize", "Fruits"],
+    buyingRates: [
+      { crop: "Tomato", rate: 530, unit: "CRATE", note: "Madanapalle & Kolar FarmGate collection" },
+      { crop: "Groundnut", rate: 7550, unit: "QUINTAL", note: "Oil content > 45%" }
+    ],
+    minQuantity: 25,
+    maxQuantity: 5000,
+    unit: "CRATE",
+    district: "Annamayya",
+    state: "Andhra Pradesh",
+    paymentTerms: "Corporate Direct Account Credit within 24h",
+    pickupAvailable: true,
+    qualityPreference: "Standard supermarket grade, minimum foreign matter",
+    rating: 4.9,
+    verified: true,
+    activeRequestsCount: 0
+  },
+  {
+    id: "proc-ven-itc",
+    vendorId: "usr-vendor-itc",
+    vendorName: "ITC e-Choupal Sourcing Desk",
+    businessName: "ITC e-Choupal Direct Farmer Sourcing Hub",
+    phone: "+91 91234 98765",
+    avatarUrl: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=150",
+    cropsBought: ["Chilli", "Paddy", "Cotton", "Groundnut"],
+    buyingRates: [
+      { crop: "Chilli", rate: 21500, unit: "QUINTAL", note: "Guntur Teja S17 / Deluxe Grade" },
+      { crop: "Cotton", rate: 7900, unit: "QUINTAL", note: "Medium-long staple 29mm" },
+      { crop: "Paddy", rate: 2650, unit: "QUINTAL", note: "BPT / Sona Masoori premium lot" }
+    ],
+    minQuantity: 20,
+    maxQuantity: 3000,
+    unit: "QUINTAL",
+    district: "Guntur",
+    state: "Andhra Pradesh",
+    paymentTerms: "Direct RTGS / e-Choupal digital wallet",
+    pickupAvailable: true,
+    qualityPreference: "CIBRC compliant, moisture certified by field tester",
+    rating: 4.9,
+    verified: true,
+    activeRequestsCount: 0
+  },
+  {
+    id: "proc-ven-phool",
+    vendorId: "usr-vendor-phool",
+    vendorName: "Sri Balaji Flower Commission Agents",
+    businessName: "Gudimalkapur & Bangalore Phool Syndicate",
+    phone: "+91 93456 78901",
+    avatarUrl: "https://images.unsplash.com/photo-1563245372-f21724e3856d?w=150",
+    cropsBought: ["Flowers", "Jasmine", "Rose", "Marigold", "Chrysanthemum", "Crossandra"],
+    buyingRates: [
+      { crop: "Flowers", rate: 420, unit: "KG", note: "Fresh unopened Jasmine / Kakada buds" },
+      { crop: "Marigold", rate: 75, unit: "KG", note: "Bright orange/yellow loose flowers" },
+      { crop: "Rose", rate: 260, unit: "BUNDLE", note: "Dutch red rose 20-stem bunch" }
+    ],
+    minQuantity: 10,
+    maxQuantity: 500,
+    unit: "KG",
+    district: "Chittoor",
+    state: "Andhra Pradesh",
+    paymentTerms: "Spot cash upon morning arrival & auction weighment",
+    pickupAvailable: true,
+    qualityPreference: "Harvested before 6:30 AM, moisture protected in wet gunny bags",
+    rating: 4.8,
+    verified: true,
+    activeRequestsCount: 0
+  }
+];
+
+const PRELOADED_PRODUCE_LISTINGS = [
+  {
+    id: "prod-list-1",
+    farmerId: "usr-farmer-1",
+    farmerName: "Ramesh Patel",
+    farmerPhone: "+91 98480 12345",
+    cropName: "Groundnut (Pod)",
+    variety: "Kadiri-6 (High Oil Content)",
+    quantity: 30,
+    unit: "QUINTAL",
+    expectedPricePerUnit: 7400,
+    harvestDate: "2026-10-25",
+    village: "Kadiri Rural",
+    district: "Sri Sathya Sai",
+    state: "Andhra Pradesh",
+    qualityGrade: "GRADE_A",
+    images: ["https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?w=400"],
+    description: "First quality Kadiri-6 groundnut pods with 2-seeded uniform kernels, clean sun-dried pods (moisture < 8%). Pre-booking accepted for October harvest.",
+    status: "AVAILABLE",
+    createdAt: "2026-09-20T10:00:00.000Z",
+    requestCount: 1
+  },
+  {
+    id: "prod-list-2",
+    farmerId: "usr-farmer-1",
+    farmerName: "Ramesh Patel",
+    farmerPhone: "+91 98480 12345",
+    cropName: "Tomato",
+    variety: "Arka Rakshak F1",
+    quantity: 50,
+    unit: "CRATE",
+    expectedPricePerUnit: 480,
+    harvestDate: "2026-11-10",
+    village: "Kadiri Rural",
+    district: "Sri Sathya Sai",
+    state: "Andhra Pradesh",
+    qualityGrade: "GRADE_A",
+    images: ["https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=400"],
+    description: "Firm, uniform red-ripe hybrid tomatoes (approx. 25 kg per crate). Ideal for retail supermarket supply and Bangalore mandi dispatch.",
+    status: "AVAILABLE",
+    createdAt: "2026-09-22T14:30:00.000Z",
+    requestCount: 0
+  }
+];
 
 interface ProduceMarketProps {
   setActiveTab: (tab: string) => void;
@@ -44,11 +245,11 @@ export const ProduceMarket: React.FC<ProduceMarketProps> = ({ setActiveTab }) =>
   const { t } = useLanguage();
 
   const [activeSubTab, setActiveSubTab] = useState<'BUYERS' | 'MY_DEALS' | 'BROWSE' | 'OFFERS'>('BUYERS');
-  const [listings, setListings] = useState<any[]>([]);
+  const [listings, setListings] = useState<any[]>(PRELOADED_PRODUCE_LISTINGS);
   const [myRequests, setMyRequests] = useState<{ incoming: any[]; outgoing: any[] }>({ incoming: [], outgoing: [] });
-  const [procurementVendors, setProcurementVendors] = useState<any[]>([]);
+  const [procurementVendors, setProcurementVendors] = useState<any[]>(PRELOADED_PROCUREMENT_VENDORS);
   const [myVendorDeals, setMyVendorDeals] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   // Crop & District Filter for Procurement Vendors
   const [selectedCropFilter, setSelectedCropFilter] = useState<string>('All');
@@ -128,23 +329,31 @@ export const ProduceMarket: React.FC<ProduceMarketProps> = ({ setActiveTab }) =>
 
   const loadData = async () => {
     try {
+      const token = localStorage.getItem('agri_token') || 'demo_token_farmer';
+      const authHeader = { Authorization: `Bearer ${token}` };
+
       const [lRes, rRes, vRes, dRes] = await Promise.all([
-        fetch('/api/produce'),
-        fetch('/api/produce/my-requests', {
-          headers: { Authorization: `Bearer ${localStorage.getItem('agri_token')}` }
-        }),
-        fetch('/api/produce/procurement-vendors'),
-        fetch('/api/produce/vendor-requests/my', {
-          headers: { Authorization: `Bearer ${localStorage.getItem('agri_token')}` }
-        })
+        fetch(apiUrl('/api/produce')),
+        fetch(apiUrl('/api/produce/my-requests'), { headers: authHeader }),
+        fetch(apiUrl('/api/produce/procurement-vendors')),
+        fetch(apiUrl('/api/produce/vendor-requests/my'), { headers: authHeader })
       ]);
 
-      if (lRes.ok) setListings(await lRes.json());
-      if (rRes.ok) setMyRequests(await rRes.json());
-      if (vRes.ok) setProcurementVendors(await vRes.json());
+      if (lRes.ok) {
+        const lData = await lRes.json();
+        if (Array.isArray(lData) && lData.length > 0) setListings(lData);
+      }
+      if (rRes.ok) {
+        const rData = await rRes.json();
+        if (rData) setMyRequests(rData);
+      }
+      if (vRes.ok) {
+        const vData = await vRes.json();
+        if (Array.isArray(vData) && vData.length > 0) setProcurementVendors(vData);
+      }
       if (dRes.ok) {
         const dealsData = await dRes.json();
-        setMyVendorDeals(dealsData.asFarmer || []);
+        if (dealsData?.asFarmer) setMyVendorDeals(dealsData.asFarmer);
       }
     } catch (err) {
       console.error('Failed to load produce data:', err);
@@ -171,18 +380,25 @@ export const ProduceMarket: React.FC<ProduceMarketProps> = ({ setActiveTab }) =>
     };
   }, []);
 
-  // Filter vendors based on selected crop & search query
-  const filteredVendors = procurementVendors.filter(v => {
+  // Filter vendors based on selected crop & search query (fully null-safe)
+  const filteredVendors = (procurementVendors || []).filter(v => {
+    if (!v) return false;
+    const crops = Array.isArray(v.cropsBought) ? v.cropsBought : [];
+    const rates = Array.isArray(v.buyingRates) ? v.buyingRates : [];
+
     const matchesCrop =
       selectedCropFilter === 'All' ||
-      v.cropsBought.some((c: string) => c.toLowerCase().includes(selectedCropFilter.toLowerCase())) ||
-      v.buyingRates.some((br: any) => br.crop.toLowerCase().includes(selectedCropFilter.toLowerCase()));
+      crops.some((c: string) => typeof c === 'string' && c.toLowerCase().includes(selectedCropFilter.toLowerCase())) ||
+      rates.some((br: any) => br && br.crop && typeof br.crop === 'string' && br.crop.toLowerCase().includes(selectedCropFilter.toLowerCase()));
 
+    const q = vendorSearchQuery.trim().toLowerCase();
     const matchesSearch =
-      !vendorSearchQuery.trim() ||
-      v.vendorName.toLowerCase().includes(vendorSearchQuery.toLowerCase()) ||
-      v.businessName.toLowerCase().includes(vendorSearchQuery.toLowerCase()) ||
-      v.district.toLowerCase().includes(vendorSearchQuery.toLowerCase());
+      !q ||
+      (v.vendorName && v.vendorName.toLowerCase().includes(q)) ||
+      (v.businessName && v.businessName.toLowerCase().includes(q)) ||
+      (v.district && v.district.toLowerCase().includes(q)) ||
+      (v.state && v.state.toLowerCase().includes(q)) ||
+      crops.some((c: string) => typeof c === 'string' && c.toLowerCase().includes(q));
 
     return matchesCrop && matchesSearch;
   });
@@ -192,12 +408,16 @@ export const ProduceMarket: React.FC<ProduceMarketProps> = ({ setActiveTab }) =>
     setSelectedVendorForRequest(vendor);
     setVendorReqError(null);
 
+    const crops = Array.isArray(vendor.cropsBought) && vendor.cropsBought.length > 0
+      ? vendor.cropsBought
+      : ['Groundnut'];
+
     // Pre-select matching crop rate if applicable
-    const matchedCrop = selectedCropFilter !== 'All' ? selectedCropFilter : vendor.cropsBought[0] || 'Groundnut';
+    const matchedCrop = selectedCropFilter !== 'All' ? selectedCropFilter : crops[0] || 'Groundnut';
     setReqCropName(matchedCrop);
 
     const matchedRateObj = vendor.buyingRates?.find((br: any) =>
-      br.crop.toLowerCase().includes(matchedCrop.toLowerCase())
+      br && br.crop && br.crop.toLowerCase().includes(matchedCrop.toLowerCase())
     );
 
     if (matchedRateObj) {
@@ -206,6 +426,9 @@ export const ProduceMarket: React.FC<ProduceMarketProps> = ({ setActiveTab }) =>
     } else if (vendor.buyingRates?.[0]) {
       setReqPrice(vendor.buyingRates[0].rate.toString());
       setReqUnit(vendor.buyingRates[0].unit || 'QUINTAL');
+    } else {
+      setReqPrice('7450');
+      setReqUnit('QUINTAL');
     }
 
     setReqQuantity('25');
@@ -233,37 +456,42 @@ export const ProduceMarket: React.FC<ProduceMarketProps> = ({ setActiveTab }) =>
       return;
     }
 
+    const token = localStorage.getItem('agri_token') || 'demo_token_farmer';
+    const payload = {
+      vendorId: selectedVendorForRequest.vendorId,
+      vendorName: selectedVendorForRequest.vendorName,
+      shopName: selectedVendorForRequest.businessName,
+      cropName: reqCropName.trim(),
+      variety: reqVariety.trim(),
+      quantity: parsedQty,
+      unit: reqUnit,
+      offeredPricePerUnit: parsedPrice,
+      proposedHarvestDate: reqHarvestDate,
+      deliveryPreference: reqDeliveryPref,
+      qualityGrade: reqQualityGrade,
+      notes: reqNotes.trim()
+    };
+
     setIsSubmittingVendorReq(true);
     try {
-      const res = await fetch('/api/produce/vendor-requests', {
+      const res = await fetch(apiUrl('/api/produce/vendor-requests'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('agri_token')}`
+          Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({
-          vendorId: selectedVendorForRequest.vendorId,
-          vendorName: selectedVendorForRequest.vendorName,
-          shopName: selectedVendorForRequest.businessName,
-          cropName: reqCropName.trim(),
-          variety: reqVariety.trim(),
-          quantity: parsedQty,
-          unit: reqUnit,
-          offeredPricePerUnit: parsedPrice,
-          proposedHarvestDate: reqHarvestDate,
-          deliveryPreference: reqDeliveryPref,
-          qualityGrade: reqQualityGrade,
-          notes: reqNotes.trim()
-        })
+        body: JSON.stringify(payload)
       });
 
       if (res.ok) {
+        const createdDeal = await res.json();
+        setMyVendorDeals(prev => [createdDeal, ...prev]);
         setSelectedVendorForRequest(null);
         showToast(`Sell request sent to ${selectedVendorForRequest.businessName}! 🌾 The vendor has been notified.`);
-        await loadData();
         setActiveSubTab('MY_DEALS');
+        loadData();
       } else {
-        const err = await res.json();
+        const err = await res.json().catch(() => ({}));
         setVendorReqError(err.error || 'Failed to submit request to vendor.');
       }
     } catch (err: any) {
@@ -294,38 +522,43 @@ export const ProduceMarket: React.FC<ProduceMarketProps> = ({ setActiveTab }) =>
       return;
     }
 
+    const token = localStorage.getItem('agri_token') || 'demo_token_farmer';
+    const payload = {
+      cropName: cropName.trim(),
+      variety: variety.trim(),
+      quantity: parsedQty,
+      unit,
+      expectedPricePerUnit: parsedPrice,
+      harvestDate,
+      qualityGrade,
+      description: description.trim(),
+      images: lotPhotoPreview ? [lotPhotoPreview] : ['https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?w=400'],
+      photoMetadata: lotPhotoTelemetry || undefined
+    };
+
     setIsSubmittingListing(true);
     try {
-      const res = await fetch('/api/produce', {
+      const res = await fetch(apiUrl('/api/produce'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('agri_token')}`
+          Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({
-          cropName: cropName.trim(),
-          variety: variety.trim(),
-          quantity: parsedQty,
-          unit,
-          expectedPricePerUnit: parsedPrice,
-          harvestDate,
-          qualityGrade,
-          description: description.trim(),
-          images: lotPhotoPreview ? [lotPhotoPreview] : undefined,
-          photoMetadata: lotPhotoTelemetry || undefined
-        })
+        body: JSON.stringify(payload)
       });
 
       if (res.ok) {
+        const createdListing = await res.json();
+        setListings(prev => [createdListing, ...prev]);
         setShowCreateModal(false);
         setLotPhotoFile(null);
         setLotPhotoPreview(null);
         setLotPhotoTelemetry(null);
         showToast('Produce lot with verified field photo published to wholesale buyers! 🌾');
-        await loadData();
         setActiveSubTab('BROWSE');
+        loadData();
       } else {
-        const err = await res.json();
+        const err = await res.json().catch(() => ({}));
         setListingError(err.error || 'Failed to publish listing.');
       }
     } catch (err: any) {
@@ -353,13 +586,14 @@ export const ProduceMarket: React.FC<ProduceMarketProps> = ({ setActiveTab }) =>
       return;
     }
 
+    const token = localStorage.getItem('agri_token') || 'demo_token_farmer';
     setIsSubmittingOffer(true);
     try {
-      const res = await fetch(`/api/produce/${selectedListingForOffer.id}/requests`, {
+      const res = await fetch(apiUrl(`/api/produce/${selectedListingForOffer.id}/requests`), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('agri_token')}`
+          Authorization: `Bearer ${token}`
         },
         body: JSON.stringify({
           offeredPricePerUnit: parsedPrice,
@@ -373,7 +607,7 @@ export const ProduceMarket: React.FC<ProduceMarketProps> = ({ setActiveTab }) =>
         showToast('Purchase offer sent to farmer! 📩');
         await loadData();
       } else {
-        const err = await res.json();
+        const err = await res.json().catch(() => ({}));
         setOfferError(err.error || 'Failed to send offer.');
       }
     } catch (err: any) {
@@ -386,12 +620,13 @@ export const ProduceMarket: React.FC<ProduceMarketProps> = ({ setActiveTab }) =>
   // Accept Buyer/Vendor Offer on Farmer Listing
   const handleAcceptBuyerOffer = async (requestId: string) => {
     setProcessingRequestId(requestId);
+    const token = localStorage.getItem('agri_token') || 'demo_token_farmer';
     try {
-      const res = await fetch(`/api/produce/requests/${requestId}`, {
+      const res = await fetch(apiUrl(`/api/produce/requests/${requestId}`), {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('agri_token')}`
+          Authorization: `Bearer ${token}`
         },
         body: JSON.stringify({
           status: 'ACCEPTED',
@@ -400,10 +635,15 @@ export const ProduceMarket: React.FC<ProduceMarketProps> = ({ setActiveTab }) =>
       });
 
       if (res.ok) {
+        // Optimistically update incoming requests
+        setMyRequests(prev => ({
+          ...prev,
+          incoming: prev.incoming.map(r => r.id === requestId ? { ...r, status: 'ACCEPTED' } : r)
+        }));
         showToast('Purchase offer accepted! You can now coordinate dispatch with the buyer. 🎉');
         await loadData();
       } else {
-        const err = await res.json();
+        const err = await res.json().catch(() => ({}));
         showToast(err.error || 'Failed to accept offer.', 'error');
       }
     } catch (err: any) {
@@ -418,12 +658,13 @@ export const ProduceMarket: React.FC<ProduceMarketProps> = ({ setActiveTab }) =>
     e.preventDefault();
     if (!selectedBidForFarmerReject) return;
     setIsSubmittingDecline(true);
+    const token = localStorage.getItem('agri_token') || 'demo_token_farmer';
     try {
-      const res = await fetch(`/api/produce/requests/${selectedBidForFarmerReject.id}`, {
+      const res = await fetch(apiUrl(`/api/produce/requests/${selectedBidForFarmerReject.id}`), {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('agri_token')}`
+          Authorization: `Bearer ${token}`
         },
         body: JSON.stringify({
           status: 'REJECTED',
@@ -432,11 +673,16 @@ export const ProduceMarket: React.FC<ProduceMarketProps> = ({ setActiveTab }) =>
       });
 
       if (res.ok) {
+        // Optimistically update incoming requests
+        setMyRequests(prev => ({
+          ...prev,
+          incoming: prev.incoming.map(r => r.id === selectedBidForFarmerReject.id ? { ...r, status: 'REJECTED', farmerReason: farmerDeclineReason.trim() } : r)
+        }));
         setSelectedBidForFarmerReject(null);
         showToast('Offer declined. The buyer/vendor has been notified with your reason. ❌');
         await loadData();
       } else {
-        const err = await res.json();
+        const err = await res.json().catch(() => ({}));
         showToast(err.error || 'Failed to decline offer', 'error');
       }
     } catch (err: any) {
@@ -632,11 +878,13 @@ export const ProduceMarket: React.FC<ProduceMarketProps> = ({ setActiveTab }) =>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {filteredVendors.map(vendor => {
                 // Find matching crop rate if applicable
-                const matchedRate = vendor.buyingRates?.find((br: any) =>
-                  selectedCropFilter === 'All'
+                const matchedRate = (vendor.buyingRates || []).find((br: any) =>
+                  br && br.crop && (selectedCropFilter === 'All'
                     ? true
-                    : br.crop.toLowerCase().includes(selectedCropFilter.toLowerCase())
-                ) || vendor.buyingRates?.[0];
+                    : br.crop.toLowerCase().includes(selectedCropFilter.toLowerCase()))
+                ) || (vendor.buyingRates && vendor.buyingRates[0]);
+
+                const cropsList: string[] = Array.isArray(vendor.cropsBought) ? vendor.cropsBought : [];
 
                 return (
                   <div
@@ -649,13 +897,13 @@ export const ProduceMarket: React.FC<ProduceMarketProps> = ({ setActiveTab }) =>
                         <div className="flex items-center gap-3">
                           <img
                             src={vendor.avatarUrl || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=150'}
-                            alt={vendor.businessName}
+                            alt={vendor.businessName || 'Buyer'}
                             className="w-12 h-12 rounded-2xl object-cover border border-gray-200 shadow-inner"
                           />
                           <div>
                             <div className="flex items-center gap-1.5">
                               <h3 className="font-black text-sm text-gray-900 leading-tight">
-                                {vendor.businessName}
+                                {vendor.businessName || 'Procurement Buyer'}
                               </h3>
                               {vendor.verified && (
                                 <span title="APMC Verified Buyer">
@@ -664,11 +912,11 @@ export const ProduceMarket: React.FC<ProduceMarketProps> = ({ setActiveTab }) =>
                               )}
                             </div>
                             <p className="text-xs text-emerald-800 font-semibold mt-0.5">
-                              {vendor.vendorName}
+                              {vendor.vendorName || 'Wholesale Mandi Trader'}
                             </p>
                             <div className="flex items-center gap-1 text-[11px] text-gray-400 mt-0.5">
                               <MapPin className="w-3 h-3 text-emerald-600" />
-                              <span>{vendor.village ? `${vendor.village}, ` : ''}{vendor.district}, {vendor.state}</span>
+                              <span>{vendor.village ? `${vendor.village}, ` : ''}{vendor.district || 'Kadiri'}, {vendor.state || 'Andhra Pradesh'}</span>
                             </div>
                           </div>
                         </div>
@@ -686,7 +934,7 @@ export const ProduceMarket: React.FC<ProduceMarketProps> = ({ setActiveTab }) =>
                           Actively Buying Commodities:
                         </span>
                         <div className="flex flex-wrap gap-1">
-                          {vendor.cropsBought.map((cropItem: string) => (
+                          {cropsList.map((cropItem: string) => (
                             <span
                               key={cropItem}
                               className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${

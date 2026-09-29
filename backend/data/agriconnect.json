@@ -12270,6 +12270,7 @@
       "minQuantity": 20,
       "maxQuantity": 1000,
       "unit": "CRATE",
+      "village": "Kadiri",
       "district": "Bengaluru Urban",
       "state": "Karnataka",
       "paymentTerms": "Same-day Bank Transfer (NEFT/RTGS) post weighment",
@@ -12315,6 +12316,7 @@
       "minQuantity": 15,
       "maxQuantity": 800,
       "unit": "QUINTAL",
+      "village": "Kadiri",
       "district": "Anantapur",
       "state": "Andhra Pradesh",
       "paymentTerms": "Instant weighbridge voucher + Immediate NEFT",
@@ -12366,6 +12368,7 @@
       "minQuantity": 5,
       "maxQuantity": 200,
       "unit": "KG",
+      "village": "Kadiri",
       "district": "Hyderabad",
       "state": "Telangana",
       "paymentTerms": "Daily morning UPI settlement",
@@ -12411,6 +12414,7 @@
       "minQuantity": 25,
       "maxQuantity": 1500,
       "unit": "QUINTAL",
+      "village": "Kadiri",
       "district": "Guntur",
       "state": "Andhra Pradesh",
       "paymentTerms": "Direct bank transfer within 2 hours of gate entry",
@@ -12421,38 +12425,100 @@
     },
     {
       "id": "prof-fa734ae0",
-      "userId": "usr-87c3df1d",
-      "companyName": "Sri Sai Mandi Wholesalers",
-      "panGst": "37AAAAA0000A1Z5",
-      "preferredCrops": [
+      "vendorId": "usr-87c3df1d",
+      "vendorName": "Sri Trader",
+      "businessName": "Sri Sai Mandi Wholesalers",
+      "phone": "+91 91234 56780",
+      "avatarUrl": "https://images.unsplash.com/photo-1542838132-92c53300491e?w=150",
+      "cropsBought": [
         "Groundnut",
         "Tomato",
         "Paddy"
       ],
-      "operatingRegion": "Rayalaseema Kadiri AP",
-      "pincode": "515591",
-      "contactPhone": "+91 91234 56780"
+      "buyingRates": [
+        {
+          "crop": "Groundnut",
+          "rate": 7450,
+          "unit": "QUINTAL",
+          "note": "Direct APMC rate"
+        },
+        {
+          "crop": "Tomato",
+          "rate": 520,
+          "unit": "CRATE",
+          "note": "Direct APMC rate"
+        },
+        {
+          "crop": "Paddy",
+          "rate": 2400,
+          "unit": "QUINTAL",
+          "note": "Direct APMC rate"
+        }
+      ],
+      "minQuantity": 10,
+      "maxQuantity": 1000,
+      "unit": "QUINTAL",
+      "village": "Kadiri",
+      "district": "Sri Sathya Sai",
+      "state": "Andhra Pradesh",
+      "paymentTerms": "Instant Bank Transfer / Cash on weighment",
+      "pickupAvailable": true,
+      "qualityPreference": "Grade A pods, clean sun-dried",
+      "rating": 4.8,
+      "verified": true
     },
     {
       "id": "prof-b52f99aa",
-      "userId": "usr-87c3df1d",
-      "companyName": "Sri Sai Mandi Wholesalers",
-      "panGst": "37AAAAA0000A1Z5",
-      "preferredCrops": [
+      "vendorId": "usr-87c3df1d",
+      "vendorName": "Sri Trader",
+      "businessName": "Sri Sai Mandi Wholesalers",
+      "phone": "+91 91234 56780",
+      "avatarUrl": "https://images.unsplash.com/photo-1542838132-92c53300491e?w=150",
+      "cropsBought": [
         "Groundnut",
         "Tomato",
         "Paddy"
       ],
-      "operatingRegion": "Rayalaseema Kadiri AP",
-      "pincode": "515591",
-      "contactPhone": "+91 91234 56780"
+      "buyingRates": [
+        {
+          "crop": "Groundnut",
+          "rate": 7450,
+          "unit": "QUINTAL",
+          "note": "Direct APMC rate"
+        },
+        {
+          "crop": "Tomato",
+          "rate": 520,
+          "unit": "CRATE",
+          "note": "Direct APMC rate"
+        },
+        {
+          "crop": "Paddy",
+          "rate": 2400,
+          "unit": "QUINTAL",
+          "note": "Direct APMC rate"
+        }
+      ],
+      "minQuantity": 10,
+      "maxQuantity": 1000,
+      "unit": "QUINTAL",
+      "village": "Kadiri",
+      "district": "Sri Sathya Sai",
+      "state": "Andhra Pradesh",
+      "paymentTerms": "Instant Bank Transfer / Cash on weighment",
+      "pickupAvailable": true,
+      "qualityPreference": "Grade A pods, clean sun-dried",
+      "rating": 4.8,
+      "verified": true
     },
     {
       "id": "prof-0ff0588c",
-      "userId": "usr-81d2a229",
-      "companyName": "kisan mandi rates",
-      "panGst": "hfuf.kkjhf",
-      "preferredCrops": [
+      "vendorId": "usr-81d2a229",
+      "vendorName": "kisan Trader",
+      "businessName": "kisan mandi rates",
+      "phone": "+91 80735 38499",
+      "avatarUrl": "https://images.unsplash.com/photo-1542838132-92c53300491e?w=150",
+      "cropsBought": [
         "Groundnut",
         "Tomato",
         "Paddy",
@@ -12461,9 +12527,61 @@
         "Mango",
         "Maize"
       ],
-      "operatingRegion": "Rayalaseema / Kadiri AP",
-      "pincode": "515591",
-      "contactPhone": "+91 80735 38499"
+      "buyingRates": [
+        {
+          "crop": "Groundnut",
+          "rate": 7450,
+          "unit": "QUINTAL",
+          "note": "Direct APMC rate"
+        },
+        {
+          "crop": "Tomato",
+          "rate": 520,
+          "unit": "CRATE",
+          "note": "Direct APMC rate"
+        },
+        {
+          "crop": "Paddy",
+          "rate": 2400,
+          "unit": "QUINTAL",
+          "note": "Direct APMC rate"
+        },
+        {
+          "crop": "Chilli",
+          "rate": 19500,
+          "unit": "QUINTAL",
+          "note": "Direct APMC rate"
+        },
+        {
+          "crop": "Cotton",
+          "rate": 2400,
+          "unit": "QUINTAL",
+          "note": "Direct APMC rate"
+        },
+        {
+          "crop": "Mango",
+          "rate": 2400,
+          "unit": "QUINTAL",
+          "note": "Direct APMC rate"
+        },
+        {
+          "crop": "Maize",
+          "rate": 2400,
+          "unit": "QUINTAL",
+          "note": "Direct APMC rate"
+        }
+      ],
+      "minQuantity": 10,
+      "maxQuantity": 1000,
+      "unit": "QUINTAL",
+      "village": "Kadiri",
+      "district": "Sri Sathya Sai",
+      "state": "Andhra Pradesh",
+      "paymentTerms": "Instant Bank Transfer / Cash on weighment",
+      "pickupAvailable": true,
+      "qualityPreference": "Grade A pods, clean sun-dried",
+      "rating": 4.8,
+      "verified": true
     }
   ],
   "vendor_deal_requests": [
@@ -12517,6 +12635,54 @@
       "notes": "Harvesting triple disease resistant hybrid tomatoes. Can supply 40 crates per picking every 4 days.",
       "status": "PENDING",
       "createdAt": "2026-09-28T07:15:00.000Z"
+    },
+    {
+      "id": "deal-20913eef",
+      "farmerId": "usr-farmer-1",
+      "farmerName": "Ramesh Patel",
+      "farmerPhone": "+91 98480 12345",
+      "farmerVillage": "Kadiri Rural",
+      "farmerDistrict": "Sri Sathya Sai",
+      "farmerState": "Andhra Pradesh",
+      "vendorId": "usr-vendor-1",
+      "vendorName": "Sri Lakshmi Agri",
+      "shopName": "Sri Lakshmi",
+      "cropName": "Groundnut",
+      "variety": "Standard Quality",
+      "quantity": 20,
+      "unit": "QUINTAL",
+      "offeredPricePerUnit": 7400,
+      "totalAmount": 148000,
+      "proposedHarvestDate": "2026-09-29",
+      "deliveryPreference": "FARM_GATE_PICKUP",
+      "qualityGrade": "GRADE_A",
+      "notes": "",
+      "status": "PENDING",
+      "createdAt": "2026-09-29T05:07:49.064Z"
+    },
+    {
+      "id": "deal-20913eef",
+      "farmerId": "usr-farmer-1",
+      "farmerName": "Ramesh Patel",
+      "farmerPhone": "+91 98480 12345",
+      "farmerVillage": "Kadiri Rural",
+      "farmerDistrict": "Sri Sathya Sai",
+      "farmerState": "Andhra Pradesh",
+      "vendorId": "usr-vendor-1",
+      "vendorName": "Sri Lakshmi Agri",
+      "shopName": "Sri Lakshmi",
+      "cropName": "Groundnut",
+      "variety": "Standard Quality",
+      "quantity": 20,
+      "unit": "QUINTAL",
+      "offeredPricePerUnit": 7400,
+      "totalAmount": 148000,
+      "proposedHarvestDate": "2026-09-29",
+      "deliveryPreference": "FARM_GATE_PICKUP",
+      "qualityGrade": "GRADE_A",
+      "notes": "",
+      "status": "PENDING",
+      "createdAt": "2026-09-29T05:07:49.064Z"
     }
   ],
   "farm_tasks": [
@@ -12639,6 +12805,26 @@
       "linkUrl": "/buyer-portal",
       "isRead": false,
       "createdAt": "2026-09-28T19:35:34.560Z"
+    },
+    {
+      "id": "notif-41869068",
+      "userId": "usr-vendor-1",
+      "title": "🌾 New Harvest Offer from Farmer Ramesh Patel",
+      "body": "Ramesh Patel offered 20 QUINTAL of Groundnut at ₹7400/QUINTAL (Total: ₹1,48,000).",
+      "category": "PRODUCE_REQUEST",
+      "linkUrl": "/vendor-portal",
+      "isRead": false,
+      "createdAt": "2026-09-29T05:07:49.099Z"
+    },
+    {
+      "id": "notif-93e3e70d",
+      "userId": "usr-farmer-1",
+      "title": "📤 Sell Request Sent to Sri Lakshmi Agri",
+      "body": "Your offer for 20 QUINTAL Groundnut has been submitted to Sri Lakshmi Agri. You will be notified when they confirm.",
+      "category": "PRODUCE_REQUEST",
+      "linkUrl": "/produce",
+      "isRead": false,
+      "createdAt": "2026-09-29T05:07:49.107Z"
     }
   ],
   "market_prices": [

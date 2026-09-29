@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useCart } from '../../context/CartContext';
+import { apiUrl } from '../../services/api';
 import {
   Sparkles,
   ShieldCheck,
@@ -59,7 +60,7 @@ export const SoilHealth: React.FC<SoilHealthProps> = ({ setActiveTab }) => {
     setIsAnalyzing(true);
     setSoilError(null);
     try {
-      const res = await fetch('/api/ai/soil-analysis', {
+      const res = await fetch(apiUrl('/api/ai/soil-analysis'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

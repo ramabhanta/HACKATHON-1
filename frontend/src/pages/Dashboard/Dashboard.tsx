@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
+import { apiUrl } from '../../services/api';
 import {
   CloudSun,
   Bot,
@@ -110,11 +111,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
   const loadData = async () => {
     try {
       const [wRes, tRes, fRes, pRes, sRes] = await Promise.all([
-        fetch('/api/ai/weather?lat=14.1165&lon=78.1634&location=Kadiri,%20Andhra%20Pradesh'),
-        fetch('/api/farm/tasks', { headers: { Authorization: `Bearer ${localStorage.getItem('agri_token')}` } }),
-        fetch('/api/farms', { headers: { Authorization: `Bearer ${localStorage.getItem('agri_token')}` } }),
-        fetch('/api/prices'),
-        fetch('/api/prices/states')
+        fetch(apiUrl('/api/ai/weather?lat=14.1165&lon=78.1634&location=Kadiri,%20Andhra%20Pradesh')),
+        fetch(apiUrl('/api/farm/tasks'), { headers: { Authorization: `Bearer ${localStorage.getItem('agri_token')}` } }),
+        fetch(apiUrl('/api/farms'), { headers: { Authorization: `Bearer ${localStorage.getItem('agri_token')}` } }),
+        fetch(apiUrl('/api/prices')),
+        fetch(apiUrl('/api/prices/states'))
       ]);
 
       if (wRes.ok) setWeather(await wRes.json());
@@ -187,7 +188,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
   const refreshWeather = async () => {
     setWeatherRefreshing(true);
     try {
-      const res = await fetch('/api/ai/weather?lat=14.1165&lon=78.1634&location=Kadiri,%20Andhra%20Pradesh');
+      const res = await fetch(apiUrl('/api/ai/weather?lat=14.1165&lon=78.1634&location=Kadiri,%20Andhra%20Pradesh'));
       if (res.ok) {
         setWeather(await res.json());
         showToast('Live weather and agricultural advisory updated!');
@@ -201,7 +202,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
 
   const handleToggleTask = async (taskId: string) => {
     try {
-      const res = await fetch(`/api/farm/tasks/${taskId}/toggle`, {
+      const res = await fetch(apiUrl(`/api/farm/tasks/${taskId}/toggle`), {
         method: 'PATCH',
         headers: { Authorization: `Bearer ${localStorage.getItem('agri_token')}` }
       });

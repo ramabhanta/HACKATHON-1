@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { apiUrl } from '../services/api';
 import {
   Sparkles,
   Key,
@@ -37,7 +38,7 @@ export const AiConfigModal: React.FC<AiConfigModalProps> = ({ isOpen, onClose, o
 
   const fetchStatus = async () => {
     try {
-      const res = await fetch('/api/ai/config');
+      const res = await fetch(apiUrl('/api/ai/config'));
       if (res.ok) {
         const data = await res.json();
         setServerHasKey(data.hasServerKey);
@@ -61,7 +62,7 @@ export const AiConfigModal: React.FC<AiConfigModalProps> = ({ isOpen, onClose, o
     setStatusMessage('');
 
     try {
-      const res = await fetch('/api/ai/chat', {
+      const res = await fetch(apiUrl('/api/ai/chat'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -77,7 +78,7 @@ export const AiConfigModal: React.FC<AiConfigModalProps> = ({ isOpen, onClose, o
         const data = await res.json();
         if (data.source === 'GEMINI_AI') {
           setTestStatus('SUCCESS');
-          setStatusMessage('Verified! Connected directly to Google Gemini 3.5 Flash.');
+          setStatusMessage('Verified! Connected directly to Google Gemini.');
         } else {
           setTestStatus('ERROR');
           setStatusMessage('Key accepted by gateway, but Gemini did not return a valid candidate.');
@@ -108,7 +109,7 @@ export const AiConfigModal: React.FC<AiConfigModalProps> = ({ isOpen, onClose, o
 
       // 2. Save in backend config
       if (trimmed) {
-        await fetch('/api/ai/config', {
+        await fetch(apiUrl('/api/ai/config'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ geminiApiKey: trimmed })

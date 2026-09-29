@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
+import { apiUrl } from '../../services/api';
 import {
   Camera,
   Upload,
@@ -268,7 +269,7 @@ export const DiseaseScan: React.FC<DiseaseScanProps> = ({ setActiveTab }) => {
         farmerId: user?.id || 'usr-farmer-1'
       });
 
-      const res = await fetch('/api/ai/crop-disease', {
+      const res = await fetch(apiUrl('/api/ai/crop-disease'), {
         method: 'POST',
         headers,
         body: formData

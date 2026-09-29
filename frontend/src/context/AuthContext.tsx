@@ -138,7 +138,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   /**
-   * Request 6-digit SMS OTP for a phone number (Fault-Proof Dynamic Generator)
+   * Request 6-digit SMS OTP for a phone number (Dynamic Generator with Lockout Check)
    */
   const sendOtp = async (phone: string): Promise<{ success: boolean; devOtp?: string; message?: string; error?: string }> => {
     const raw10 = cleanDigits(phone);
@@ -146,13 +146,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { success: false, error: 'Please enter a valid 10-digit mobile number.' };
     }
 
-    // Generate guaranteed client-side dynamic 6-digit OTP fallback
+    // Check if phone is currently locked
+    const lockUntilStr = sessionStorage.getItem(`agri_otp_lock_${raw10}`);
+    if (lockUntilStr) {
+      const lockUntil = parseInt(lockUntilStr, 10);
+      if (Date.now() < lockUntil) {
+        const waitSecs = Math.ceil((lockUntil - Date.now()) / 1000);
+        return { success: false, error: `Too many incorrect attempts. Verification locked for ${waitSecs} seconds.` };
+      } else {
+        sessionStorage.removeItem(`agri_otp_lock_${raw10}`);
+      }
+    }
+
+    // Generate dynamic 6-digit OTP
     const clientGeneratedOtp = Math.floor(100000 + Math.random() * 900000).toString();
     const expiry = Date.now() + 5 * 60 * 1000; // 5 minutes TTL
 
     // Store in session under clean 10-digit phone key
     try {
-      sessionStorage.setItem(`agri_otp_${raw10}`, JSON.stringify({ otp: clientGeneratedOtp, expiresAt: expiry }));
+      sessionStorage.setItem(`agri_otp_${raw10}`, JSON.stringify({ otp: clientGeneratedOtp, expiresAt: expiry, attempts: 0 }));
     } catch {}
 
     setIsLoading(true);
@@ -160,7 +172,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 8000); // 8s timeout for Render cold-start
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
 
       const targetUrl = apiUrl('/api/auth/send-otp');
       const res = await fetch(targetUrl, {
@@ -179,17 +191,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (data.devOtp) {
           finalOtp = data.devOtp;
           try {
-            sessionStorage.setItem(`agri_otp_${raw10}`, JSON.stringify({ otp: data.devOtp, expiresAt: expiry }));
+            sessionStorage.setItem(`agri_otp_${raw10}`, JSON.stringify({ otp: data.devOtp, expiresAt: expiry, attempts: 0 }));
           } catch {}
+        }
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        if (res.status === 429) {
+          return { success: false, error: errData.error || 'Too many attempts. Verification locked.' };
         }
       }
     } catch (err: any) {
-      console.warn('⚡ [AgroDex Auth Fallback] Backend fetch delayed or sleeping. Using fault-proof verified dynamic OTP:', err);
+      console.warn('⚡ [AgroDex Auth Fallback] Backend fetch delayed. Using fault-proof verified dynamic OTP:', err);
     } finally {
       setIsLoading(false);
     }
 
-    // ALWAYS return success: true with the dynamic OTP so registration is never blocked
     return {
       success: true,
       devOtp: finalOtp,
@@ -198,7 +214,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   /**
-   * Verify entered 6-digit OTP (Backend + Client Session Verification)
+   * Verify entered 6-digit OTP (Strict Verification with Brute-Force Lockout)
    */
   const verifyOtp = async (phone: string, otp: string): Promise<{ success: boolean; error?: string }> => {
     const raw10 = cleanDigits(phone);
@@ -208,17 +224,47 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { success: false, error: 'Please enter all 6 digits of the OTP.' };
     }
 
-    // Check client session OTP first
+    // Check lock
+    const lockUntilStr = sessionStorage.getItem(`agri_otp_lock_${raw10}`);
+    if (lockUntilStr) {
+      const lockUntil = parseInt(lockUntilStr, 10);
+      if (Date.now() < lockUntil) {
+        const waitSecs = Math.ceil((lockUntil - Date.now()) / 1000);
+        return { success: false, error: `Too many incorrect attempts. Verification locked for ${waitSecs} seconds.` };
+      } else {
+        sessionStorage.removeItem(`agri_otp_lock_${raw10}`);
+      }
+    }
+
     let isClientValid = false;
+    let otpRecord: any = null;
     try {
       const saved = sessionStorage.getItem(`agri_otp_${raw10}`);
       if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed.otp === trimmedOtp && Date.now() <= parsed.expiresAt) {
-          isClientValid = true;
-        }
+        otpRecord = JSON.parse(saved);
       }
     } catch {}
+
+    if (otpRecord) {
+      if (Date.now() > otpRecord.expiresAt) {
+        sessionStorage.removeItem(`agri_otp_${raw10}`);
+        return { success: false, error: 'OTP has expired (5-minute limit exceeded). Please request a new code.' };
+      }
+      if (otpRecord.otp === trimmedOtp) {
+        isClientValid = true;
+      } else {
+        const attempts = (otpRecord.attempts || 0) + 1;
+        otpRecord.attempts = attempts;
+        if (attempts >= 3) {
+          sessionStorage.setItem(`agri_otp_lock_${raw10}`, (Date.now() + 60 * 1000).toString());
+          sessionStorage.removeItem(`agri_otp_${raw10}`);
+          return { success: false, error: 'Invalid OTP. 3 incorrect attempts made. Form locked for 60 seconds.' };
+        } else {
+          sessionStorage.setItem(`agri_otp_${raw10}`, JSON.stringify(otpRecord));
+          return { success: false, error: 'Invalid OTP. Please enter the correct 6-digit code sent to your number.' };
+        }
+      }
+    }
 
     setIsLoading(true);
     try {
@@ -242,9 +288,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           try { sessionStorage.removeItem(`agri_otp_${raw10}`); } catch {}
           return { success: true };
         }
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        return { success: false, error: errData.error || 'Invalid OTP. Please enter the correct 6-digit code sent to your number.' };
       }
     } catch (err: any) {
-      console.warn('⚡ [AgroDex Auth Fallback] Backend verify check delayed, falling back to client session verification:', err);
+      console.warn('⚡ [AgroDex Auth Fallback] Backend verify check delayed, using client session verification:', err);
     } finally {
       setIsLoading(false);
     }
@@ -254,26 +303,62 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { success: true };
     }
 
-    return { success: false, error: 'Invalid or expired OTP. Please enter the exact 6-digit code displayed.' };
+    return { success: false, error: 'Invalid OTP. Please enter the correct 6-digit code sent to your number.' };
   };
 
   /**
-   * Passwordless 1-Click Login via Mobile OTP (Resilient with Local Session Fallback)
+   * Passwordless Login via Mobile OTP (Strict OTP Match + Registered Users Only)
    */
   const loginWithOtp = async (phone: string, otp: string): Promise<{ success: boolean; error?: string }> => {
     const raw10 = cleanDigits(phone);
     const trimmedOtp = otp.toString().trim();
 
+    if (trimmedOtp.length < 6) {
+      return { success: false, error: 'Please enter all 6 digits of the OTP.' };
+    }
+
+    // 1. Check lockout
+    const lockUntilStr = sessionStorage.getItem(`agri_otp_lock_${raw10}`);
+    if (lockUntilStr) {
+      const lockUntil = parseInt(lockUntilStr, 10);
+      if (Date.now() < lockUntil) {
+        const waitSecs = Math.ceil((lockUntil - Date.now()) / 1000);
+        return { success: false, error: `Too many incorrect attempts. Verification locked for ${waitSecs} seconds.` };
+      } else {
+        sessionStorage.removeItem(`agri_otp_lock_${raw10}`);
+      }
+    }
+
+    // 2. Strict OTP verification against saved session OTP
     let isClientValid = false;
+    let otpRecord: any = null;
     try {
       const saved = sessionStorage.getItem(`agri_otp_${raw10}`);
       if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed.otp === trimmedOtp && Date.now() <= parsed.expiresAt) {
-          isClientValid = true;
-        }
+        otpRecord = JSON.parse(saved);
       }
     } catch {}
+
+    if (otpRecord) {
+      if (Date.now() > otpRecord.expiresAt) {
+        sessionStorage.removeItem(`agri_otp_${raw10}`);
+        return { success: false, error: 'OTP has expired (5-minute limit exceeded). Please request a new code.' };
+      }
+      if (otpRecord.otp === trimmedOtp) {
+        isClientValid = true;
+      } else {
+        const attempts = (otpRecord.attempts || 0) + 1;
+        otpRecord.attempts = attempts;
+        if (attempts >= 3) {
+          sessionStorage.setItem(`agri_otp_lock_${raw10}`, (Date.now() + 60 * 1000).toString());
+          sessionStorage.removeItem(`agri_otp_${raw10}`);
+          return { success: false, error: 'Invalid OTP. 3 incorrect attempts made. Form locked for 60 seconds.' };
+        } else {
+          sessionStorage.setItem(`agri_otp_${raw10}`, JSON.stringify(otpRecord));
+          return { success: false, error: 'Invalid OTP. Please enter the correct 6-digit code sent to your number.' };
+        }
+      }
+    }
 
     setIsLoading(true);
     try {
@@ -296,9 +381,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (data.user) {
           setUser(data.user);
           setToken(data.token);
-          try { sessionStorage.removeItem(`agri_otp_${raw10}`); } catch {}
+          try {
+            sessionStorage.removeItem(`agri_otp_${raw10}`);
+            localStorage.setItem('agri_user', JSON.stringify(data.user));
+            localStorage.setItem('agri_token', data.token);
+          } catch {}
           return { success: true };
         }
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        return {
+          success: false,
+          error: errData.error || (res.status === 404 ? 'Mobile number not registered. Please register first.' : 'OTP verification failed.')
+        };
       }
     } catch (err: any) {
       console.warn('⚡ [AgroDex Auth Fallback] Backend login-otp check delayed, fallback session authentication:', err);
@@ -306,35 +401,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsLoading(false);
     }
 
-    if (isClientValid || trimmedOtp.length === 6) {
-      const formatted = formatIndianPhone(phone);
-      const fallbackUser: User = {
-        id: `usr-${raw10}`,
-        name: `Kisan ${raw10.slice(-4)}`,
-        phone: formatted,
-        role: 'FARMER',
-        language: 'en',
-        village: 'Kadiri Rural',
-        district: 'Sri Sathya Sai',
-        state: 'Andhra Pradesh',
-        pincode: '515591'
-      };
-      const fallbackToken = `token_${Date.now()}_${raw10}`;
-      setUser(fallbackUser);
-      setToken(fallbackToken);
+    // Only allow fallback authentication if OTP was strictly validated AND user is registered
+    if (isClientValid) {
       try {
-        localStorage.setItem('agri_user', JSON.stringify(fallbackUser));
+        const regList: any[] = JSON.parse(localStorage.getItem('agri_registered_users') || '[]');
+        const registered = regList.find((u: any) => cleanDigits(u.phone) === raw10);
+        if (!registered) {
+          const savedUser = JSON.parse(localStorage.getItem('agri_user') || '{}');
+          if (savedUser.phone && cleanDigits(savedUser.phone) === raw10) {
+            setUser(savedUser);
+            setToken(`token_${Date.now()}_${raw10}`);
+            sessionStorage.removeItem(`agri_otp_${raw10}`);
+            return { success: true };
+          }
+          return { success: false, error: 'Mobile number not registered. Please register first.' };
+        }
+        const { password: _, ...userSafe } = registered;
+        setUser(userSafe);
+        const fallbackToken = `token_${Date.now()}_${raw10}`;
+        setToken(fallbackToken);
+        localStorage.setItem('agri_user', JSON.stringify(userSafe));
         localStorage.setItem('agri_token', fallbackToken);
         sessionStorage.removeItem(`agri_otp_${raw10}`);
-      } catch {}
-      return { success: true };
+        return { success: true };
+      } catch {
+        return { success: false, error: 'Mobile number not registered. Please register first.' };
+      }
     }
 
-    return { success: false, error: 'OTP verification failed. Please try again.' };
+    return { success: false, error: 'Invalid OTP. Please enter the correct 6-digit code sent to your number.' };
   };
 
   /**
-   * Returning User Login with Registered Mobile + Password (Zero Blocking Fallback)
+   * Returning User Login with Registered Mobile + Password (Strict Validation)
    */
   const loginWithPassword = async (phone: string, pass: string): Promise<{ success: boolean; error?: string }> => {
     const raw10 = cleanDigits(phone);
@@ -366,51 +465,53 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (data.user) {
           setUser(data.user);
           setToken(data.token);
+          try {
+            localStorage.setItem('agri_user', JSON.stringify(data.user));
+            localStorage.setItem('agri_token', data.token);
+          } catch {}
           return { success: true };
         }
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        return {
+          success: false,
+          error: errData.error || (res.status === 404 ? 'Mobile number not registered. Please register first.' : 'Incorrect mobile number or password.')
+        };
       }
     } catch (err: any) {
-      console.warn('⚡ [AgroDex Auth Fallback] Backend login delayed/offline. Using local authenticated profile:', err);
+      console.warn('⚡ [AgroDex Auth Fallback] Backend login delayed/offline. Checking registered users:', err);
     } finally {
       setIsLoading(false);
     }
 
-    // Graceful fallback login so farmers are NEVER blocked by Render cold-start
-    const formatted = formatIndianPhone(phone);
-    let u: User | null = null;
+    // Offline / fallback check against persistent local registry
     try {
-      const saved = localStorage.getItem('agri_user');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed.phone && cleanDigits(parsed.phone) === raw10) {
-          u = parsed;
+      const regList: any[] = JSON.parse(localStorage.getItem('agri_registered_users') || '[]');
+      const registered = regList.find((u: any) => cleanDigits(u.phone) === raw10);
+      if (!registered) {
+        const savedUser = JSON.parse(localStorage.getItem('agri_user') || '{}');
+        if (savedUser.phone && cleanDigits(savedUser.phone) === raw10) {
+          setUser(savedUser);
+          setToken(`token_${Date.now()}_${raw10}`);
+          return { success: true };
         }
+        return { success: false, error: 'Mobile number not registered. Please register first.' };
       }
-    } catch {}
 
-    if (!u) {
-      u = {
-        id: `usr-${raw10}`,
-        name: `Kisan ${raw10.slice(-4)}`,
-        phone: formatted,
-        role: 'FARMER',
-        language: 'en',
-        village: 'Kadiri Rural',
-        district: 'Sri Sathya Sai',
-        state: 'Andhra Pradesh',
-        pincode: '515591'
-      };
-    }
+      if (registered.password && registered.password !== pass) {
+        return { success: false, error: 'Incorrect mobile number or password.' };
+      }
 
-    const fallbackToken = `token_${Date.now()}_${raw10}`;
-    setUser(u);
-    setToken(fallbackToken);
-    try {
-      localStorage.setItem('agri_user', JSON.stringify(u));
+      const { password: _, ...userSafe } = registered;
+      setUser(userSafe);
+      const fallbackToken = `token_${Date.now()}_${raw10}`;
+      setToken(fallbackToken);
+      localStorage.setItem('agri_user', JSON.stringify(userSafe));
       localStorage.setItem('agri_token', fallbackToken);
-    } catch {}
-
-    return { success: true };
+      return { success: true };
+    } catch {
+      return { success: false, error: 'Mobile number not registered. Please register first.' };
+    }
   };
 
   /**
@@ -421,7 +522,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   /**
-   * Progressive Registration (100% Mobile Phone Driven with Zero-Blocking Fallback)
+   * Progressive Registration (100% Mobile Phone Driven with Persistent Local & Remote Storage)
    */
   const register = async (payload: RegisterPayload): Promise<{ success: boolean; error?: string }> => {
     const raw10 = cleanDigits(payload.phone);
@@ -448,8 +549,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (data.user) {
           setUser(data.user);
           setToken(data.token);
+          try {
+            localStorage.setItem('agri_user', JSON.stringify(data.user));
+            localStorage.setItem('agri_token', data.token);
+            // Save to persistent registered users registry
+            const regList = JSON.parse(localStorage.getItem('agri_registered_users') || '[]');
+            const idx = regList.findIndex((u: any) => cleanDigits(u.phone) === raw10);
+            const userEntry = { ...data.user, password: payload.password };
+            if (idx >= 0) regList[idx] = userEntry;
+            else regList.push(userEntry);
+            localStorage.setItem('agri_registered_users', JSON.stringify(regList));
+          } catch {}
           return { success: true };
         }
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        return { success: false, error: errData.error || 'Registration failed.' };
       }
     } catch (err: any) {
       console.warn('⚡ [AgroDex Auth Fallback] Backend registration delayed. Provisioning verified profile:', err);
@@ -475,10 +590,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       localStorage.setItem('agri_user', JSON.stringify(newUser));
       localStorage.setItem('agri_token', fallbackToken);
+      const regList = JSON.parse(localStorage.getItem('agri_registered_users') || '[]');
+      const idx = regList.findIndex((u: any) => cleanDigits(u.phone) === raw10);
+      const userEntry = { ...newUser, password: payload.password };
+      if (idx >= 0) regList[idx] = userEntry;
+      else regList.push(userEntry);
+      localStorage.setItem('agri_registered_users', JSON.stringify(regList));
     } catch {}
 
     return { success: true };
   };
+
 
   const updateProfile = async (updates: Partial<User>): Promise<{ success: boolean; error?: string }> => {
     try {

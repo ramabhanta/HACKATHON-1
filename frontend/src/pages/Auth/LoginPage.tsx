@@ -59,8 +59,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
   // -------------------------------------------------------------
   // Returning User Sign-In State
   // -------------------------------------------------------------
-  const [loginPhone, setLoginPhone] = useState('9848012345');
-  const [loginPassword, setLoginPassword] = useState('password123');
+  const [loginPhone, setLoginPhone] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
   const [loginOtpSent, setLoginOtpSent] = useState(false);
   const [loginOtpDigits, setLoginOtpDigits] = useState(['', '', '', '', '', '']);
 
@@ -573,7 +573,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                         <input
                           type="tel"
                           maxLength={10}
-                          placeholder="98480 12345"
+                          placeholder="Enter 10-digit mobile number"
                           value={loginPhone}
                           onChange={e => handlePhoneInputChange(e.target.value, setLoginPhone)}
                           className="w-full px-3 py-2.5 text-sm font-bold text-gray-900 outline-none"
@@ -598,7 +598,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                       <div className="relative">
                         <input
                           type={showPassword ? 'text' : 'password'}
-                          placeholder="Enter your secure password"
+                          placeholder="Enter your password or PIN"
                           value={loginPassword}
                           onChange={e => setLoginPassword(e.target.value)}
                           className="w-full rounded-2xl border border-gray-300 px-3.5 py-2.5 text-sm font-bold text-gray-900 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 outline-none pr-10"
@@ -646,7 +646,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                         <input
                           type="tel"
                           maxLength={10}
-                          placeholder="98480 12345"
+                          placeholder="Enter 10-digit mobile number"
                           value={loginPhone}
                           onChange={e => handlePhoneInputChange(e.target.value, setLoginPhone)}
                           disabled={loginOtpSent}
@@ -914,7 +914,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                         <input
                           type="tel"
                           maxLength={10}
-                          placeholder="98480 12345"
+                          placeholder="Enter 10-digit mobile number"
                           value={regPhone}
                           onChange={e => handlePhoneInputChange(e.target.value, setRegPhone)}
                           className="w-full px-3 py-2.5 text-sm font-bold text-gray-900 outline-none"

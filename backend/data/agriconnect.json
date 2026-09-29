@@ -606,6 +606,144 @@
       "detected_disease": "Flower Drop / Fruit Setting Failure due to Thrips (Thrips parvispinus) and Associated Physiological Stress",
       "confidence": 0.92,
       "remedies": "• Install blue and yellow sticky traps @ 10-15 per acre to monitor and trap adult thrips\n• Maintain optimum soil moisture through drip irrigation to prevent moisture stress during flowering stage\n• Avoid excessive nitrogenous fertilization; apply balanced NPK and adequate potassium to strengthen cell walls\n• Cold-pressed Neem Oil 10,000 PPM @ 600-800 ml in 200 litres of water per acre (approx. 3-4 ml per litre of water) as a preventive antifeedant spray\n• Verticillium lecanii (entomopathogenic fungus) @ 5g per litre of water (1 kg/acre) directed towards the underside of leaves for biological thrips management\n• Bayer Confidor [Imidacloprid 17.8% SL] @ 100 ml per acre in 200L water (0.5 ml per litre of water) for systemic sucking pest control\n• FMC Koragen [Chlorantraniliprole 18.5% SC] @ 60 ml per acre in 200L water (0.3 ml per litre of water) or Spinetoram 11.7% SC @ 180 ml/acre, maintaining a 5-7 day safe harvest interval (PHI)"
+    },
+    {
+      "id": "diag-2fd060eb",
+      "userId": "f91d8b66-37b6-4d43-ae00-0d0aca328ad4",
+      "cropName": "Tomato (Solanum lycopersicum)",
+      "imageUrl": "https://yxdbvpzxkfptxoitselr.supabase.co/storage/v1/object/public/crop-scans/1790661197702_diseased-tomato-leaf-fungal-disease-leaves-193039824.webp",
+      "photoMetadata": {
+        "uploadedAt": "2026-09-29T05:53:15.770Z",
+        "uploadDateFormatted": "Tue, 29 Sept, 2026",
+        "uploadTimeFormatted": "11:23:15 am",
+        "uploadedAtFormatted": "Tue, 29 Sept, 2026 at 11:23:15 am",
+        "captureDateFormatted": "28 Sept 2026 at 09:39 am",
+        "fileName": "diseased-tomato-leaf-fungal-disease-leaves-193039824.webp",
+        "fileSizeBytes": 24346,
+        "fileSizeFormatted": "23.78 KB",
+        "dimensions": "800 × 534 px",
+        "megapixels": "0.4 MP",
+        "mimeType": "image/webp",
+        "aspectRatio": "800:534 (Landscape)",
+        "latitude": 14.1165,
+        "longitude": 78.1634,
+        "locationName": "Kadiri Rural, Sri Sathya Sai, Andhra Pradesh",
+        "deviceSource": "DEVICE_GALLERY",
+        "verified": true
+      },
+      "suspectedIssue": "Tomato Yellow Leaf Curl Virus (TYLCV) / Whitefly Vector Infestation (Bemisia tabaci)",
+      "confidenceScore": 92,
+      "severity": "MODERATE",
+      "symptomsEvidence": [
+        "Interveinal chlorosis and yellowing along leaf margins and lamina",
+        "Upward cupping and curling of leaflets with reduced leaf size",
+        "Stunting of the overall plant canopy and potential flower drop"
+      ],
+      "culturalControl": [
+        "Install yellow sticky traps at 10-15 traps per acre to monitor and mass-trap adult whiteflies",
+        "Uproot and destroy severely infected virus-stricken plants to prevent secondary spread to healthy neighboring plants"
+      ],
+      "biologicalControl": [
+        "Cold-pressed Neem Oil 10,000 PPM @ 600-800 ml in 200L water per acre (3-4 ml per litre of water) as a repellent foliar spray",
+        "Verticillium lecanii (entomopathogenic fungus) @ 5g/L water to control nymph and adult whitefly populations organically"
+      ],
+      "chemicalControlSafe": [
+        "Bayer Confidor [Imidacloprid 17.8% SL] @ 100 ml per acre in 200L water (0.5 ml per litre of water) to knock down vector populations; maintain a 7-day PHI",
+        "Syngenta Pegasus [Diafenthiuron 50% WP] @ 400g per acre in 200L water (2g per litre of water) for effective whitefly control; adhere to a 5-day PHI"
+      ],
+      "safetyWarnings": [
+        "Wear protective face mask, rubber gloves, and eye goggles during mixing and foliar application",
+        "Spray only during early morning hours (before 9:00 AM) or late evening (after 4:30 PM); avoid application during high wind speeds or midday heat",
+        "Observe the prescribed Pre-Harvest Interval (PHI) strictly before harvesting tomato fruits for market sale"
+      ],
+      "recommendedProductIds": [
+        "prod-confidor-100ml",
+        "prod-alika-100ml",
+        "prod-neem-oil",
+        "prod-sprayer"
+      ],
+      "isExpertReviewed": true,
+      "expertNotes": "Transmitted primarily by the silverleaf whitefly (Bemisia tabaci). High ambient temperatures, drought conditions, and continuous mono-cropping of solanaceous crops in regions like Rayalaseema favor vector buildup and viral proliferation.",
+      "cropIdentified": true,
+      "requiresFarmerConfirmation": false,
+      "isCropPlant": true,
+      "followUpQuestions": [
+        "Are you observing similar yellowing and leaf curling symptoms across the entire field or only in isolated patches?",
+        "What stage of crop growth is currently underway (vegetative stage, flowering, or fruit setting)?"
+      ],
+      "createdAt": "2026-09-29T05:53:21.871Z",
+      "detected_disease": "Tomato Yellow Leaf Curl Virus (TYLCV) / Whitefly Vector Infestation (Bemisia tabaci)",
+      "confidence": 0.92,
+      "remedies": "• Install yellow sticky traps at 10-15 traps per acre to monitor and mass-trap adult whiteflies\n• Uproot and destroy severely infected virus-stricken plants to prevent secondary spread to healthy neighboring plants\n• Cold-pressed Neem Oil 10,000 PPM @ 600-800 ml in 200L water per acre (3-4 ml per litre of water) as a repellent foliar spray\n• Verticillium lecanii (entomopathogenic fungus) @ 5g/L water to control nymph and adult whitefly populations organically\n• Bayer Confidor [Imidacloprid 17.8% SL] @ 100 ml per acre in 200L water (0.5 ml per litre of water) to knock down vector populations; maintain a 7-day PHI\n• Syngenta Pegasus [Diafenthiuron 50% WP] @ 400g per acre in 200L water (2g per litre of water) for effective whitefly control; adhere to a 5-day PHI"
+    },
+    {
+      "id": "diag-2fd060eb",
+      "userId": "f91d8b66-37b6-4d43-ae00-0d0aca328ad4",
+      "cropName": "Tomato (Solanum lycopersicum)",
+      "imageUrl": "https://yxdbvpzxkfptxoitselr.supabase.co/storage/v1/object/public/crop-scans/1790661197702_diseased-tomato-leaf-fungal-disease-leaves-193039824.webp",
+      "photoMetadata": {
+        "uploadedAt": "2026-09-29T05:53:15.770Z",
+        "uploadDateFormatted": "Tue, 29 Sept, 2026",
+        "uploadTimeFormatted": "11:23:15 am",
+        "uploadedAtFormatted": "Tue, 29 Sept, 2026 at 11:23:15 am",
+        "captureDateFormatted": "28 Sept 2026 at 09:39 am",
+        "fileName": "diseased-tomato-leaf-fungal-disease-leaves-193039824.webp",
+        "fileSizeBytes": 24346,
+        "fileSizeFormatted": "23.78 KB",
+        "dimensions": "800 × 534 px",
+        "megapixels": "0.4 MP",
+        "mimeType": "image/webp",
+        "aspectRatio": "800:534 (Landscape)",
+        "latitude": 14.1165,
+        "longitude": 78.1634,
+        "locationName": "Kadiri Rural, Sri Sathya Sai, Andhra Pradesh",
+        "deviceSource": "DEVICE_GALLERY",
+        "verified": true
+      },
+      "suspectedIssue": "Tomato Yellow Leaf Curl Virus (TYLCV) / Whitefly Vector Infestation (Bemisia tabaci)",
+      "confidenceScore": 92,
+      "severity": "MODERATE",
+      "symptomsEvidence": [
+        "Interveinal chlorosis and yellowing along leaf margins and lamina",
+        "Upward cupping and curling of leaflets with reduced leaf size",
+        "Stunting of the overall plant canopy and potential flower drop"
+      ],
+      "culturalControl": [
+        "Install yellow sticky traps at 10-15 traps per acre to monitor and mass-trap adult whiteflies",
+        "Uproot and destroy severely infected virus-stricken plants to prevent secondary spread to healthy neighboring plants"
+      ],
+      "biologicalControl": [
+        "Cold-pressed Neem Oil 10,000 PPM @ 600-800 ml in 200L water per acre (3-4 ml per litre of water) as a repellent foliar spray",
+        "Verticillium lecanii (entomopathogenic fungus) @ 5g/L water to control nymph and adult whitefly populations organically"
+      ],
+      "chemicalControlSafe": [
+        "Bayer Confidor [Imidacloprid 17.8% SL] @ 100 ml per acre in 200L water (0.5 ml per litre of water) to knock down vector populations; maintain a 7-day PHI",
+        "Syngenta Pegasus [Diafenthiuron 50% WP] @ 400g per acre in 200L water (2g per litre of water) for effective whitefly control; adhere to a 5-day PHI"
+      ],
+      "safetyWarnings": [
+        "Wear protective face mask, rubber gloves, and eye goggles during mixing and foliar application",
+        "Spray only during early morning hours (before 9:00 AM) or late evening (after 4:30 PM); avoid application during high wind speeds or midday heat",
+        "Observe the prescribed Pre-Harvest Interval (PHI) strictly before harvesting tomato fruits for market sale"
+      ],
+      "recommendedProductIds": [
+        "prod-confidor-100ml",
+        "prod-alika-100ml",
+        "prod-neem-oil",
+        "prod-sprayer"
+      ],
+      "isExpertReviewed": true,
+      "expertNotes": "Transmitted primarily by the silverleaf whitefly (Bemisia tabaci). High ambient temperatures, drought conditions, and continuous mono-cropping of solanaceous crops in regions like Rayalaseema favor vector buildup and viral proliferation.",
+      "cropIdentified": true,
+      "requiresFarmerConfirmation": false,
+      "isCropPlant": true,
+      "followUpQuestions": [
+        "Are you observing similar yellowing and leaf curling symptoms across the entire field or only in isolated patches?",
+        "What stage of crop growth is currently underway (vegetative stage, flowering, or fruit setting)?"
+      ],
+      "createdAt": "2026-09-29T05:53:21.871Z",
+      "detected_disease": "Tomato Yellow Leaf Curl Virus (TYLCV) / Whitefly Vector Infestation (Bemisia tabaci)",
+      "confidence": 0.92,
+      "remedies": "• Install yellow sticky traps at 10-15 traps per acre to monitor and mass-trap adult whiteflies\n• Uproot and destroy severely infected virus-stricken plants to prevent secondary spread to healthy neighboring plants\n• Cold-pressed Neem Oil 10,000 PPM @ 600-800 ml in 200L water per acre (3-4 ml per litre of water) as a repellent foliar spray\n• Verticillium lecanii (entomopathogenic fungus) @ 5g/L water to control nymph and adult whitefly populations organically\n• Bayer Confidor [Imidacloprid 17.8% SL] @ 100 ml per acre in 200L water (0.5 ml per litre of water) to knock down vector populations; maintain a 7-day PHI\n• Syngenta Pegasus [Diafenthiuron 50% WP] @ 400g per acre in 200L water (2g per litre of water) for effective whitefly control; adhere to a 5-day PHI"
     }
   ],
   "product_categories": [

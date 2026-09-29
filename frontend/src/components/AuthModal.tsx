@@ -37,8 +37,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialTa
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Sign In State
-  const [loginPhone, setLoginPhone] = useState('9848012345');
-  const [loginPassword, setLoginPassword] = useState('password123');
+  const [loginPhone, setLoginPhone] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
   const [loginOtpSent, setLoginOtpSent] = useState(false);
   const [loginOtpDigits, setLoginOtpDigits] = useState(['', '', '', '', '', '']);
 
@@ -373,7 +373,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialTa
                       maxLength={10}
                       value={loginPhone}
                       onChange={e => handlePhoneInputChange(e.target.value, setLoginPhone)}
-                      placeholder="98480 12345"
+                      placeholder="Enter 10-digit mobile number"
                       className="w-full px-3 py-2 font-bold text-gray-900 outline-none"
                       required
                     />
@@ -387,7 +387,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialTa
                       type={showPassword ? 'text' : 'password'}
                       value={loginPassword}
                       onChange={e => setLoginPassword(e.target.value)}
-                      placeholder="••••••••"
+                      placeholder="Enter your password or PIN"
                       className="w-full px-3 py-2 rounded-xl border border-gray-200 outline-none pr-9 font-bold"
                       required
                     />
@@ -421,7 +421,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialTa
                       value={loginPhone}
                       onChange={e => handlePhoneInputChange(e.target.value, setLoginPhone)}
                       disabled={loginOtpSent}
-                      placeholder="98480 12345"
+                      placeholder="Enter 10-digit mobile number"
                       className="w-full px-3 py-2 font-bold text-gray-900 outline-none disabled:bg-stone-50"
                     />
                   </div>
@@ -528,7 +528,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialTa
                       maxLength={10}
                       value={regPhone}
                       onChange={e => handlePhoneInputChange(e.target.value, setRegPhone)}
-                      placeholder="98480 12345"
+                      placeholder="Enter 10-digit mobile number"
                       className="w-full px-3 py-2 font-bold text-gray-900 outline-none"
                       required
                     />

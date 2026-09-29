@@ -11,10 +11,12 @@ import { SupabaseDataService } from '../database/supabaseDataService.js';
 
 export const authRouter = Router();
 
-// In-memory OTP storage with 5-minute validity
+// In-memory OTP storage with 5-minute validity and brute-force attempt tracking
 interface OtpRecord {
   otp: string;
   expiresAt: number;
+  attempts: number;
+  lockedUntil?: number;
 }
 const otpCache = new Map<string, OtpRecord>();
 
@@ -45,19 +47,28 @@ authRouter.post('/send-otp', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Please enter a valid 10-digit mobile number.' });
     }
 
+    // Check if phone is locked due to brute force
+    const existing = otpCache.get(rawDigits) || otpCache.get(formatted);
+    if (existing?.lockedUntil && Date.now() < existing.lockedUntil) {
+      const waitSecs = Math.ceil((existing.lockedUntil - Date.now()) / 1000);
+      return res.status(429).json({
+        error: `Too many incorrect attempts. Verification locked for ${waitSecs} seconds.`
+      });
+    }
+
     // Generate real cryptographically secure 6-digit dynamic random OTP
     const generatedOtp = crypto.randomInt(100000, 1000000).toString();
     const expiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes strict TTL
 
-    // Store under normalized keys for strict lookup
-    otpCache.set(rawDigits, { otp: generatedOtp, expiresAt });
-    otpCache.set(formatted, { otp: generatedOtp, expiresAt });
+    const record: OtpRecord = { otp: generatedOtp, expiresAt, attempts: 0 };
+    otpCache.set(rawDigits, record);
+    otpCache.set(formatted, record);
 
     console.log(`📱 [Real SMS OTP Service] Dynamic OTP generated for ${formatted}: ${generatedOtp} (Expires in 5m)`);
 
     return res.json({
       success: true,
-      message: `6-digit verification OTP sent to ${formatted}`,
+      message: `AgroDex Verification Code: ${generatedOtp} (Valid for 5 mins)`,
       phone: formatted,
       devOtp: generatedOtp
     });
@@ -67,7 +78,7 @@ authRouter.post('/send-otp', async (req: Request, res: Response) => {
 });
 
 // ============================================================================
-// 2. VERIFY DYNAMIC SMS OTP
+// 2. VERIFY DYNAMIC SMS OTP (Strict Verification with Brute-Force Lockout)
 // ============================================================================
 authRouter.post('/verify-otp', async (req: Request, res: Response) => {
   try {
@@ -87,6 +98,14 @@ authRouter.post('/verify-otp', async (req: Request, res: Response) => {
       });
     }
 
+    // Check brute force lock
+    if (cached.lockedUntil && Date.now() < cached.lockedUntil) {
+      const waitSecs = Math.ceil((cached.lockedUntil - Date.now()) / 1000);
+      return res.status(429).json({
+        error: `Too many incorrect attempts. Form locked for ${waitSecs} seconds.`
+      });
+    }
+
     if (Date.now() > cached.expiresAt) {
       otpCache.delete(rawDigits);
       otpCache.delete(formatted);
@@ -96,8 +115,15 @@ authRouter.post('/verify-otp', async (req: Request, res: Response) => {
     }
 
     if (cached.otp !== trimmedOtp) {
+      cached.attempts = (cached.attempts || 0) + 1;
+      if (cached.attempts >= 3) {
+        cached.lockedUntil = Date.now() + 60 * 1000;
+        return res.status(429).json({
+          error: 'Invalid OTP. 3 incorrect attempts made. Form locked for 60 seconds.'
+        });
+      }
       return res.status(400).json({
-        error: 'Invalid OTP entered. Please enter the exact 6-digit code received.'
+        error: 'Invalid OTP. Please enter the correct 6-digit code sent to your number.'
       });
     }
 
@@ -117,7 +143,7 @@ authRouter.post('/verify-otp', async (req: Request, res: Response) => {
 });
 
 // ============================================================================
-// 3. LOGIN VIA DYNAMIC SMS OTP (Passwordless Mobile Login)
+// 3. LOGIN VIA DYNAMIC SMS OTP (Passwordless Mobile Login - Registered Users Only)
 // ============================================================================
 authRouter.post('/login-otp', async (req: Request, res: Response) => {
   try {
@@ -129,12 +155,30 @@ authRouter.post('/login-otp', async (req: Request, res: Response) => {
     const { formatted, rawDigits } = cleanPhone(phone);
     const trimmedOtp = otp.toString().trim();
 
-    // Verify dynamic OTP
+    // Verify dynamic OTP strictly
     const cached = otpCache.get(rawDigits) || otpCache.get(formatted);
-    const isValidCached = cached && cached.otp === trimmedOtp && Date.now() <= cached.expiresAt;
+    if (!cached) {
+      return res.status(400).json({ error: 'OTP expired or not found. Please request a new verification code.' });
+    }
 
-    if (!isValidCached) {
-      return res.status(400).json({ error: 'Invalid or expired OTP. Please enter the exact 6-digit verification code.' });
+    if (cached.lockedUntil && Date.now() < cached.lockedUntil) {
+      const waitSecs = Math.ceil((cached.lockedUntil - Date.now()) / 1000);
+      return res.status(429).json({ error: `Too many incorrect attempts. Form locked for ${waitSecs} seconds.` });
+    }
+
+    if (Date.now() > cached.expiresAt) {
+      otpCache.delete(rawDigits);
+      otpCache.delete(formatted);
+      return res.status(400).json({ error: 'OTP has expired (5-minute limit exceeded). Please request a new code.' });
+    }
+
+    if (cached.otp !== trimmedOtp) {
+      cached.attempts = (cached.attempts || 0) + 1;
+      if (cached.attempts >= 3) {
+        cached.lockedUntil = Date.now() + 60 * 1000;
+        return res.status(429).json({ error: 'Invalid OTP. 3 incorrect attempts made. Form locked for 60 seconds.' });
+      }
+      return res.status(400).json({ error: 'Invalid OTP. Please enter the correct 6-digit code sent to your number.' });
     }
 
     // Clear cached OTP
@@ -146,30 +190,13 @@ authRouter.post('/login-otp', async (req: Request, res: Response) => {
     if (!user) {
       user = await SupabaseDataService.getUserByPhone(rawDigits);
     }
-
     if (!user) {
-      // Auto-provision basic profile if new user logs in via verified OTP
-      const passwordHash = await bcrypt.hash('password123', 10);
-      user = {
-        id: `usr-${uuidv4().substring(0, 8)}`,
-        name: `Kisan ${rawDigits.slice(-4)}`,
-        phone: formatted,
-        passwordHash,
-        role: 'FARMER',
-        language: 'en',
-        village: 'Kadiri Rural',
-        district: 'Sri Sathya Sai',
-        state: 'Andhra Pradesh',
-        pincode: '515591',
-        latitude: 14.1165,
-        longitude: 78.1634,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-      await SupabaseDataService.createUser(user);
-      await SupabaseDataService.upsertProfile(user);
-    } else {
-      await SupabaseDataService.upsertProfile(user);
+      user = await SupabaseDataService.getUserByEmailOrPhone(phone);
+    }
+
+    // Existing registered users only: do not auto-create on login
+    if (!user) {
+      return res.status(404).json({ error: 'Mobile number not registered. Please register first.' });
     }
 
     const token = jwt.sign(
@@ -186,7 +213,7 @@ authRouter.post('/login-otp', async (req: Request, res: Response) => {
 });
 
 // ============================================================================
-// 4. RETURNING USER SIGN-IN (Mobile Number + Password)
+// 4. RETURNING USER SIGN-IN (Mobile Number + Password - Strict Validation)
 // ============================================================================
 authRouter.post('/login', async (req: Request, res: Response) => {
   try {
@@ -209,43 +236,22 @@ authRouter.post('/login', async (req: Request, res: Response) => {
     }
 
     if (!user) {
-      // Auto-provision user account for testing phone numbers
-      const passwordHash = await bcrypt.hash(password, 10);
-      user = {
-        id: `usr-${uuidv4().substring(0, 8)}`,
-        name: `User ${rawDigits.slice(-4) || 'Farmer'}`,
-        phone: formatted,
-        passwordHash,
-        role: 'FARMER',
-        language: 'en',
-        village: 'Kadiri Rural',
-        district: 'Sri Sathya Sai',
-        state: 'Andhra Pradesh',
-        pincode: '515591',
-        latitude: 14.1165,
-        longitude: 78.1634,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-      await SupabaseDataService.createUser(user);
-      await SupabaseDataService.upsertProfile(user, password);
-    } else {
-      let isValid = false;
-      if (user.passwordHash) {
-        try {
-          isValid = await bcrypt.compare(password, user.passwordHash);
-        } catch {
-          isValid = user.passwordHash === password;
-        }
-      }
-      if (!isValid && (password === 'password123' || password.includes('demo') || !user.passwordHash)) {
-        isValid = true;
-      }
-      if (!isValid) {
-        return res.status(401).json({ error: 'Incorrect mobile number or password.' });
-      }
-      await SupabaseDataService.upsertProfile(user, password);
+      return res.status(404).json({ error: 'Mobile number not registered. Please register first.' });
     }
+
+    let isValid = false;
+    if (user.passwordHash) {
+      try {
+        isValid = await bcrypt.compare(password, user.passwordHash);
+      } catch {
+        isValid = user.passwordHash === password;
+      }
+    }
+    if (!isValid) {
+      return res.status(401).json({ error: 'Incorrect mobile number or password.' });
+    }
+
+    await SupabaseDataService.upsertProfile(user, password);
 
     const token = jwt.sign(
       { userId: user.id, phone: user.phone, role: user.role },

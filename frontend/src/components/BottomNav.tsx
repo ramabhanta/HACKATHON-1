@@ -328,7 +328,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab, o
             {/* Drawer Footer with Sign Out */}
             <div className="p-3 bg-gray-50 dark:bg-slate-800/80 border-t border-gray-100 dark:border-slate-800 flex items-center justify-between">
               <span className="text-[11px] text-gray-500 dark:text-gray-400 font-mono">
-                {user?.phone || '+91 98480 12345'}
+                {user?.phone || 'Guest User'}
               </span>
               <button
                 onClick={() => {

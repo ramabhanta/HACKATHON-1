@@ -12914,6 +12914,16 @@
       "linkUrl": "/produce",
       "isRead": false,
       "createdAt": "2026-09-29T05:07:49.107Z"
+    },
+    {
+      "id": "notif-c4afb8b8",
+      "userId": "usr-farmer-3",
+      "title": "⚡ Direct Procurement Offer: Byadgi Chilli (50 QUINTAL)",
+      "body": "Buyer Kisan Mandi Wholesalers posted a verified purchase demand for Byadgi Chilli at ₹18000 per Quintal. Center: Kadiri Mandi Collection Center. Click to review and accept.",
+      "category": "PRODUCE_REQUEST",
+      "linkUrl": "/produce",
+      "isRead": false,
+      "createdAt": "2026-09-29T07:33:48.993Z"
     }
   ],
   "market_prices": [
@@ -13138,5 +13148,75 @@
       ],
       "inStockCount": 45
     }
-  ]
+  ],
+  "purchase_offers": [
+    {
+      "id": "po-kadiri-8812",
+      "buyerId": "usr-buyer-1",
+      "buyerName": "Kisan Mandi Wholesalers",
+      "buyerBusinessName": "Kisan Mandi Multi-Commodity Procure Hub",
+      "buyerPhone": "+91 94400 98765",
+      "cropName": "Groundnut (Pod)",
+      "variety": "Kadiri-6",
+      "qualityGrade": "Grade A (Premium)",
+      "requiredQuantity": 100,
+      "unit": "QUINTAL",
+      "targetPrice": 7500,
+      "priceUnit": "per Quintal",
+      "procurementCenter": "Kadiri APMC Main Yard",
+      "district": "Sri Sathya Sai",
+      "state": "Andhra Pradesh",
+      "validUntil": "2026-10-06",
+      "specialRequirements": "Sun-dried pods, moisture < 7.5%, free from mold. Spot payment via RTGS immediately after weighment.",
+      "status": "ACTIVE",
+      "matchedFarmersCount": 1,
+      "createdAt": "2026-09-29T02:32:07.927Z"
+    },
+    {
+      "id": "po-kadiri-8813",
+      "buyerId": "usr-buyer-1",
+      "buyerName": "Kisan Mandi Wholesalers",
+      "buyerBusinessName": "Kisan Mandi Multi-Commodity Procure Hub",
+      "buyerPhone": "+91 94400 98765",
+      "cropName": "Tomato",
+      "variety": "Grade A Red-Ripe Hybrid",
+      "qualityGrade": "Export Quality (Firm Red)",
+      "requiredQuantity": 500,
+      "unit": "CRATE",
+      "targetPrice": 530,
+      "priceUnit": "per Crate (25kg)",
+      "procurementCenter": "Madanapalle / Kadiri Collection Center",
+      "district": "Sri Sathya Sai & Annamayya",
+      "state": "Andhra Pradesh",
+      "validUntil": "2026-10-02",
+      "specialRequirements": "Uniform red ripeness, clean crates, immediate farm-gate truck pickup arranged by our logistics team.",
+      "status": "ACTIVE",
+      "matchedFarmersCount": 2,
+      "createdAt": "2026-09-29T05:32:07.927Z"
+    },
+    {
+      "id": "po-bca4f4c5",
+      "buyerId": "usr-buyer-1",
+      "buyerName": "Kisan Mandi Wholesalers",
+      "buyerBusinessName": "Agri Procurement Hub",
+      "buyerPhone": "+91 94400 98765",
+      "cropName": "Byadgi Chilli",
+      "variety": "Stemless Dry Red",
+      "qualityGrade": "Export Quality",
+      "requiredQuantity": 50,
+      "unit": "QUINTAL",
+      "targetPrice": 18000,
+      "priceUnit": "per Quintal",
+      "procurementCenter": "Kadiri Mandi Collection Center",
+      "district": "Sri Sathya Sai",
+      "state": "Andhra Pradesh",
+      "validUntil": "2026-10-06",
+      "specialRequirements": "Direct farm gate pickup, prompt payment.",
+      "status": "CLOSED",
+      "matchedFarmersCount": 1,
+      "createdAt": "2026-09-29T07:33:39.822Z",
+      "updatedAt": "2026-09-29T07:33:55.658Z"
+    }
+  ],
+  "nearby_farmers": []
 }

@@ -21,7 +21,9 @@ import {
   ChatMessage,
   AppNotification,
   MarketPrice,
-  Shop
+  Shop,
+  PurchaseOffer,
+  NearbyFarmerProfile
 } from '../models/types.js';
 
 const DATA_DIR = path.resolve(process.cwd(), 'data');
@@ -52,6 +54,8 @@ interface DatabaseSchema {
   notifications: AppNotification[];
   market_prices: MarketPrice[];
   shops: Shop[];
+  purchase_offers: PurchaseOffer[];
+  nearby_farmers: NearbyFarmerProfile[];
 }
 
 export class Database {
@@ -93,7 +97,9 @@ export class Database {
       messages: [],
       notifications: [],
       market_prices: [],
-      shops: []
+      shops: [],
+      purchase_offers: [],
+      nearby_farmers: []
     };
 
 

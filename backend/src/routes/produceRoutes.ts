@@ -2,7 +2,8 @@ import { Router, Request, Response } from 'express';
 import { authenticate, AuthenticatedRequest } from '../middleware/auth.js';
 import { db } from '../database/db.js';
 import { SupabaseDataService } from '../database/supabaseDataService.js';
-import { ProduceListing, BuyerRequest, AppNotification, ProcurementVendor, VendorDealRequest } from '../models/types.js';
+import { ProduceListing, BuyerRequest, AppNotification, ProcurementVendor, VendorDealRequest, PurchaseOffer } from '../models/types.js';
+import { FarmerDirectoryService } from '../services/farmerDirectoryService.js';
 import { v4 as uuidv4 } from 'uuid';
 
 export const produceRouter = Router();
@@ -309,6 +310,125 @@ produceRouter.get('/ready-farmer-harvests', (req: Request, res: Response) => {
   }));
 
   return res.json(enriched);
+});
+
+// ==========================================
+// 4. Dynamic Buyer Purchase Offers & Demands
+// ==========================================
+
+// GET all purchase offers / demands
+produceRouter.get('/purchase-offers', (req: Request, res: Response) => {
+  const { buyerId } = req.query;
+  const offers = FarmerDirectoryService.getPurchaseOffers(buyerId as string | undefined);
+  return res.json(offers);
+});
+
+// POST create new buyer purchase offer
+produceRouter.post('/purchase-offers', (req: Request, res: Response) => {
+  const {
+    buyerId,
+    buyerName,
+    buyerBusinessName,
+    buyerPhone,
+    cropName,
+    variety,
+    qualityGrade,
+    requiredQuantity,
+    unit,
+    targetPrice,
+    priceUnit,
+    procurementCenter,
+    district,
+    state,
+    validUntil,
+    specialRequirements
+  } = req.body;
+
+  if (!cropName || !requiredQuantity || !targetPrice) {
+    return res.status(400).json({ error: 'Crop name, quantity, and target price are required' });
+  }
+
+  const created = FarmerDirectoryService.createPurchaseOffer({
+    buyerId: buyerId || 'usr-buyer-1',
+    buyerName: buyerName || 'Kisan Mandi Wholesalers',
+    buyerBusinessName: buyerBusinessName || 'Agri Procurement Hub',
+    buyerPhone: buyerPhone || '+91 94400 98765',
+    cropName,
+    variety,
+    qualityGrade,
+    requiredQuantity: parseFloat(requiredQuantity),
+    unit,
+    targetPrice: parseFloat(targetPrice),
+    priceUnit,
+    procurementCenter,
+    district,
+    state,
+    validUntil,
+    specialRequirements
+  });
+
+  return res.status(201).json(created);
+});
+
+// PATCH close buyer purchase offer
+produceRouter.patch('/purchase-offers/:id/close', (req: Request, res: Response) => {
+  const { id } = req.params;
+  const closed = FarmerDirectoryService.closePurchaseOffer(id);
+  if (!closed) return res.status(404).json({ error: 'Purchase offer not found' });
+  return res.json(closed);
+});
+
+// ==========================================
+// 5. Real Nearby Farmers Directory (Dedicated)
+// ==========================================
+
+// GET verified nearby farmer profiles with standing harvest
+produceRouter.get('/nearby-farmers', (req: Request, res: Response) => {
+  const { crop, district, maxDistanceKm, timeline, search } = req.query;
+  const farmers = FarmerDirectoryService.getNearbyFarmers({
+    crop: crop as string,
+    district: district as string,
+    maxDistanceKm: maxDistanceKm ? parseFloat(maxDistanceKm as string) : undefined,
+    timeline: timeline as string,
+    search: search as string
+  });
+  return res.json(farmers);
+});
+
+// POST matchmaking: broadcast purchase offer to matching farmers
+produceRouter.post('/purchase-offers/:id/match-broadcast', (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { farmerIds } = req.body;
+
+  const rawOffers = FarmerDirectoryService.getPurchaseOffers();
+  const offer = rawOffers.find(o => o.id === id);
+  if (!offer) return res.status(404).json({ error: 'Purchase offer not found' });
+
+  const targetFarmerIds: string[] = Array.isArray(farmerIds) && farmerIds.length > 0
+    ? farmerIds
+    : FarmerDirectoryService.matchFarmers(offer.cropName, offer.district).map(f => f.farmerId);
+
+  // Send in-app notification to all targeted farmers
+  for (const fId of targetFarmerIds) {
+    const notif: AppNotification = {
+      id: `notif-${uuidv4().substring(0, 8)}`,
+      userId: fId,
+      title: `⚡ Direct Procurement Offer: ${offer.cropName} (${offer.requiredQuantity} ${offer.unit})`,
+      body: `Buyer ${offer.buyerName} posted a verified purchase demand for ${offer.cropName} at ₹${offer.targetPrice} ${offer.priceUnit}. Center: ${offer.procurementCenter}. Click to review and accept.`,
+      category: 'PRODUCE_REQUEST',
+      linkUrl: '/produce',
+      isRead: false,
+      createdAt: new Date().toISOString()
+    };
+    db.insert('notifications', notif);
+  }
+
+  return res.json({
+    success: true,
+    message: `Procurement offer successfully broadcasted to ${targetFarmerIds.length} verified farmers!`,
+    broadcastCount: targetFarmerIds.length,
+    offerId: id
+  });
 });
 
 // GET single listing

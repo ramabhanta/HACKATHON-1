@@ -24,6 +24,7 @@ import {
 } from '../models/types.js';
 import { syncLocalDataToSupabase } from './supabaseClient.js';
 import { extendedCategories, comprehensiveProductsCatalog } from './productsCatalog.js';
+import { PRELOADED_PURCHASE_OFFERS, PRELOADED_NEARBY_FARMERS } from '../services/farmerDirectoryService.js';
 
 export async function seedDatabase() {
   console.log('🌱 Seeding AgriConnect AI database with realistic agricultural data...');
@@ -1011,7 +1012,9 @@ export async function seedDatabase() {
     messages: [],
     notifications,
     market_prices: marketPrices,
-    shops
+    shops,
+    purchase_offers: PRELOADED_PURCHASE_OFFERS,
+    nearby_farmers: PRELOADED_NEARBY_FARMERS
   });
 
   console.log('✅ Database seeded successfully with all tables and realistic data.');

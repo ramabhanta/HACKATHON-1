@@ -421,6 +421,55 @@ export interface VendorDealRequest {
   createdAt: string;
 }
 
+export interface PurchaseOffer {
+  id: string;
+  buyerId: string;
+  buyerName: string;
+  buyerBusinessName?: string;
+  buyerPhone: string;
+  cropName: string;
+  variety?: string;
+  qualityGrade: string;
+  requiredQuantity: number;
+  unit: 'QUINTAL' | 'TONNE' | 'CRATE' | 'BAGS' | 'KG';
+  targetPrice: number;
+  priceUnit: string;
+  procurementCenter: string;
+  district: string;
+  state: string;
+  validUntil: string;
+  specialRequirements?: string;
+  status: 'ACTIVE' | 'CLOSED' | 'FULFILLED';
+  matchedFarmersCount?: number;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface NearbyFarmerProfile {
+  id: string;
+  farmerId: string;
+  farmerName: string;
+  phone: string;
+  avatarUrl?: string;
+  village: string;
+  taluk: string;
+  district: string;
+  state: string;
+  distanceKm: number;
+  isVerified: boolean;
+  totalAcreage: number;
+  cropName: string;
+  variety: string;
+  estimatedQuantity: number;
+  unit: 'QUINTAL' | 'TONNE' | 'CRATE' | 'BAGS';
+  harvestTimeline: 'READY_NOW' | 'NEXT_7_DAYS' | 'NEXT_15_DAYS' | 'NEXT_30_DAYS';
+  expectedPrice: number | null;
+  priceUnit: string;
+  qualityGrade: string;
+  readyHarvestDate: string;
+  notes?: string;
+}
+
 
 export interface FarmTask {
   id: string;

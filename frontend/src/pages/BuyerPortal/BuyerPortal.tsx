@@ -25,6 +25,7 @@ import {
   Clock,
   Sparkles
 } from 'lucide-react';
+import { apiUrl } from '../../services/api';
 
 interface BuyerPortalProps {
   setActiveTab?: (tab: string) => void;
@@ -85,11 +86,11 @@ export const BuyerPortal: React.FC<BuyerPortalProps> = ({ setActiveTab }) => {
   const loadBuyerData = async () => {
     try {
       const [lRes, rRes, pRes] = await Promise.all([
-        fetch('/api/produce'),
-        fetch('/api/produce/my-requests', {
+        fetch(apiUrl('/api/produce')),
+        fetch(apiUrl('/api/produce/my-requests'), {
           headers: { Authorization: `Bearer ${localStorage.getItem('agri_token')}` }
         }),
-        fetch('/api/prices')
+        fetch(apiUrl('/api/prices'))
       ]);
 
       if (lRes.ok) setListings(await lRes.json());
@@ -134,7 +135,7 @@ export const BuyerPortal: React.FC<BuyerPortalProps> = ({ setActiveTab }) => {
     setBidError(null);
 
     try {
-      const res = await fetch(`/api/produce/${selectedLotForBid.id}/requests`, {
+      const res = await fetch(apiUrl(`/api/produce/${selectedLotForBid.id}/requests`), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

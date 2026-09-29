@@ -505,6 +505,7 @@ export interface MarketPrice {
   date?: string;
   trend: 'UP' | 'DOWN' | 'STABLE';
   changeAmount?: number;
+  arrivals?: string;
   isFallback?: boolean;
   fallbackSource?: string;
   fallbackBadge?: string;

@@ -629,7 +629,8 @@ priceRouter.get('/', (req: Request, res: Response) => {
     min_price: p.minPrice,
     max_price: p.maxPrice,
     modal_price: p.modalPrice,
-    date: p.priceDate || p.date
+    date: p.priceDate || p.date,
+    arrivals: p.arrivals || '150 Tonnes'
   }));
 
   return res.json(responseData);

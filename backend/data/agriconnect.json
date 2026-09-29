@@ -434,6 +434,146 @@
       "isExpertReviewed": true,
       "expertNotes": "Optimal nutritional balance observed. Keep monitoring for early whitefly vectors.",
       "createdAt": "2026-09-28T08:30:00.000Z"
+    },
+    {
+      "id": "diag-09b5f1f4",
+      "userId": "usr-farmer-1",
+      "cropName": "Chilli (Mirchi / Capsicum annuum)",
+      "imageUrl": "https://yxdbvpzxkfptxoitselr.supabase.co/storage/v1/object/public/crop-scans/1790656696086_photo.avif",
+      "photoMetadata": {
+        "uploadedAt": "2026-09-29T04:38:13.852Z",
+        "uploadDateFormatted": "Tue, 29 Sept, 2026",
+        "uploadTimeFormatted": "10:08:13 am",
+        "uploadedAtFormatted": "Tue, 29 Sept, 2026 at 10:08:13 am",
+        "captureDateFormatted": "28 Sept 2026 at 03:11 pm",
+        "fileName": "photo.avif",
+        "fileSizeBytes": 17461,
+        "fileSizeFormatted": "17.05 KB",
+        "dimensions": "1280 × 720 px",
+        "megapixels": "0.9 MP",
+        "mimeType": "image/avif",
+        "aspectRatio": "1280:720 (Landscape)",
+        "latitude": 14.1165,
+        "longitude": 78.1634,
+        "locationName": "Kadiri Rural, Sri Sathya Sai, Andhra Pradesh",
+        "deviceSource": "DEVICE_GALLERY",
+        "verified": true
+      },
+      "suspectedIssue": "Flower Drop / Fruit Setting Failure due to Thrips (Thrips parvispinus) and Associated Physiological Stress",
+      "confidenceScore": 92,
+      "severity": "MODERATE",
+      "symptomsEvidence": [
+        "Calyx and pedicel drying causing premature yellowing and dropping of young chilli buttons/fruits",
+        "Silvering and rasping injury on tender leaves and floral buds",
+        "Stunted terminal growth and upward curling of young leaves due to sap-sucking pest activity"
+      ],
+      "culturalControl": [
+        "Install blue and yellow sticky traps @ 10-15 per acre to monitor and trap adult thrips",
+        "Maintain optimum soil moisture through drip irrigation to prevent moisture stress during flowering stage",
+        "Avoid excessive nitrogenous fertilization; apply balanced NPK and adequate potassium to strengthen cell walls"
+      ],
+      "biologicalControl": [
+        "Cold-pressed Neem Oil 10,000 PPM @ 600-800 ml in 200 litres of water per acre (approx. 3-4 ml per litre of water) as a preventive antifeedant spray",
+        "Verticillium lecanii (entomopathogenic fungus) @ 5g per litre of water (1 kg/acre) directed towards the underside of leaves for biological thrips management"
+      ],
+      "chemicalControlSafe": [
+        "Bayer Confidor [Imidacloprid 17.8% SL] @ 100 ml per acre in 200L water (0.5 ml per litre of water) for systemic sucking pest control",
+        "FMC Koragen [Chlorantraniliprole 18.5% SC] @ 60 ml per acre in 200L water (0.3 ml per litre of water) or Spinetoram 11.7% SC @ 180 ml/acre, maintaining a 5-7 day safe harvest interval (PHI)"
+      ],
+      "safetyWarnings": [
+        "Wear personal protective equipment (PPE) including rubber gloves, face mask, and eye goggles during mixing and foliar application",
+        "Perform spraying during early morning hours (before 9:00 AM) or late evening (after 4:30 PM) to avoid high ambient temperatures and protect beneficial pollinators",
+        "Observe proper Pre-Harvest Interval (PHI) of 7 to 10 days before harvesting green chillies for market sale"
+      ],
+      "recommendedProductIds": [
+        "prod-delegate-100ml",
+        "prod-confidor-100ml",
+        "prod-neem-oil",
+        "prod-sprayer"
+      ],
+      "isExpertReviewed": true,
+      "expertNotes": "Thrips parvispinus feeding on tender pedicels and developing ovary tissues, combined with micronutrient imbalance (Boron/Calcium deficiency) and high temperatures during flowering, leading to pedicel necrosis and premature flower/fruit shedding.",
+      "cropIdentified": true,
+      "requiresFarmerConfirmation": false,
+      "isCropPlant": true,
+      "followUpQuestions": [
+        "Are you observing leaf curling or silvering symptoms on the upper canopy leaves?",
+        "What has been the prevailing daytime temperature and irrigation frequency in your field over the last two weeks?"
+      ],
+      "createdAt": "2026-09-29T04:38:20.618Z",
+      "detected_disease": "Flower Drop / Fruit Setting Failure due to Thrips (Thrips parvispinus) and Associated Physiological Stress",
+      "confidence": 0.92,
+      "remedies": "• Install blue and yellow sticky traps @ 10-15 per acre to monitor and trap adult thrips\n• Maintain optimum soil moisture through drip irrigation to prevent moisture stress during flowering stage\n• Avoid excessive nitrogenous fertilization; apply balanced NPK and adequate potassium to strengthen cell walls\n• Cold-pressed Neem Oil 10,000 PPM @ 600-800 ml in 200 litres of water per acre (approx. 3-4 ml per litre of water) as a preventive antifeedant spray\n• Verticillium lecanii (entomopathogenic fungus) @ 5g per litre of water (1 kg/acre) directed towards the underside of leaves for biological thrips management\n• Bayer Confidor [Imidacloprid 17.8% SL] @ 100 ml per acre in 200L water (0.5 ml per litre of water) for systemic sucking pest control\n• FMC Koragen [Chlorantraniliprole 18.5% SC] @ 60 ml per acre in 200L water (0.3 ml per litre of water) or Spinetoram 11.7% SC @ 180 ml/acre, maintaining a 5-7 day safe harvest interval (PHI)"
+    },
+    {
+      "id": "diag-09b5f1f4",
+      "userId": "usr-farmer-1",
+      "cropName": "Chilli (Mirchi / Capsicum annuum)",
+      "imageUrl": "https://yxdbvpzxkfptxoitselr.supabase.co/storage/v1/object/public/crop-scans/1790656696086_photo.avif",
+      "photoMetadata": {
+        "uploadedAt": "2026-09-29T04:38:13.852Z",
+        "uploadDateFormatted": "Tue, 29 Sept, 2026",
+        "uploadTimeFormatted": "10:08:13 am",
+        "uploadedAtFormatted": "Tue, 29 Sept, 2026 at 10:08:13 am",
+        "captureDateFormatted": "28 Sept 2026 at 03:11 pm",
+        "fileName": "photo.avif",
+        "fileSizeBytes": 17461,
+        "fileSizeFormatted": "17.05 KB",
+        "dimensions": "1280 × 720 px",
+        "megapixels": "0.9 MP",
+        "mimeType": "image/avif",
+        "aspectRatio": "1280:720 (Landscape)",
+        "latitude": 14.1165,
+        "longitude": 78.1634,
+        "locationName": "Kadiri Rural, Sri Sathya Sai, Andhra Pradesh",
+        "deviceSource": "DEVICE_GALLERY",
+        "verified": true
+      },
+      "suspectedIssue": "Flower Drop / Fruit Setting Failure due to Thrips (Thrips parvispinus) and Associated Physiological Stress",
+      "confidenceScore": 92,
+      "severity": "MODERATE",
+      "symptomsEvidence": [
+        "Calyx and pedicel drying causing premature yellowing and dropping of young chilli buttons/fruits",
+        "Silvering and rasping injury on tender leaves and floral buds",
+        "Stunted terminal growth and upward curling of young leaves due to sap-sucking pest activity"
+      ],
+      "culturalControl": [
+        "Install blue and yellow sticky traps @ 10-15 per acre to monitor and trap adult thrips",
+        "Maintain optimum soil moisture through drip irrigation to prevent moisture stress during flowering stage",
+        "Avoid excessive nitrogenous fertilization; apply balanced NPK and adequate potassium to strengthen cell walls"
+      ],
+      "biologicalControl": [
+        "Cold-pressed Neem Oil 10,000 PPM @ 600-800 ml in 200 litres of water per acre (approx. 3-4 ml per litre of water) as a preventive antifeedant spray",
+        "Verticillium lecanii (entomopathogenic fungus) @ 5g per litre of water (1 kg/acre) directed towards the underside of leaves for biological thrips management"
+      ],
+      "chemicalControlSafe": [
+        "Bayer Confidor [Imidacloprid 17.8% SL] @ 100 ml per acre in 200L water (0.5 ml per litre of water) for systemic sucking pest control",
+        "FMC Koragen [Chlorantraniliprole 18.5% SC] @ 60 ml per acre in 200L water (0.3 ml per litre of water) or Spinetoram 11.7% SC @ 180 ml/acre, maintaining a 5-7 day safe harvest interval (PHI)"
+      ],
+      "safetyWarnings": [
+        "Wear personal protective equipment (PPE) including rubber gloves, face mask, and eye goggles during mixing and foliar application",
+        "Perform spraying during early morning hours (before 9:00 AM) or late evening (after 4:30 PM) to avoid high ambient temperatures and protect beneficial pollinators",
+        "Observe proper Pre-Harvest Interval (PHI) of 7 to 10 days before harvesting green chillies for market sale"
+      ],
+      "recommendedProductIds": [
+        "prod-delegate-100ml",
+        "prod-confidor-100ml",
+        "prod-neem-oil",
+        "prod-sprayer"
+      ],
+      "isExpertReviewed": true,
+      "expertNotes": "Thrips parvispinus feeding on tender pedicels and developing ovary tissues, combined with micronutrient imbalance (Boron/Calcium deficiency) and high temperatures during flowering, leading to pedicel necrosis and premature flower/fruit shedding.",
+      "cropIdentified": true,
+      "requiresFarmerConfirmation": false,
+      "isCropPlant": true,
+      "followUpQuestions": [
+        "Are you observing leaf curling or silvering symptoms on the upper canopy leaves?",
+        "What has been the prevailing daytime temperature and irrigation frequency in your field over the last two weeks?"
+      ],
+      "createdAt": "2026-09-29T04:38:20.618Z",
+      "detected_disease": "Flower Drop / Fruit Setting Failure due to Thrips (Thrips parvispinus) and Associated Physiological Stress",
+      "confidence": 0.92,
+      "remedies": "• Install blue and yellow sticky traps @ 10-15 per acre to monitor and trap adult thrips\n• Maintain optimum soil moisture through drip irrigation to prevent moisture stress during flowering stage\n• Avoid excessive nitrogenous fertilization; apply balanced NPK and adequate potassium to strengthen cell walls\n• Cold-pressed Neem Oil 10,000 PPM @ 600-800 ml in 200 litres of water per acre (approx. 3-4 ml per litre of water) as a preventive antifeedant spray\n• Verticillium lecanii (entomopathogenic fungus) @ 5g per litre of water (1 kg/acre) directed towards the underside of leaves for biological thrips management\n• Bayer Confidor [Imidacloprid 17.8% SL] @ 100 ml per acre in 200L water (0.5 ml per litre of water) for systemic sucking pest control\n• FMC Koragen [Chlorantraniliprole 18.5% SC] @ 60 ml per acre in 200L water (0.3 ml per litre of water) or Spinetoram 11.7% SC @ 180 ml/acre, maintaining a 5-7 day safe harvest interval (PHI)"
     }
   ],
   "product_categories": [

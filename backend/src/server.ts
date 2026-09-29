@@ -97,6 +97,8 @@ app.use('/api/admin', adminRouter);
 app.use('/api/notifications', notificationRouter);
 app.use('/api/prices', priceRouter);
 app.use('/api/market-prices', priceRouter);
+app.use('/api/mandi', priceRouter);
+app.use('/api/mandi-prices', priceRouter);
 app.use('/api/storage', storageRouter);
 app.use('/api/supabase', supabaseRouter);
 

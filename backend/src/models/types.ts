@@ -134,6 +134,14 @@ export interface PhotoMetadata {
   verified?: boolean;
 }
 
+export interface ChemicalTreatment {
+  commercialName: string;
+  composition: string;
+  dosage: string;
+  phi?: string;
+  purpose?: string;
+}
+
 export interface AiDiagnosis {
   id: string;
   userId: string;
@@ -142,12 +150,16 @@ export interface AiDiagnosis {
   imageUrl: string;
   photoMetadata?: PhotoMetadata;
   suspectedIssue: string;
+  pathogenName?: string;
   detected_disease?: string;
   confidenceScore: number;
   confidence?: number;
   remedies?: string;
   severity: 'MILD' | 'MODERATE' | 'SEVERE';
   symptomsEvidence: string[];
+  symptoms?: string[];
+  chemicalTreatments?: ChemicalTreatment[];
+  organicTreatments?: string[];
   culturalControl: string[];
   biologicalControl: string[];
   chemicalControlSafe: string[];

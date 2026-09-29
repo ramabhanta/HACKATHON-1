@@ -157,6 +157,22 @@ export const BuyerPortal: React.FC<BuyerPortalProps> = ({ setActiveTab }) => {
     } catch {}
   }, [farmInspections]);
 
+  // Universal Escape key listener for BuyerPortal modals
+  useEffect(() => {
+    if (!callingFarmer && !selectedFarmerForDirectBid && !showCreateOfferModal && !selectedFarmerForInspection && !selectedOfferForMatchmaking) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setCallingFarmer(null);
+        setSelectedFarmerForDirectBid(null);
+        setShowCreateOfferModal(false);
+        setSelectedFarmerForInspection(null);
+        setSelectedOfferForMatchmaking(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [callingFarmer, selectedFarmerForDirectBid, showCreateOfferModal, selectedFarmerForInspection, selectedOfferForMatchmaking]);
+
   // Load Remote Data
   const loadBuyerData = async () => {
     try {
@@ -1034,8 +1050,21 @@ export const BuyerPortal: React.FC<BuyerPortalProps> = ({ setActiveTab }) => {
 
       {/* MODAL 3: CALL FARMER DIALOG */}
       {callingFarmer && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in">
-          <div className="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl relative border border-gray-100 text-center space-y-4">
+        <div
+          onClick={() => setCallingFarmer(null)}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in"
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            className="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl relative border border-gray-100 text-center space-y-4"
+          >
+            <button
+              onClick={() => setCallingFarmer(null)}
+              aria-label="Close dialog"
+              className="absolute top-4 right-4 w-10 h-10 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center justify-center transition active:scale-95 border border-gray-200"
+            >
+              <X className="w-5 h-5" />
+            </button>
             <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center mx-auto text-2xl font-black">
               📞
             </div>
@@ -1054,9 +1083,9 @@ export const BuyerPortal: React.FC<BuyerPortalProps> = ({ setActiveTab }) => {
               <button
                 type="button"
                 onClick={() => setCallingFarmer(null)}
-                className="flex-1 py-2.5 rounded-xl border border-gray-300 font-bold text-xs text-gray-700"
+                className="flex-1 py-2.5 rounded-xl border border-gray-300 font-bold text-xs text-gray-700 hover:bg-gray-50 transition"
               >
-                Close
+                Close / ಮುಚ್ಚಿ
               </button>
               <a
                 href={`tel:${callingFarmer.phone}`}
@@ -1076,8 +1105,14 @@ export const BuyerPortal: React.FC<BuyerPortalProps> = ({ setActiveTab }) => {
 
       {/* MODAL 4: SEND DIRECT PURCHASE OFFER TO FARMER */}
       {selectedFarmerForDirectBid && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl relative border border-gray-100 space-y-4">
+        <div
+          onClick={() => setSelectedFarmerForDirectBid(null)}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in"
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl relative border border-gray-100 space-y-4"
+          >
             <div className="flex items-center justify-between pb-3 border-b border-gray-100">
               <div>
                 <h3 className="font-black text-lg text-gray-900">Direct Purchase Offer</h3>
@@ -1087,7 +1122,8 @@ export const BuyerPortal: React.FC<BuyerPortalProps> = ({ setActiveTab }) => {
               </div>
               <button
                 onClick={() => setSelectedFarmerForDirectBid(null)}
-                className="text-gray-400 hover:text-gray-600 p-1.5 rounded-full hover:bg-gray-100"
+                aria-label="Close dialog"
+                className="w-10 h-10 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center justify-center transition active:scale-95 border border-gray-200"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1145,9 +1181,9 @@ export const BuyerPortal: React.FC<BuyerPortalProps> = ({ setActiveTab }) => {
                 <button
                   type="button"
                   onClick={() => setSelectedFarmerForDirectBid(null)}
-                  className="px-4 py-2 rounded-xl border border-gray-300 text-gray-700 font-bold"
+                  className="px-4 py-2.5 rounded-xl border border-gray-300 text-gray-700 font-bold hover:bg-gray-50 transition"
                 >
-                  Cancel
+                  Cancel / ಮುಚ್ಚಿ
                 </button>
                 <button
                   type="submit"

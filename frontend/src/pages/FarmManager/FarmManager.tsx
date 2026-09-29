@@ -124,6 +124,21 @@ export const FarmManager: React.FC<FarmManagerProps> = ({ setActiveTab }) => {
     };
   }, []);
 
+  // Universal Escape key listener for FarmManager modals
+  useEffect(() => {
+    if (!showTaskModal && !showExpenseModal) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setShowTaskModal(false);
+        setEditingTask(null);
+        setShowExpenseModal(false);
+        setEditingExpense(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showTaskModal, showExpenseModal]);
+
   // Reset or initialize task modal form
   const openNewTaskModal = () => {
     setEditingTask(null);
@@ -610,14 +625,24 @@ export const FarmManager: React.FC<FarmManagerProps> = ({ setActiveTab }) => {
 
       {/* Modal: Add / Edit Task */}
       {showTaskModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-emerald-100 relative space-y-4">
+        <div
+          onClick={() => {
+            setShowTaskModal(false);
+            setEditingTask(null);
+          }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in"
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-emerald-100 relative space-y-4"
+          >
             <button
               onClick={() => {
                 setShowTaskModal(false);
                 setEditingTask(null);
               }}
-              className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100"
+              aria-label="Close dialog"
+              className="absolute top-4 right-4 w-10 h-10 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center justify-center transition active:scale-95 border border-gray-200"
             >
               <X className="w-5 h-5" />
             </button>
@@ -714,20 +739,32 @@ export const FarmManager: React.FC<FarmManagerProps> = ({ setActiveTab }) => {
                 />
               </div>
 
-              <button
-                type="submit"
-                disabled={isSubmittingTask}
-                className="w-full py-3 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-extrabold rounded-2xl shadow transition text-xs active:scale-95 flex items-center justify-center gap-2"
-              >
-                {isSubmittingTask ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Saving Scheduled Task...</span>
-                  </>
-                ) : (
-                  <span>{editingTask ? 'Update Scheduled Task' : 'Save Scheduled Task'}</span>
-                )}
-              </button>
+              <div className="flex gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowTaskModal(false);
+                    setEditingTask(null);
+                  }}
+                  className="px-4 py-3 rounded-2xl border border-gray-200 hover:bg-gray-50 text-gray-700 font-extrabold text-xs transition"
+                >
+                  Cancel / ಮುಚ್ಚಿ
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmittingTask}
+                  className="flex-1 py-3 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-extrabold rounded-2xl shadow transition text-xs active:scale-95 flex items-center justify-center gap-2"
+                >
+                  {isSubmittingTask ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Saving Scheduled Task...</span>
+                    </>
+                  ) : (
+                    <span>{editingTask ? 'Update Scheduled Task' : 'Save Scheduled Task'}</span>
+                  )}
+                </button>
+              </div>
             </form>
           </div>
         </div>
@@ -735,14 +772,24 @@ export const FarmManager: React.FC<FarmManagerProps> = ({ setActiveTab }) => {
 
       {/* Modal: Record / Edit Expense */}
       {showExpenseModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-emerald-100 relative space-y-4">
+        <div
+          onClick={() => {
+            setShowExpenseModal(false);
+            setEditingExpense(null);
+          }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in"
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-emerald-100 relative space-y-4"
+          >
             <button
               onClick={() => {
                 setShowExpenseModal(false);
                 setEditingExpense(null);
               }}
-              className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100"
+              aria-label="Close dialog"
+              className="absolute top-4 right-4 w-10 h-10 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center justify-center transition active:scale-95 border border-gray-200"
             >
               <X className="w-5 h-5" />
             </button>
@@ -829,20 +876,32 @@ export const FarmManager: React.FC<FarmManagerProps> = ({ setActiveTab }) => {
                 />
               </div>
 
-              <button
-                type="submit"
-                disabled={isSubmittingExpense}
-                className="w-full py-3 bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white font-extrabold rounded-2xl shadow transition text-xs active:scale-95 flex items-center justify-center gap-2"
-              >
-                {isSubmittingExpense ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Saving Expense Entry...</span>
-                  </>
-                ) : (
-                  <span>{editingExpense ? 'Update Expense Entry' : 'Log Expense Entry'}</span>
-                )}
-              </button>
+              <div className="flex gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowExpenseModal(false);
+                    setEditingExpense(null);
+                  }}
+                  className="px-4 py-3 rounded-2xl border border-gray-200 hover:bg-gray-50 text-gray-700 font-extrabold text-xs transition"
+                >
+                  Cancel / ಮುಚ್ಚಿ
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmittingExpense}
+                  className="flex-1 py-3 bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white font-extrabold rounded-2xl shadow transition text-xs active:scale-95 flex items-center justify-center gap-2"
+                >
+                  {isSubmittingExpense ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Saving Expense Entry...</span>
+                    </>
+                  ) : (
+                    <span>{editingExpense ? 'Update Expense Entry' : 'Log Expense Entry'}</span>
+                  )}
+                </button>
+              </div>
             </form>
           </div>
         </div>

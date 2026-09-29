@@ -264,6 +264,21 @@ export const ProduceMarket: React.FC<ProduceMarketProps> = ({ setActiveTab }) =>
   const [farmerDeclineReason, setFarmerDeclineReason] = useState('Offered price is below my cultivation cost and expected mandi rate.');
   const [isSubmittingDecline, setIsSubmittingDecline] = useState(false);
 
+  // Universal Escape key listener to close any active modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setShowCreateModal(false);
+        setSelectedListingForOffer(null);
+        setSelectedVendorForRequest(null);
+        setViewAgreementDeal(null);
+        setSelectedBidForFarmerReject(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   // Form fields - Create Listing (Public Mandi)
   const [cropName, setCropName] = useState('Groundnut');
   const [variety, setVariety] = useState('Kadiri-6 (High Oil Content)');
@@ -1381,11 +1396,18 @@ export const ProduceMarket: React.FC<ProduceMarketProps> = ({ setActiveTab }) =>
       {/* MODAL: DIRECT SELL REQUEST TO SPECIFIC VENDOR */}
       {/* ======================================================== */}
       {selectedVendorForRequest && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-emerald-100 relative space-y-4 max-h-[90vh] overflow-y-auto">
+        <div
+          onClick={() => setSelectedVendorForRequest(null)}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in"
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-emerald-100 relative space-y-4 max-h-[90vh] overflow-y-auto"
+          >
             <button
               onClick={() => setSelectedVendorForRequest(null)}
-              className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100"
+              className="absolute top-4 right-4 w-10 h-10 min-w-[40px] min-h-[40px] rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900 flex items-center justify-center transition cursor-pointer shadow-sm"
+              aria-label="Close"
             >
               <X className="w-5 h-5" />
             </button>
@@ -1394,7 +1416,7 @@ export const ProduceMarket: React.FC<ProduceMarketProps> = ({ setActiveTab }) =>
               <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase mb-1">
                 Direct Deal Request
               </div>
-              <h3 className="text-lg font-black text-gray-900">
+              <h3 className="text-lg font-black text-gray-900 pr-10">
                 Sell Produce to {selectedVendorForRequest.businessName}
               </h3>
               <p className="text-xs text-gray-500">
@@ -1458,11 +1480,11 @@ export const ProduceMarket: React.FC<ProduceMarketProps> = ({ setActiveTab }) =>
                     <option value="CRATE">Crate (25 kg)</option>
                     <option value="KG">Kilogram (kg)</option>
                     <option value="TONNE">Tonne</option>
-                    <option value="BUNDLE">Bundle (Flowers)</option>
+                    <option value="BUNDLE">Bundle / Bag</option>
                   </select>
                 </div>
                 <div>
-                  <label className="font-bold text-gray-700 block mb-1">Asking Rate (₹) *</label>
+                  <label className="font-bold text-gray-700 block mb-1">Asking Price (₹) *</label>
                   <input
                     type="number"
                     min="1"
@@ -1485,7 +1507,7 @@ export const ProduceMarket: React.FC<ProduceMarketProps> = ({ setActiveTab }) =>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="font-bold text-gray-700 block mb-1">Proposed Harvest / Handover Date</label>
+                  <label className="font-bold text-gray-700 block mb-1">Expected Ready / Harvest Date</label>
                   <input
                     type="date"
                     value={reqHarvestDate}
@@ -1500,8 +1522,8 @@ export const ProduceMarket: React.FC<ProduceMarketProps> = ({ setActiveTab }) =>
                     onChange={e => setReqQualityGrade(e.target.value as any)}
                     className="w-full p-2.5 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-emerald-500"
                   >
-                    <option value="GRADE_A">Grade A (Sorted Premium)</option>
-                    <option value="GRADE_B">Grade B (Standard Market)</option>
+                    <option value="GRADE_A">Grade A (Premium Supermarket)</option>
+                    <option value="GRADE_B">Grade B (Standard Mandi)</option>
                     <option value="ORGANIC">Certified Organic</option>
                   </select>
                 </div>
@@ -1549,20 +1571,29 @@ export const ProduceMarket: React.FC<ProduceMarketProps> = ({ setActiveTab }) =>
                 />
               </div>
 
-              <button
-                type="submit"
-                disabled={isSubmittingVendorReq}
-                className="w-full py-3 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-black rounded-2xl shadow transition text-xs active:scale-95 flex items-center justify-center gap-2"
-              >
-                {isSubmittingVendorReq ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Submitting Request to Vendor...</span>
-                  </>
-                ) : (
-                  <span>Submit Deal Request to Vendor</span>
-                )}
-              </button>
+              <div className="flex items-center gap-3 pt-1">
+                <button
+                  type="button"
+                  onClick={() => setSelectedVendorForRequest(null)}
+                  className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-2xl transition text-xs cursor-pointer"
+                >
+                  Cancel / ಮುಚ್ಚಿ
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmittingVendorReq}
+                  className="flex-2 py-3 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-black rounded-2xl shadow transition text-xs active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  {isSubmittingVendorReq ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Submitting Request to Vendor...</span>
+                    </>
+                  ) : (
+                    <span>Submit Deal Request to Vendor</span>
+                  )}
+                </button>
+              </div>
             </form>
           </div>
         </div>
@@ -1572,11 +1603,18 @@ export const ProduceMarket: React.FC<ProduceMarketProps> = ({ setActiveTab }) =>
       {/* MODAL: VIEW DIGITAL AGREEMENT & GATE PASS */}
       {/* ======================================================== */}
       {viewAgreementDeal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-emerald-100 relative space-y-4">
+        <div
+          onClick={() => setViewAgreementDeal(null)}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in"
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-emerald-100 relative space-y-4"
+          >
             <button
               onClick={() => setViewAgreementDeal(null)}
-              className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100"
+              className="absolute top-4 right-4 w-10 h-10 min-w-[40px] min-h-[40px] rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900 flex items-center justify-center transition cursor-pointer shadow-sm"
+              aria-label="Close"
             >
               <X className="w-5 h-5" />
             </button>
@@ -1647,21 +1685,31 @@ export const ProduceMarket: React.FC<ProduceMarketProps> = ({ setActiveTab }) =>
               )}
             </div>
 
-            <button
-              onClick={() => {
-                try {
-                  exportProcurementVoucherPDF(viewAgreementDeal);
-                  showToast('Procurement voucher PDF generated & downloaded! 📄');
-                } catch (err) {
-                  showToast('Failed to download voucher PDF.', 'error');
-                }
-                setViewAgreementDeal(null);
-              }}
-              className="w-full py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl text-xs transition flex items-center justify-center gap-2 shadow-xs"
-            >
-              <FileDown className="w-4 h-4" />
-              <span>Download Official Gate Voucher (PDF)</span>
-            </button>
+            <div className="flex items-center gap-2 pt-1">
+              <button
+                type="button"
+                onClick={() => setViewAgreementDeal(null)}
+                className="w-1/3 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl text-xs transition cursor-pointer"
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  try {
+                    exportProcurementVoucherPDF(viewAgreementDeal);
+                    showToast('Procurement voucher PDF generated & downloaded! 📄');
+                  } catch (err) {
+                    showToast('Failed to download voucher PDF.', 'error');
+                  }
+                  setViewAgreementDeal(null);
+                }}
+                className="w-2/3 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl text-xs transition flex items-center justify-center gap-2 shadow-xs cursor-pointer active:scale-95"
+              >
+                <FileDown className="w-4 h-4" />
+                <span>Download PDF</span>
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -1670,16 +1718,23 @@ export const ProduceMarket: React.FC<ProduceMarketProps> = ({ setActiveTab }) =>
       {/* MODAL: CREATE PUBLIC OPEN MANDI LISTING */}
       {/* ======================================================== */}
       {showCreateModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-emerald-100 relative space-y-4">
+        <div
+          onClick={() => setShowCreateModal(false)}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in"
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-emerald-100 relative space-y-4 max-h-[90vh] overflow-y-auto"
+          >
             <button
               onClick={() => setShowCreateModal(false)}
-              className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100"
+              className="absolute top-4 right-4 w-10 h-10 min-w-[40px] min-h-[40px] rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900 flex items-center justify-center transition cursor-pointer shadow-sm"
+              aria-label="Close"
             >
               <X className="w-5 h-5" />
             </button>
 
-            <h3 className="text-lg font-black text-gray-900">List Produce for Direct Sale</h3>
+            <h3 className="text-lg font-black text-gray-900 pr-10">List Produce for Direct Sale</h3>
             <p className="text-xs text-gray-500">Connect with wholesale traders and mandis across AP and Karnataka</p>
 
             {listingError && (
@@ -1827,20 +1882,29 @@ export const ProduceMarket: React.FC<ProduceMarketProps> = ({ setActiveTab }) =>
                 />
               </div>
 
-              <button
-                type="submit"
-                disabled={isSubmittingListing}
-                className="w-full py-3 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-extrabold rounded-2xl shadow transition text-xs active:scale-95 flex items-center justify-center gap-2"
-              >
-                {isSubmittingListing ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Publishing Listing...</span>
-                  </>
-                ) : (
-                  <span>Publish Listing to Buyers</span>
-                )}
-              </button>
+              <div className="flex items-center gap-3 pt-1">
+                <button
+                  type="button"
+                  onClick={() => setShowCreateModal(false)}
+                  className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-2xl transition text-xs cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmittingListing}
+                  className="flex-2 py-3 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-extrabold rounded-2xl shadow transition text-xs active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  {isSubmittingListing ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Publishing Listing...</span>
+                    </>
+                  ) : (
+                    <span>Publish Listing to Buyers</span>
+                  )}
+                </button>
+              </div>
             </form>
           </div>
         </div>
@@ -1850,16 +1914,23 @@ export const ProduceMarket: React.FC<ProduceMarketProps> = ({ setActiveTab }) =>
       {/* MODAL: BUYER SEND OFFER ON PUBLIC LOT */}
       {/* ======================================================== */}
       {selectedListingForOffer && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-emerald-100 relative space-y-4">
+        <div
+          onClick={() => setSelectedListingForOffer(null)}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in"
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-emerald-100 relative space-y-4"
+          >
             <button
               onClick={() => setSelectedListingForOffer(null)}
-              className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100"
+              className="absolute top-4 right-4 w-10 h-10 min-w-[40px] min-h-[40px] rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900 flex items-center justify-center transition cursor-pointer shadow-sm"
+              aria-label="Close"
             >
               <X className="w-5 h-5" />
             </button>
 
-            <h3 className="text-lg font-black text-gray-900">
+            <h3 className="text-lg font-black text-gray-900 pr-10">
               Submit Offer for {selectedListingForOffer.cropName}
             </h3>
             <p className="text-xs text-gray-500">
@@ -1911,20 +1982,29 @@ export const ProduceMarket: React.FC<ProduceMarketProps> = ({ setActiveTab }) =>
                 />
               </div>
 
-              <button
-                type="submit"
-                disabled={isSubmittingOffer}
-                className="w-full py-3 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-extrabold rounded-2xl shadow transition text-xs active:scale-95 flex items-center justify-center gap-2"
-              >
-                {isSubmittingOffer ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Submitting Offer...</span>
-                  </>
-                ) : (
-                  <span>Send Offer to Farmer</span>
-                )}
-              </button>
+              <div className="flex items-center gap-3 pt-1">
+                <button
+                  type="button"
+                  onClick={() => setSelectedListingForOffer(null)}
+                  className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-2xl transition text-xs cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmittingOffer}
+                  className="flex-2 py-3 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-extrabold rounded-2xl shadow transition text-xs active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  {isSubmittingOffer ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Submitting Offer...</span>
+                    </>
+                  ) : (
+                    <span>Send Offer to Farmer</span>
+                  )}
+                </button>
+              </div>
             </form>
           </div>
         </div>
@@ -1934,16 +2014,23 @@ export const ProduceMarket: React.FC<ProduceMarketProps> = ({ setActiveTab }) =>
       {/* MODAL: FARMER DECLINE BUYER OFFER (FARMER CHOICE) */}
       {/* ======================================================== */}
       {selectedBidForFarmerReject && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-red-100 relative space-y-4">
+        <div
+          onClick={() => setSelectedBidForFarmerReject(null)}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in"
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-red-100 relative space-y-4 max-h-[90vh] overflow-y-auto"
+          >
             <button
               onClick={() => setSelectedBidForFarmerReject(null)}
-              className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100"
+              className="absolute top-4 right-4 w-10 h-10 min-w-[40px] min-h-[40px] rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900 flex items-center justify-center transition cursor-pointer shadow-sm"
+              aria-label="Close"
             >
               <X className="w-5 h-5" />
             </button>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 pr-10">
               <div className="w-10 h-10 rounded-2xl bg-red-100 text-red-700 flex items-center justify-center text-lg font-black shrink-0">
                 ✕
               </div>
@@ -2023,14 +2110,14 @@ export const ProduceMarket: React.FC<ProduceMarketProps> = ({ setActiveTab }) =>
                 <button
                   type="button"
                   onClick={() => setSelectedBidForFarmerReject(null)}
-                  className="w-1/3 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl text-xs transition"
+                  className="w-1/3 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl text-xs transition cursor-pointer"
                 >
-                  Cancel
+                  Cancel / ಮುಚ್ಚಿ
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmittingDecline || !farmerDeclineReason.trim()}
-                  className="w-2/3 py-2.5 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-black rounded-xl text-xs transition flex items-center justify-center gap-1.5 shadow-sm active:scale-95"
+                  className="w-2/3 py-2.5 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-black rounded-xl text-xs transition flex items-center justify-center gap-1.5 shadow-sm active:scale-95 cursor-pointer"
                 >
                   {isSubmittingDecline ? (
                     <>
@@ -2038,7 +2125,7 @@ export const ProduceMarket: React.FC<ProduceMarketProps> = ({ setActiveTab }) =>
                       <span>Declining...</span>
                     </>
                   ) : (
-                    <span>Decline This Offer</span>
+                    <span>Confirm Decline Offer</span>
                   )}
                 </button>
               </div>

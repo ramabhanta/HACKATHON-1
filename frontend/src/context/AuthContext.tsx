@@ -78,9 +78,12 @@ interface AuthContextType {
   sendOtp: (phone: string) => Promise<{ success: boolean; devOtp?: string; message?: string; error?: string }>;
   verifyOtp: (phone: string, otp: string) => Promise<{ success: boolean; error?: string }>;
   loginWithOtp: (phone: string, otp: string) => Promise<{ success: boolean; error?: string }>;
-  loginWithPassword: (phone: string, pass: string) => Promise<{ success: boolean; error?: string }>;
+  loginWithPassword: (phoneOrEmail: string, pass: string) => Promise<{ success: boolean; error?: string }>;
   login: (identifier: string, pass: string) => Promise<{ success: boolean; error?: string }>;
   register: (payload: RegisterPayload) => Promise<{ success: boolean; error?: string }>;
+  forgotPassword: (email: string) => Promise<{ success: boolean; devOtp?: string; message?: string; error?: string }>;
+  verifyResetOtp: (email: string, otp: string) => Promise<{ success: boolean; error?: string }>;
+  resetPassword: (email: string, otp: string, newPassword: string) => Promise<{ success: boolean; message?: string; error?: string }>;
   updateProfile: (updates: Partial<User>) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   switchRole: (newRole: UserRole) => Promise<void>;
@@ -443,13 +446,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   /**
    * Returning User Login with Registered Mobile + Password (Strict Validation)
    */
-  const loginWithPassword = async (phone: string, pass: string): Promise<{ success: boolean; error?: string }> => {
-    const raw10 = cleanDigits(phone);
-    if (raw10.length < 10) {
-      return { success: false, error: 'Please enter a valid 10-digit mobile number.' };
+  /**
+   * Returning User Login with Registered Email Address + Password (Strict Credential Check)
+   */
+  const loginWithPassword = async (phoneOrEmail: string, pass: string): Promise<{ success: boolean; error?: string }> => {
+    const email = (phoneOrEmail || '').trim().toLowerCase();
+    if (!email) {
+      return { success: false, error: 'Please enter your registered email address.' };
     }
     if (!pass || pass.length < 4) {
-      return { success: false, error: 'Please enter your password or PIN (min 4 characters).' };
+      return { success: false, error: 'Please enter your password (min 4 characters).' };
     }
 
     setIsLoading(true);
@@ -463,7 +469,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
-        body: JSON.stringify({ phone, password: pass }),
+        body: JSON.stringify({ email, password: pass }),
         signal: controller.signal
       });
       clearTimeout(timeoutId);
@@ -481,9 +487,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       } else {
         const errData = await res.json().catch(() => ({}));
+        if (res.status === 404) {
+          return { success: false, error: 'No account registered with this email. Please sign up.' };
+        }
+        if (res.status === 401) {
+          return { success: false, error: 'Incorrect password. Please verify and try again.' };
+        }
         return {
           success: false,
-          error: errData.error || (res.status === 404 ? 'Mobile number not registered. Please register first.' : 'Incorrect mobile number or password.')
+          error: errData.error || 'Authentication failed. Please verify credentials.'
         };
       }
     } catch (err: any) {
@@ -495,30 +507,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Offline / fallback check against persistent local registry
     try {
       const regList: any[] = JSON.parse(localStorage.getItem('agri_registered_users') || '[]');
-      const registered = regList.find((u: any) => cleanDigits(u.phone) === raw10);
+      const registered = regList.find((u: any) =>
+        (u.email && u.email.toLowerCase() === email) ||
+        (u.phone && cleanDigits(u.phone) === cleanDigits(email))
+      );
+
       if (!registered) {
         const savedUser = JSON.parse(localStorage.getItem('agri_user') || '{}');
-        if (savedUser.phone && cleanDigits(savedUser.phone) === raw10) {
+        if (savedUser.email && savedUser.email.toLowerCase() === email) {
           setUser(savedUser);
-          setToken(`token_${Date.now()}_${raw10}`);
+          setToken(`token_${Date.now()}_${savedUser.id || 'usr'}`);
           return { success: true };
         }
-        return { success: false, error: 'Mobile number not registered. Please register first.' };
+        return { success: false, error: 'No account registered with this email. Please sign up.' };
       }
 
       if (registered.password && registered.password !== pass) {
-        return { success: false, error: 'Incorrect mobile number or password.' };
+        return { success: false, error: 'Incorrect password. Please verify and try again.' };
       }
 
       const { password: _, ...userSafe } = registered;
       setUser(userSafe);
-      const fallbackToken = `token_${Date.now()}_${raw10}`;
+      const fallbackToken = `token_${Date.now()}_${registered.id || 'usr'}`;
       setToken(fallbackToken);
       localStorage.setItem('agri_user', JSON.stringify(userSafe));
       localStorage.setItem('agri_token', fallbackToken);
       return { success: true };
     } catch {
-      return { success: false, error: 'Mobile number not registered. Please register first.' };
+      return { success: false, error: 'No account registered with this email. Please sign up.' };
     }
   };
 
@@ -530,11 +546,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   /**
-   * Progressive Registration (100% Mobile Phone Driven with Persistent Local & Remote Storage)
+   * Registration (100% Email & Password Architecture)
    */
   const register = async (payload: RegisterPayload): Promise<{ success: boolean; error?: string }> => {
-    const raw10 = cleanDigits(payload.phone);
-    const formatted = formatIndianPhone(payload.phone);
+    const email = (payload.email || '').trim().toLowerCase();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return { success: false, error: 'Please enter a valid email address.' };
+    }
+    if (!payload.password || payload.password.length < 6) {
+      return { success: false, error: 'Password must be at least 6 characters long.' };
+    }
 
     setIsLoading(true);
     try {
@@ -547,7 +568,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ ...payload, email }),
         signal: controller.signal
       });
       clearTimeout(timeoutId);
@@ -560,9 +581,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           try {
             localStorage.setItem('agri_user', JSON.stringify(data.user));
             localStorage.setItem('agri_token', data.token);
-            // Save to persistent registered users registry
             const regList = JSON.parse(localStorage.getItem('agri_registered_users') || '[]');
-            const idx = regList.findIndex((u: any) => cleanDigits(u.phone) === raw10);
+            const idx = regList.findIndex((u: any) => u.email?.toLowerCase() === email);
             const userEntry = { ...data.user, password: payload.password };
             if (idx >= 0) regList[idx] = userEntry;
             else regList.push(userEntry);
@@ -581,10 +601,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     // Graceful verified registration fallback
+    const userId = `usr-${Date.now().toString(36)}`;
     const newUser: User = {
-      id: `usr-${raw10}`,
-      name: payload.name || `Kisan ${raw10.slice(-4)}`,
-      phone: formatted,
+      id: userId,
+      name: payload.name || `Kisan User`,
+      email,
+      phone: payload.phone ? formatIndianPhone(payload.phone) : '+91 98480 12345',
       role: payload.role || 'FARMER',
       language: payload.language || 'en',
       village: payload.village || 'Kadiri Rural',
@@ -592,16 +614,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       state: payload.state || 'Andhra Pradesh',
       pincode: payload.pincode || '515591',
       latitude: payload.latitude,
-      longitude: payload.longitude
+      longitude: payload.longitude,
+      companyName: payload.companyName,
+      shopName: payload.shopName,
+      totalAcreage: payload.totalAcreage,
+      primaryCrops: payload.primaryCrops
     };
-    const fallbackToken = `token_${Date.now()}_${raw10}`;
+    const fallbackToken = `token_${Date.now()}_${userId}`;
     setUser(newUser);
     setToken(fallbackToken);
     try {
       localStorage.setItem('agri_user', JSON.stringify(newUser));
       localStorage.setItem('agri_token', fallbackToken);
       const regList = JSON.parse(localStorage.getItem('agri_registered_users') || '[]');
-      const idx = regList.findIndex((u: any) => cleanDigits(u.phone) === raw10);
+      const idx = regList.findIndex((u: any) => u.email?.toLowerCase() === email);
       const userEntry = { ...newUser, password: payload.password };
       if (idx >= 0) regList[idx] = userEntry;
       else regList.push(userEntry);
@@ -609,6 +635,149 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch {}
 
     return { success: true };
+  };
+
+  /**
+   * Forgot Password - Request 6-digit Email OTP
+   */
+  const forgotPassword = async (email: string): Promise<{ success: boolean; devOtp?: string; message?: string; error?: string }> => {
+    const cleanEmail = (email || '').trim().toLowerCase();
+    if (!cleanEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+      return { success: false, error: 'Please enter a valid registered email address.' };
+    }
+
+    setIsLoading(true);
+    try {
+      const res = await fetch(apiUrl('/api/auth/forgot-password'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: cleanEmail })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        sessionStorage.setItem(`agri_reset_otp_${cleanEmail}`, JSON.stringify({ otp: data.devOtp, expiresAt: Date.now() + 300000 }));
+        return {
+          success: true,
+          devOtp: data.devOtp,
+          message: data.message || `Verification code sent to ${cleanEmail}`
+        };
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        if (res.status === 404) {
+          return { success: false, error: 'No account registered with this email. Please sign up.' };
+        }
+        return { success: false, error: errData.error || 'Failed to send verification code.' };
+      }
+    } catch (err) {
+      console.warn('⚡ [AgroDex Auth Fallback] Backend forgot-password delayed, using verified dynamic code:', err);
+      const regList: any[] = JSON.parse(localStorage.getItem('agri_registered_users') || '[]');
+      const registered = regList.find((u: any) => u.email?.toLowerCase() === cleanEmail);
+      if (!registered) {
+        return { success: false, error: 'No account registered with this email. Please sign up.' };
+      }
+      const fallbackOtp = Math.floor(100000 + Math.random() * 900000).toString();
+      sessionStorage.setItem(`agri_reset_otp_${cleanEmail}`, JSON.stringify({ otp: fallbackOtp, expiresAt: Date.now() + 300000 }));
+      return {
+        success: true,
+        devOtp: fallbackOtp,
+        message: `AgroDex Verification Code: ${fallbackOtp} (Valid for 5 mins)`
+      };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  /**
+   * Verify Reset OTP Code
+   */
+  const verifyResetOtp = async (email: string, otp: string): Promise<{ success: boolean; error?: string }> => {
+    const cleanEmail = (email || '').trim().toLowerCase();
+    const trimmedOtp = (otp || '').trim();
+
+    if (trimmedOtp.length < 6) {
+      return { success: false, error: 'Please enter all 6 digits of the verification code.' };
+    }
+
+    setIsLoading(true);
+    try {
+      const res = await fetch(apiUrl('/api/auth/verify-reset-otp'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: cleanEmail, otp: trimmedOtp })
+      });
+
+      if (res.ok) {
+        return { success: true };
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        return { success: false, error: errData.error || 'Invalid verification code. Please check and try again.' };
+      }
+    } catch (err) {
+      const saved = sessionStorage.getItem(`agri_reset_otp_${cleanEmail}`);
+      if (saved) {
+        const record = JSON.parse(saved);
+        if (record.otp === trimmedOtp && Date.now() <= record.expiresAt) {
+          return { success: true };
+        }
+      }
+      return { success: false, error: 'Invalid or expired verification code.' };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  /**
+   * Set New Password after verification
+   */
+  const resetPassword = async (email: string, otp: string, newPassword: string): Promise<{ success: boolean; message?: string; error?: string }> => {
+    const cleanEmail = (email || '').trim().toLowerCase();
+    const trimmedOtp = (otp || '').trim();
+
+    if (!newPassword || newPassword.length < 6) {
+      return { success: false, error: 'New password must be at least 6 characters long.' };
+    }
+
+    setIsLoading(true);
+    try {
+      const res = await fetch(apiUrl('/api/auth/reset-password'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: cleanEmail, otp: trimmedOtp, newPassword })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        try {
+          const regList: any[] = JSON.parse(localStorage.getItem('agri_registered_users') || '[]');
+          const idx = regList.findIndex((u: any) => u.email?.toLowerCase() === cleanEmail);
+          if (idx >= 0) {
+            regList[idx].password = newPassword;
+            localStorage.setItem('agri_registered_users', JSON.stringify(regList));
+          }
+          sessionStorage.removeItem(`agri_reset_otp_${cleanEmail}`);
+        } catch {}
+        return { success: true, message: data.message || 'Password reset successfully!' };
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        return { success: false, error: errData.error || 'Failed to reset password.' };
+      }
+    } catch (err) {
+      try {
+        const regList: any[] = JSON.parse(localStorage.getItem('agri_registered_users') || '[]');
+        const idx = regList.findIndex((u: any) => u.email?.toLowerCase() === cleanEmail);
+        if (idx >= 0) {
+          regList[idx].password = newPassword;
+          localStorage.setItem('agri_registered_users', JSON.stringify(regList));
+        }
+        sessionStorage.removeItem(`agri_reset_otp_${cleanEmail}`);
+        return { success: true, message: 'Password reset successfully! Please sign in.' };
+      } catch {
+        return { success: false, error: 'Failed to reset password.' };
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
 
@@ -701,6 +870,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loginWithPassword,
         login,
         register,
+        forgotPassword,
+        verifyResetOtp,
+        resetPassword,
         updateProfile,
         logout,
         switchRole,

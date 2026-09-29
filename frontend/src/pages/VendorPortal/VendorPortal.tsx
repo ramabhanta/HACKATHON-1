@@ -101,6 +101,21 @@ export const VendorPortal: React.FC = () => {
   const [rejectNotes, setRejectNotes] = useState('Godown currently at maximum storage capacity for this commodity.');
   const [isRejectingDeal, setIsRejectingDeal] = useState(false);
 
+  // Universal Escape key listener to close any active modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setSelectedLotForBid(null);
+        setSelectedDealForConfirm(null);
+        setSelectedDealForReject(null);
+        setShowAddProductModal(false);
+        setSelectedOrderForReject(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   // Logistics simulation state
   const [assignedDriver, setAssignedDriver] = useState<string>('Srinivas Rao (Tata Ace - AP 02 TE 4821)');
   const [driverStatus, setDriverStatus] = useState<string>('DISPATCHED');
@@ -1553,16 +1568,23 @@ export const VendorPortal: React.FC = () => {
       {/* MODAL: SUBMIT PURCHASE BID TO FARMER */}
       {/* ======================================================== */}
       {selectedLotForBid && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-emerald-100 relative space-y-4">
+        <div
+          onClick={() => setSelectedLotForBid(null)}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in"
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-emerald-100 relative space-y-4 max-h-[90vh] overflow-y-auto"
+          >
             <button
               onClick={() => setSelectedLotForBid(null)}
-              className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100"
+              className="absolute top-4 right-4 w-10 h-10 min-w-[40px] min-h-[40px] rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900 flex items-center justify-center transition cursor-pointer shadow-sm"
+              aria-label="Close"
             >
               <X className="w-5 h-5" />
             </button>
 
-            <div>
+            <div className="pr-10">
               <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase mb-1">
                 Wholesale Procurement Bid
               </div>
@@ -1637,20 +1659,29 @@ export const VendorPortal: React.FC = () => {
                 />
               </div>
 
-              <button
-                type="submit"
-                disabled={isSubmittingBid}
-                className="w-full py-3 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-black rounded-2xl shadow transition text-xs active:scale-95 flex items-center justify-center gap-2"
-              >
-                {isSubmittingBid ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Submitting Offer to Farmer...</span>
-                  </>
-                ) : (
-                  <span>Send Purchase Offer to Farmer</span>
-                )}
-              </button>
+              <div className="flex items-center gap-3 pt-1">
+                <button
+                  type="button"
+                  onClick={() => setSelectedLotForBid(null)}
+                  className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-2xl transition text-xs cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmittingBid}
+                  className="flex-2 py-3 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-black rounded-2xl shadow transition text-xs active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  {isSubmittingBid ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Submitting Offer...</span>
+                    </>
+                  ) : (
+                    <span>Send Purchase Offer</span>
+                  )}
+                </button>
+              </div>
             </form>
           </div>
         </div>
@@ -1660,16 +1691,23 @@ export const VendorPortal: React.FC = () => {
       {/* MODAL: CONFIRM FARMER DIRECT DEAL */}
       {/* ======================================================== */}
       {selectedDealForConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-emerald-100 relative space-y-4">
+        <div
+          onClick={() => setSelectedDealForConfirm(null)}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in"
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-emerald-100 relative space-y-4 max-h-[90vh] overflow-y-auto"
+          >
             <button
               onClick={() => setSelectedDealForConfirm(null)}
-              className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100"
+              className="absolute top-4 right-4 w-10 h-10 min-w-[40px] min-h-[40px] rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900 flex items-center justify-center transition cursor-pointer shadow-sm"
+              aria-label="Close"
             >
               <X className="w-5 h-5" />
             </button>
 
-            <div className="text-center space-y-1">
+            <div className="text-center space-y-1 pr-10">
               <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center text-xl mx-auto">
                 🤝
               </div>
@@ -1704,20 +1742,29 @@ export const VendorPortal: React.FC = () => {
                 />
               </div>
 
-              <button
-                type="submit"
-                disabled={isConfirmingDeal}
-                className="w-full py-3 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-black rounded-2xl shadow transition text-xs active:scale-95 flex items-center justify-center gap-2"
-              >
-                {isConfirmingDeal ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Locking Deal & Notifying Farmer...</span>
-                  </>
-                ) : (
-                  <span>Confirm Deal & Generate Gate Pass</span>
-                )}
-              </button>
+              <div className="flex items-center gap-3 pt-1">
+                <button
+                  type="button"
+                  onClick={() => setSelectedDealForConfirm(null)}
+                  className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-2xl transition text-xs cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isConfirmingDeal}
+                  className="flex-2 py-3 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-black rounded-2xl shadow transition text-xs active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  {isConfirmingDeal ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Locking Deal...</span>
+                    </>
+                  ) : (
+                    <span>Confirm Deal & Pass</span>
+                  )}
+                </button>
+              </div>
             </form>
           </div>
         </div>
@@ -1727,16 +1774,23 @@ export const VendorPortal: React.FC = () => {
       {/* MODAL: REJECT FARMER DIRECT DEAL */}
       {/* ======================================================== */}
       {selectedDealForReject && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-red-100 relative space-y-4">
+        <div
+          onClick={() => setSelectedDealForReject(null)}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in"
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-red-100 relative space-y-4 max-h-[90vh] overflow-y-auto"
+          >
             <button
               onClick={() => setSelectedDealForReject(null)}
-              className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100"
+              className="absolute top-4 right-4 w-10 h-10 min-w-[40px] min-h-[40px] rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900 flex items-center justify-center transition cursor-pointer shadow-sm"
+              aria-label="Close"
             >
               <X className="w-5 h-5" />
             </button>
 
-            <div>
+            <div className="pr-10">
               <h3 className="text-lg font-black text-gray-900">
                 Decline Offer from {selectedDealForReject.farmerName}
               </h3>
@@ -1767,27 +1821,36 @@ export const VendorPortal: React.FC = () => {
                     key={r}
                     type="button"
                     onClick={() => setRejectNotes(r)}
-                    className="p-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-[10px] font-semibold text-gray-700"
+                    className="p-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-[10px] font-semibold text-gray-700 cursor-pointer"
                   >
                     {r}
                   </button>
                 ))}
               </div>
 
-              <button
-                type="submit"
-                disabled={isRejectingDeal}
-                className="w-full py-3 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-black rounded-2xl shadow transition text-xs active:scale-95 flex items-center justify-center gap-2"
-              >
-                {isRejectingDeal ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Declining...</span>
-                  </>
-                ) : (
-                  <span>Confirm Decline & Notify Farmer</span>
-                )}
-              </button>
+              <div className="flex items-center gap-3 pt-1">
+                <button
+                  type="button"
+                  onClick={() => setSelectedDealForReject(null)}
+                  className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-2xl transition text-xs cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isRejectingDeal}
+                  className="flex-2 py-3 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-black rounded-2xl shadow transition text-xs active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  {isRejectingDeal ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Declining...</span>
+                    </>
+                  ) : (
+                    <span>Confirm Decline & Notify</span>
+                  )}
+                </button>
+              </div>
             </form>
           </div>
         </div>
@@ -1797,16 +1860,23 @@ export const VendorPortal: React.FC = () => {
       {/* MODAL: ADD PRODUCT TO STORE CATALOG */}
       {/* ======================================================== */}
       {showAddProductModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-emerald-100 relative space-y-4">
+        <div
+          onClick={() => setShowAddProductModal(false)}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in"
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-emerald-100 relative space-y-4 max-h-[90vh] overflow-y-auto"
+          >
             <button
               onClick={() => setShowAddProductModal(false)}
-              className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100"
+              className="absolute top-4 right-4 w-10 h-10 min-w-[40px] min-h-[40px] rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900 flex items-center justify-center transition cursor-pointer shadow-sm"
+              aria-label="Close"
             >
               <X className="w-5 h-5" />
             </button>
 
-            <h3 className="text-lg font-black text-gray-900">Add Agricultural Product to Store</h3>
+            <h3 className="text-lg font-black text-gray-900 pr-10">Add Agricultural Product to Store</h3>
             <p className="text-xs text-gray-500">List certified seeds, fertilizers, or tools for local farmers to purchase.</p>
 
             {productError && (
@@ -1914,20 +1984,29 @@ export const VendorPortal: React.FC = () => {
                 />
               </div>
 
-              <button
-                type="submit"
-                disabled={isSubmittingProduct}
-                className="w-full py-3 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-extrabold rounded-2xl shadow transition text-xs active:scale-95 flex items-center justify-center gap-2"
-              >
-                {isSubmittingProduct ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Listing Product...</span>
-                  </>
-                ) : (
-                  <span>Publish Product to Store</span>
-                )}
-              </button>
+              <div className="flex items-center gap-3 pt-1">
+                <button
+                  type="button"
+                  onClick={() => setShowAddProductModal(false)}
+                  className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-2xl transition text-xs cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmittingProduct}
+                  className="flex-2 py-3 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-extrabold rounded-2xl shadow transition text-xs active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  {isSubmittingProduct ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Listing Product...</span>
+                    </>
+                  ) : (
+                    <span>Publish Product to Store</span>
+                  )}
+                </button>
+              </div>
             </form>
           </div>
         </div>
@@ -1937,19 +2016,29 @@ export const VendorPortal: React.FC = () => {
       {/* MODAL: DECLINE / REJECT FARMER BOOKING */}
       {/* ======================================================== */}
       {selectedOrderForReject && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-rose-100 relative space-y-4">
+        <div
+          onClick={() => {
+            setSelectedOrderForReject(null);
+            setOrderRejectNotes('');
+          }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in"
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-rose-100 relative space-y-4 max-h-[90vh] overflow-y-auto"
+          >
             <button
               onClick={() => {
                 setSelectedOrderForReject(null);
                 setOrderRejectNotes('');
               }}
-              className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100"
+              className="absolute top-4 right-4 w-10 h-10 min-w-[40px] min-h-[40px] rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900 flex items-center justify-center transition cursor-pointer shadow-sm"
+              aria-label="Close"
             >
               <X className="w-5 h-5" />
             </button>
 
-            <div>
+            <div className="pr-10">
               <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 text-[10px] font-black uppercase mb-1">
                 <AlertTriangle className="w-3 h-3 text-rose-600" />
                 <span>Decline Booking Request</span>
@@ -2039,14 +2128,14 @@ export const VendorPortal: React.FC = () => {
                     setSelectedOrderForReject(null);
                     setOrderRejectNotes('');
                   }}
-                  className="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl transition text-xs"
+                  className="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl transition text-xs cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isRejectingBooking}
-                  className="flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 disabled:opacity-50 text-white font-bold rounded-xl shadow transition text-xs flex items-center justify-center gap-1.5"
+                  className="flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 disabled:opacity-50 text-white font-bold rounded-xl shadow transition text-xs flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   {isRejectingBooking ? (
                     <>

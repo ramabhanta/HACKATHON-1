@@ -36,6 +36,16 @@ export const AiConfigModal: React.FC<AiConfigModalProps> = ({ isOpen, onClose, o
     }
   }, [isOpen]);
 
+  // Universal Escape key listener
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   const fetchStatus = async () => {
     try {
       const res = await fetch(apiUrl('/api/ai/config'));
@@ -143,8 +153,14 @@ export const AiConfigModal: React.FC<AiConfigModalProps> = ({ isOpen, onClose, o
   const hasAnyKey = Boolean(apiKey.trim() || serverHasKey);
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
-      <div className="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-emerald-100 overflow-hidden">
+    <div
+      onClick={onClose}
+      className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200"
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        className="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-emerald-100 overflow-hidden"
+      >
         {/* Header */}
         <div className="bg-gradient-to-r from-emerald-800 to-emerald-950 text-white p-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -160,7 +176,8 @@ export const AiConfigModal: React.FC<AiConfigModalProps> = ({ isOpen, onClose, o
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-white/70 hover:text-white hover:bg-white/10 rounded-xl transition"
+            aria-label="Close dialog"
+            className="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition active:scale-95 border border-white/20"
           >
             <X className="w-5 h-5" />
           </button>
@@ -267,6 +284,14 @@ export const AiConfigModal: React.FC<AiConfigModalProps> = ({ isOpen, onClose, o
             </div>
 
             <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-3.5 py-2 rounded-xl border border-gray-300 hover:bg-gray-100 text-gray-700 text-xs font-bold transition"
+              >
+                Cancel / ಮುಚ್ಚಿ
+              </button>
+
               <button
                 type="button"
                 onClick={handleTestKey}

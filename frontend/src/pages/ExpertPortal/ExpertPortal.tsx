@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import {
@@ -124,6 +124,17 @@ export const ExpertPortal: React.FC<ExpertPortalProps> = ({ setActiveTab }) => {
     setBroadcastTitle('');
     setBroadcastMessage('');
   };
+
+  // Universal Escape key listener
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setSelectedCase(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   return (
     <div className="space-y-6 pb-20 md:pb-8">
@@ -356,8 +367,14 @@ export const ExpertPortal: React.FC<ExpertPortalProps> = ({ setActiveTab }) => {
 
       {/* MODAL: DIAGNOSE & ISSUE PRESCRIPTION */}
       {selectedCase && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl relative border border-gray-100 space-y-4 max-h-[90vh] overflow-y-auto">
+        <div
+          onClick={() => setSelectedCase(null)}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in"
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl relative border border-gray-100 space-y-4 max-h-[90vh] overflow-y-auto"
+          >
             <div className="flex items-center justify-between pb-3 border-b border-gray-100">
               <div>
                 <h3 className="font-black text-lg text-gray-900">Official Agronomic Prescription</h3>
@@ -367,7 +384,8 @@ export const ExpertPortal: React.FC<ExpertPortalProps> = ({ setActiveTab }) => {
               </div>
               <button
                 onClick={() => setSelectedCase(null)}
-                className="text-gray-400 hover:text-gray-600 p-1.5 rounded-full hover:bg-gray-100"
+                className="w-10 h-10 min-w-[40px] min-h-[40px] rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900 flex items-center justify-center transition cursor-pointer shadow-sm"
+                aria-label="Close"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -417,9 +435,9 @@ export const ExpertPortal: React.FC<ExpertPortalProps> = ({ setActiveTab }) => {
                 <button
                   type="button"
                   onClick={() => setSelectedCase(null)}
-                  className="px-4 py-2 rounded-xl border border-gray-300 text-gray-700 font-bold"
+                  className="px-4 py-2 rounded-xl border border-gray-300 text-gray-700 font-bold hover:bg-gray-50 transition"
                 >
-                  Cancel
+                  Cancel / ಮುಚ್ಚಿ
                 </button>
                 <button
                   type="submit"

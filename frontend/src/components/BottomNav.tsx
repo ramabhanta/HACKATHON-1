@@ -45,6 +45,16 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab, o
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [showLangPicker, setShowLangPicker] = useState(false);
 
+  // Universal Escape key listener for BottomNav mobile drawer
+  React.useEffect(() => {
+    if (!isDrawerOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsDrawerOpen(false);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isDrawerOpen]);
+
   // Prime bottom bar items
   let navItems: { id: string; label: string; icon: any; isCenter?: boolean; badge?: number }[] = [];
 
@@ -187,8 +197,12 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab, o
 
       {/* 2. Comprehensive Mobile "All Features" Slide-Out Drawer */}
       {isDrawerOpen && (
-        <div className="md:hidden fixed inset-0 z-50 flex flex-col justify-end bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+        <div
+          onClick={() => setIsDrawerOpen(false)}
+          className="md:hidden fixed inset-0 z-50 flex flex-col justify-end bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+        >
           <div
+            onClick={e => e.stopPropagation()}
             className={`w-full max-h-[88vh] rounded-t-3xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom duration-200 ${
               isDarkMode ? 'bg-slate-900 text-white' : 'bg-white text-gray-900'
             }`}
@@ -210,10 +224,10 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab, o
               </div>
               <button
                 onClick={() => setIsDrawerOpen(false)}
-                className="w-8 h-8 rounded-full bg-gray-100 dark:bg-slate-800 text-gray-500 hover:text-gray-900 flex items-center justify-center transition"
+                className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-slate-800 text-gray-500 hover:text-gray-900 flex items-center justify-center transition active:scale-95 border border-gray-200 dark:border-slate-700"
                 aria-label="Close drawer"
               >
-                <X className="w-4 h-4" />
+                <X className="w-5 h-5" />
               </button>
             </div>
 
@@ -360,16 +374,25 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab, o
                 </span>
               )}
 
-              <button
-                onClick={() => {
-                  setIsDrawerOpen(false);
-                  logout();
-                }}
-                className="px-3 py-1.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs flex items-center gap-1 transition active:scale-95 border border-red-200 shrink-0"
-              >
-                <LogOut className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Sign Out</span>
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsDrawerOpen(false)}
+                  className="px-3 py-1.5 rounded-xl border border-gray-200 dark:border-slate-700 text-gray-600 dark:text-gray-300 font-bold text-xs hover:bg-gray-100 dark:hover:bg-slate-800 transition active:scale-95"
+                >
+                  Close / ಮುಚ್ಚಿ
+                </button>
+                <button
+                  onClick={() => {
+                    setIsDrawerOpen(false);
+                    logout();
+                  }}
+                  className="px-3 py-1.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs flex items-center gap-1 transition active:scale-95 border border-red-200 shrink-0"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Sign Out</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>

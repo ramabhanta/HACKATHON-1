@@ -56,6 +56,16 @@ export const CreatePurchaseOfferModal: React.FC<CreatePurchaseOfferModalProps> =
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Universal Escape key listener
+  React.useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   const handleDayPreset = (days: number) => {
@@ -158,8 +168,14 @@ export const CreatePurchaseOfferModal: React.FC<CreatePurchaseOfferModalProps> =
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center bg-black/60 backdrop-blur-xs p-0 md:p-4 animate-in fade-in">
-      <div className="bg-white w-full md:max-w-xl rounded-t-3xl md:rounded-3xl shadow-2xl max-h-[92vh] flex flex-col border border-emerald-100 overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
+    <div
+      onClick={onClose}
+      className="fixed inset-0 z-50 flex items-end md:items-center justify-center bg-black/60 backdrop-blur-xs p-0 md:p-4 animate-in fade-in"
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        className="bg-white w-full md:max-w-xl rounded-t-3xl md:rounded-3xl shadow-2xl max-h-[92vh] flex flex-col border border-emerald-100 overflow-hidden animate-in slide-in-from-bottom-4 duration-300"
+      >
         
         {/* Header */}
         <div className="p-5 sm:p-6 bg-gradient-to-r from-teal-900 via-emerald-800 to-teal-950 text-white flex items-center justify-between shrink-0">
@@ -181,7 +197,8 @@ export const CreatePurchaseOfferModal: React.FC<CreatePurchaseOfferModalProps> =
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-white/70 hover:text-white rounded-full hover:bg-white/10 transition"
+            aria-label="Close dialog"
+            className="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition active:scale-95 border border-white/20"
           >
             <X className="w-5 h-5" />
           </button>

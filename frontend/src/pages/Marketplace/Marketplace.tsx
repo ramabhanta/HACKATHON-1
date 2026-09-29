@@ -100,6 +100,20 @@ export const Marketplace: React.FC<MarketplaceProps> = ({ setActiveTab }) => {
     };
   }, []);
 
+  // Universal Escape key listener for Marketplace modals
+  useEffect(() => {
+    if (!bookingModalProduct && !activeProductModal) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setBookingModalProduct(null);
+        setBookingSuccessOrder(null);
+        setActiveProductModal(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [bookingModalProduct, activeProductModal]);
+
   const openBookingModal = (product: any) => {
     setBookingModalProduct(product);
     setBookingQty(1);
@@ -652,14 +666,24 @@ export const Marketplace: React.FC<MarketplaceProps> = ({ setActiveTab }) => {
       {/* MODAL 1: AGRI STORE BOOKING RESERVATION (Zero Debit Flow) */}
       {/* ======================================================== */}
       {bookingModalProduct && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in">
-          <div className="bg-white rounded-3xl max-w-xl w-full max-h-[92vh] overflow-y-auto p-6 shadow-2xl border border-emerald-100 relative space-y-4">
+        <div
+          onClick={() => {
+            setBookingModalProduct(null);
+            setBookingSuccessOrder(null);
+          }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in"
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            className="bg-white rounded-3xl max-w-xl w-full max-h-[92vh] overflow-y-auto p-6 shadow-2xl border border-emerald-100 relative space-y-4"
+          >
             <button
               onClick={() => {
                 setBookingModalProduct(null);
                 setBookingSuccessOrder(null);
               }}
-              className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100"
+              aria-label="Close dialog"
+              className="absolute top-4 right-4 w-10 h-10 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center justify-center transition active:scale-95 border border-gray-200"
             >
               <X className="w-5 h-5" />
             </button>
@@ -1106,11 +1130,21 @@ export const Marketplace: React.FC<MarketplaceProps> = ({ setActiveTab }) => {
                 </div>
 
                 {/* Submit Action */}
-                <div className="pt-2">
+                <div className="pt-2 flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setBookingModalProduct(null);
+                      setBookingSuccessOrder(null);
+                    }}
+                    className="px-4 py-3 rounded-2xl border border-gray-200 hover:bg-gray-50 text-gray-700 font-extrabold text-xs transition"
+                  >
+                    Cancel / ಮುಚ್ಚಿ
+                  </button>
                   <button
                     type="submit"
                     disabled={isSubmittingBooking}
-                    className="w-full py-3 bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold rounded-2xl shadow-lg transition active:scale-95 flex items-center justify-center gap-2 text-sm disabled:opacity-50"
+                    className="flex-1 py-3 bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold rounded-2xl shadow-lg transition active:scale-95 flex items-center justify-center gap-2 text-sm disabled:opacity-50"
                   >
                     <ShoppingBag className="w-4 h-4" />
                     <span>{isSubmittingBooking ? 'Submitting Reservation...' : 'Submit Booking Reservation'}</span>
@@ -1126,11 +1160,18 @@ export const Marketplace: React.FC<MarketplaceProps> = ({ setActiveTab }) => {
       {/* MODAL 2: AGRICULTURAL TECHNICAL & USAGE INFO */}
       {/* ======================================================== */}
       {activeProductModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in">
-          <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl border border-emerald-100 relative space-y-4">
+        <div
+          onClick={() => setActiveProductModal(null)}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in"
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl border border-emerald-100 relative space-y-4"
+          >
             <button
               onClick={() => setActiveProductModal(null)}
-              className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition"
+              aria-label="Close dialog"
+              className="absolute top-4 right-4 w-10 h-10 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center justify-center transition active:scale-95 border border-gray-200"
             >
               <X className="w-5 h-5" />
             </button>
@@ -1310,6 +1351,13 @@ export const Marketplace: React.FC<MarketplaceProps> = ({ setActiveTab }) => {
 
             {/* Action Buttons */}
             <div className="pt-2 flex gap-3">
+              <button
+                type="button"
+                onClick={() => setActiveProductModal(null)}
+                className="px-4 py-3 rounded-2xl border border-gray-200 hover:bg-gray-50 text-gray-700 font-extrabold text-xs transition"
+              >
+                Cancel / ಮುಚ್ಚಿ
+              </button>
               <button
                 onClick={() => {
                   const p = activeProductModal;

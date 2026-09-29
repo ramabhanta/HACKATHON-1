@@ -306,6 +306,19 @@ export const MarketPrices: React.FC<MarketPricesProps> = ({ setActiveTab }) => {
     fetchPrices();
   }, [selectedState, selectedDistrict]);
 
+  // Universal Escape key listener for MarketPrices modals
+  useEffect(() => {
+    if (!isAddModalOpen && !sellOfferModal.isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsAddModalOpen(false);
+        setSellOfferModal({ isOpen: false, buyer: null, crop: '', rate: 0, unit: 'QUINTAL' });
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isAddModalOpen, sellOfferModal.isOpen]);
+
   const fetchRegions = async () => {
     try {
       const res = await fetch(apiUrl('/api/market-prices/states'));
@@ -1515,8 +1528,14 @@ export const MarketPrices: React.FC<MarketPricesProps> = ({ setActiveTab }) => {
 
       {/* MODAL: ADD / REPORT MARKET PRICE */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs overflow-y-auto">
-          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl relative animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto border border-gray-100">
+        <div
+          onClick={() => setIsAddModalOpen(false)}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs overflow-y-auto"
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl relative animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto border border-gray-100"
+          >
             {/* Modal Header */}
             <div className="flex items-center justify-between pb-4 border-b border-gray-100">
               <div className="flex items-center gap-3">
@@ -1532,7 +1551,8 @@ export const MarketPrices: React.FC<MarketPricesProps> = ({ setActiveTab }) => {
               </div>
               <button
                 onClick={() => setIsAddModalOpen(false)}
-                className="text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-100 transition"
+                aria-label="Close dialog"
+                className="w-10 h-10 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center justify-center transition active:scale-95 border border-gray-200"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1791,7 +1811,7 @@ export const MarketPrices: React.FC<MarketPricesProps> = ({ setActiveTab }) => {
                   onClick={() => setIsAddModalOpen(false)}
                   className="px-5 py-2.5 rounded-xl border border-gray-300 text-gray-700 text-sm font-bold hover:bg-gray-100 transition"
                 >
-                  Cancel
+                  Cancel / ಮುಚ್ಚಿ
                 </button>
                 <button
                   type="submit"
@@ -1809,8 +1829,14 @@ export const MarketPrices: React.FC<MarketPricesProps> = ({ setActiveTab }) => {
 
       {/* MODAL: DIRECT SELL OFFER TO INSTITUTIONAL BUYER */}
       {sellOfferModal.isOpen && sellOfferModal.buyer && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs overflow-y-auto">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl relative animate-in fade-in zoom-in-95 duration-200 border border-gray-100">
+        <div
+          onClick={() => setSellOfferModal({ isOpen: false, buyer: null, crop: '', rate: 0, unit: 'QUINTAL' })}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs overflow-y-auto"
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl relative animate-in fade-in zoom-in-95 duration-200 border border-gray-100"
+          >
             {/* Header */}
             <div className="flex items-start justify-between pb-4 border-b border-gray-100">
               <div className="flex items-center gap-3">
@@ -1829,7 +1855,8 @@ export const MarketPrices: React.FC<MarketPricesProps> = ({ setActiveTab }) => {
               </div>
               <button
                 onClick={() => setSellOfferModal({ isOpen: false, buyer: null, crop: '', rate: 0, unit: 'QUINTAL' })}
-                className="text-gray-400 hover:text-gray-600 p-1.5 rounded-full hover:bg-gray-100 transition"
+                aria-label="Close dialog"
+                className="w-10 h-10 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center justify-center transition active:scale-95 border border-gray-200"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1924,7 +1951,7 @@ export const MarketPrices: React.FC<MarketPricesProps> = ({ setActiveTab }) => {
                   onClick={() => setSellOfferModal({ isOpen: false, buyer: null, crop: '', rate: 0, unit: 'QUINTAL' })}
                   className="px-4 py-2 rounded-xl border border-gray-300 text-gray-700 text-xs font-bold hover:bg-gray-100"
                 >
-                  Cancel
+                  Cancel / ಮುಚ್ಚಿ
                 </button>
                 <button
                   type="submit"

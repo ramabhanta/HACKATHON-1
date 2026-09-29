@@ -191,6 +191,20 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
     };
   }, []);
 
+  // Universal Escape key listener for Dashboard modals
+  useEffect(() => {
+    if (!showAddFarmModal && !showAddCropModal) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setShowAddFarmModal(false);
+        setShowAddCropModal(false);
+        setEditingCrop(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showAddFarmModal, showAddCropModal]);
+
   useEffect(() => {
     async function fetchDashPrices() {
       try {
@@ -1175,11 +1189,18 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
 
       {/* Modal: Add Farm */}
       {showAddFarmModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-emerald-100 relative space-y-4">
+        <div
+          onClick={() => setShowAddFarmModal(false)}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in"
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-emerald-100 relative space-y-4"
+          >
             <button
               onClick={() => setShowAddFarmModal(false)}
-              className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100"
+              aria-label="Close dialog"
+              className="absolute top-4 right-4 w-10 h-10 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center justify-center transition active:scale-95 border border-gray-200"
             >
               <X className="w-5 h-5" />
             </button>
@@ -1260,20 +1281,29 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
                 </select>
               </div>
 
-              <button
-                type="submit"
-                disabled={isSubmittingFarm}
-                className="w-full py-3 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-extrabold rounded-2xl shadow transition text-xs active:scale-95 flex items-center justify-center gap-2"
-              >
-                {isSubmittingFarm ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>{t('registeringFarm')}</span>
-                  </>
-                ) : (
-                  <span>{t('registerFarmBtn')}</span>
-                )}
-              </button>
+              <div className="flex gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => setShowAddFarmModal(false)}
+                  className="px-4 py-3 rounded-2xl border border-gray-200 hover:bg-gray-50 text-gray-700 font-extrabold text-xs transition"
+                >
+                  Cancel / ಮುಚ್ಚಿ
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmittingFarm}
+                  className="flex-1 py-3 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-extrabold rounded-2xl shadow transition text-xs active:scale-95 flex items-center justify-center gap-2"
+                >
+                  {isSubmittingFarm ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>{t('registeringFarm')}</span>
+                    </>
+                  ) : (
+                    <span>{t('registerFarmBtn')}</span>
+                  )}
+                </button>
+              </div>
             </form>
           </div>
         </div>
@@ -1281,14 +1311,24 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
 
       {/* Modal: Add / Edit Crop */}
       {showAddCropModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-emerald-100 relative space-y-4">
+        <div
+          onClick={() => {
+            setShowAddCropModal(false);
+            setEditingCrop(null);
+          }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in"
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-emerald-100 relative space-y-4"
+          >
             <button
               onClick={() => {
                 setShowAddCropModal(false);
                 setEditingCrop(null);
               }}
-              className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100"
+              aria-label="Close dialog"
+              className="absolute top-4 right-4 w-10 h-10 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center justify-center transition active:scale-95 border border-gray-200"
             >
               <X className="w-5 h-5" />
             </button>
@@ -1380,20 +1420,32 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
                 </div>
               </div>
 
-              <button
-                type="submit"
-                disabled={isSubmittingCrop}
-                className="w-full py-3 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-extrabold rounded-2xl shadow transition text-xs active:scale-95 flex items-center justify-center gap-2"
-              >
-                {isSubmittingCrop ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>{t('savingCrop')}</span>
-                  </>
-                ) : (
-                  <span>{editingCrop ? t('updateCropBtn') : t('saveCropBtn')}</span>
-                )}
-              </button>
+              <div className="flex gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowAddCropModal(false);
+                    setEditingCrop(null);
+                  }}
+                  className="px-4 py-3 rounded-2xl border border-gray-200 hover:bg-gray-50 text-gray-700 font-extrabold text-xs transition"
+                >
+                  Cancel / ಮುಚ್ಚಿ
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmittingCrop}
+                  className="flex-1 py-3 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-extrabold rounded-2xl shadow transition text-xs active:scale-95 flex items-center justify-center gap-2"
+                >
+                  {isSubmittingCrop ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>{t('savingCrop')}</span>
+                    </>
+                  ) : (
+                    <span>{editingCrop ? t('updateCropBtn') : t('saveCropBtn')}</span>
+                  )}
+                </button>
+              </div>
             </form>
           </div>
         </div>

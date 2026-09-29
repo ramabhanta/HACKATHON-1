@@ -100,6 +100,33 @@ export class SupabaseDataService {
     );
   }
 
+  public static async getUserByEmail(email: string): Promise<User | undefined> {
+    const cleanEmail = (email || '').trim().toLowerCase();
+    if (!cleanEmail) return undefined;
+    const client = getSupabase();
+    if (client) {
+      try {
+        let { data, error } = await client
+          .from('users')
+          .select('*')
+          .ilike('email', cleanEmail)
+          .limit(1);
+        if (error || !data || data.length === 0) {
+          const p = await client
+            .from('profiles')
+            .select('*')
+            .ilike('email', cleanEmail)
+            .limit(1);
+          if (!p.error && p.data && p.data[0]) data = p.data;
+        }
+        if (data && data[0]) return this.mapUserFromSupabase(data[0]);
+      } catch (e) {
+        console.warn('Supabase getUserByEmail fallback to local db:', (e as any)?.message);
+      }
+    }
+    return db.findOne('users', u => u.email?.trim().toLowerCase() === cleanEmail);
+  }
+
   public static async getUserByPhone(phone: string): Promise<User | undefined> {
     const rawDigits = phone.replace(/[^0-9]/g, '');
     const clean10 = rawDigits.length >= 10 ? rawDigits.slice(-10) : rawDigits;

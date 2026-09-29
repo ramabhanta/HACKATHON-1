@@ -60,7 +60,7 @@ export function saveCachedLocation(location: DetectedLocation): void {
  * Wraps browser navigator.geolocation.getCurrentPosition with Promise and robust error mapping
  */
 export function getCurrentCoordinates(
-  options: PositionOptions = { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+  options: PositionOptions = { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
 ): Promise<{ latitude: number; longitude: number; accuracy: number }> {
   return new Promise((resolve, reject) => {
     if (!navigator.geolocation) {
@@ -99,7 +99,12 @@ export function getCurrentCoordinates(
 
         reject({ code, message } as GeolocationError);
       },
-      options
+      {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 0,
+        ...options
+      }
     );
   });
 }
@@ -146,11 +151,15 @@ export async function reverseGeocode(lat: number, lon: number): Promise<Detected
 
       const village =
         addr.village ||
-        addr.town ||
         addr.hamlet ||
         addr.suburb ||
         addr.neighbourhood ||
+        addr.residential ||
+        addr.town ||
         addr.city_district ||
+        addr.quarter ||
+        addr.subdistrict ||
+        addr.municipality ||
         addr.city ||
         'Kadiri Rural';
 
@@ -159,6 +168,7 @@ export async function reverseGeocode(lat: number, lon: number): Promise<Detected
         addr.subdistrict ||
         addr.state_district ||
         addr.town ||
+        village ||
         'Kadiri';
 
       const district =

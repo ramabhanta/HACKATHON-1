@@ -27,16 +27,16 @@ interface UserProfileModalProps {
 // 6 Curated Agricultural Avatars for Indian Farmers, Dealers & Wholesalers
 const PRESET_AVATARS = [
   {
-    id: 'farmer-cap',
+    id: 'farmer-field',
     label: 'Organic Farmer',
     icon: '🌾',
     url: 'https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=250&auto=format&fit=crop&q=80'
   },
   {
-    id: 'agronomist',
-    label: 'Modern Agronomist',
-    icon: '🔬',
-    url: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=250&auto=format&fit=crop&q=80'
+    id: 'kisan-portrait',
+    label: 'Rural Kisan',
+    icon: '👨‍🌾',
+    url: 'https://images.unsplash.com/photo-1530595467537-0b5996c41f2d?w=250&auto=format&fit=crop&q=80'
   },
   {
     id: 'dealer',
@@ -45,14 +45,14 @@ const PRESET_AVATARS = [
     url: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=250&auto=format&fit=crop&q=80'
   },
   {
-    id: 'tractor',
-    label: 'Mechanized Farmer',
+    id: 'tractor-farm',
+    label: 'Mechanized Grower',
     icon: '🚜',
-    url: 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=250&auto=format&fit=crop&q=80'
+    url: 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=250&auto=format&fit=crop&q=80'
   },
   {
     id: 'kisan-village',
-    label: 'Village Kisan',
+    label: 'Village Elder',
     icon: '🌻',
     url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=250&auto=format&fit=crop&q=80'
   },

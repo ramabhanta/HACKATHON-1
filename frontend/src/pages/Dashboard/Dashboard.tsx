@@ -537,7 +537,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
             </button>
           </div>
           <div className="flex items-center gap-3.5 my-2">
-            {user?.avatarUrl ? (
+            {user?.avatarUrl && !user.avatarUrl.includes('photo-1544717305-2782549b5136') ? (
               <img
                 src={user.avatarUrl}
                 alt={user.name}

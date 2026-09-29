@@ -101,7 +101,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const saved = localStorage.getItem('agri_user');
       if (saved) {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        if (parsed?.avatarUrl && parsed.avatarUrl.includes('photo-1544717305-2782549b5136')) {
+          delete parsed.avatarUrl;
+        }
+        return parsed;
       }
     } catch {
       // ignore parse error

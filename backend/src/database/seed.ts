@@ -48,7 +48,6 @@ export async function seedDatabase() {
       pincode: '515591',
       latitude: 14.1165,
       longitude: 78.1634,
-      avatarUrl: 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=150',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     },

@@ -56,11 +56,15 @@ geoRouter.get('/reverse', async (req: Request, res: Response) => {
       // Parse hierarchical address components
       const village =
         addr.village ||
-        addr.town ||
         addr.hamlet ||
         addr.suburb ||
         addr.neighbourhood ||
+        addr.residential ||
+        addr.town ||
         addr.city_district ||
+        addr.quarter ||
+        addr.subdistrict ||
+        addr.municipality ||
         addr.city ||
         'Kadiri Rural';
 
@@ -69,6 +73,7 @@ geoRouter.get('/reverse', async (req: Request, res: Response) => {
         addr.subdistrict ||
         addr.state_district ||
         addr.town ||
+        village ||
         'Kadiri';
 
       const district =

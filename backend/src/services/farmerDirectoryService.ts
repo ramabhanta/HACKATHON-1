@@ -8,7 +8,7 @@ export const PRELOADED_NEARBY_FARMERS: NearbyFarmerProfile[] = [
     farmerId: 'usr-farmer-1',
     farmerName: 'Ramesh Patel',
     phone: '+91 98480 12345',
-    avatarUrl: 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=150',
+    avatarUrl: 'https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=150',
     village: 'Kadiri Rural',
     taluk: 'Kadiri',
     district: 'Sri Sathya Sai',

@@ -121,7 +121,7 @@ export async function extractPhotoTelemetry(
         navigator.geolocation.getCurrentPosition(
           (p) => resolve(p),
           () => resolve(null),
-          { timeout: 3000, enableHighAccuracy: false }
+          { timeout: 10000, enableHighAccuracy: true, maximumAge: 0 }
         );
       });
 

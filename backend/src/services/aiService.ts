@@ -63,7 +63,15 @@ STRICT OPERATIONAL GUIDELINES:
    - Provide authentic Mandi market dynamics (e.g., APMC wholesale prices, MSP minimum support prices, seasonal arrival trends, quality grading parameters like moisture percentage and pod filling).
    - Encourage direct farm-gate and local mandi aggregation to prevent distress selling.
 
-5. FORMATTING & CLARITY:
+5. FERTILIZER & INPUT PROCUREMENT (KADIRI & ANDHRA PRADESH CONTEXT):
+   - When a farmer asks where to buy urea or fertilizers near Kadiri (Sri Sathya Sai district):
+     * Direct them to the nearest Rythu Bharosa Kendras (RBK) in Kadiri mandal / village secretariats for biometric subsidized allocation.
+     * Primary Agricultural Credit Societies (PACS) / Kadiri Cooperative Society.
+     * Licensed local agro dealers in Kadiri: Sri Lakshmi Agri Inputs (APMC Market Road) and IFFCO Kisan Seva Kendra (Kadiri Rural).
+     * Exact Subsidized Statutory MRP Prices: Neem-Coated Urea 46% N ~₹266.50 / 45 kg bag; IFFCO Nano Urea ₹225 / 500 ml bottle; DAP 18:46:0 ₹1,350 / 50 kg bag; MOP (Muriate of Potash) ~₹1,700 / 50 kg bag.
+     * Remind farmers to carry their Aadhaar card (for e-POS biometric authentication) and e-Crop booking / Pattadar passbook (1B record).
+
+6. FORMATTING & CLARITY:
    - Use clear markdown bullet points, bold headings, and actionable step-by-step numbers.
    - Avoid generic disclaimers or repetitive AI boilerplate. Provide confident, scientifically sound, farmer-first guidance.`;
 
@@ -310,8 +318,82 @@ ${context.soil ? `- Soil Health Data: pH ${context.soil.ph}, N: ${context.soil.n
 
     let baseAnswer = '';
 
-    // 1. Fertilizer Inquiries (Groundnut / NPK / DAP / Urea / Gypsum)
-    if (
+    // 1. Where to Buy Urea / Fertilizer / Agri Store & Kadiri Procurement Inquiries (PRIORITIZED FIRST)
+    const isProcurementQuery =
+      qLower.includes('where') ||
+      qLower.includes('buy') ||
+      qLower.includes('store') ||
+      qLower.includes('shop') ||
+      qLower.includes('dealer') ||
+      qLower.includes('pacs') ||
+      qLower.includes('rbk') ||
+      qLower.includes('near me') ||
+      qLower.includes('near') ||
+      qLower.includes('purchase') ||
+      qLower.includes('dokan') ||
+      qLower.includes('కొనాలి') ||
+      qLower.includes('కొనుగోలు') ||
+      qLower.includes('ఎక్కడ') ||
+      qLower.includes('దొరుకుతుంది') ||
+      qLower.includes('లభిస్తుంది') ||
+      qLower.includes('दुकान') ||
+      qLower.includes('खरीदें') ||
+      qLower.includes('ఖరీది') ||
+      (qLower.includes('urea') && (qLower.includes('get') || qLower.includes('find') || qLower.includes('price') || qLower.includes('near') || qLower.includes('bag') || qLower.includes('cost')));
+
+    if (isProcurementQuery) {
+      if (isTe) {
+        baseAnswer = `**కదిరి మరియు సమీప ప్రాంతాల్లో యూరియా & ఎరువుల కొనుగోలు మార్గదర్శకం (శ్రీ సత్యసాయి జిల్లా)**\n\n` +
+          `• **1. సమీప రైతు భరోసా కేంద్రాలు (RBKs) & గ్రామ సచివాలయాలు:**\n` +
+          `  - కదిరి మండలం పరిధిలోని మీ గ్రామ రైతు భరోసా కేంద్రం (RBK) వద్ద ప్రభుత్వం నిర్దేశించిన సబ్సిడీ ధరలకే ధృవీకరించిన ఎరువులు లభిస్తాయి. గ్రామ వ్యవసాయ సహాయకులు (VAAs) ద్వారా డిజిటల్ రిజిస్ట్రేషన్ జరుగుతుంది.\n\n` +
+          `• **2. ప్రాథమిక వ్యవసాయ సహకార సంఘాలు (PACS):**\n` +
+          `  - కదిరి కో-ఆపరేటివ్ సొసైటీ (PACS Kadiri) వద్ద ఇఫ్కో (IFFCO) మరియు క్రిభ్కో (KRIBHCO) అధికారిక ఎరువుల నిల్వలు అందుబాటులో ఉంటాయి.\n\n` +
+          `• **3. కదిరిలోని లైసెన్స్ పొందిన అధీకృత డీలర్లు:**\n` +
+          `  - **శ్రీ లక్ష్మి అగ్రి ఇన్‌పుట్స్ (Sri Lakshmi Agri Inputs):** APMC మార్కెట్ రోడ్, కదిరి టౌన్.\n` +
+          `  - **ఇఫ్కో కిసాన్ సేవా కేంద్రం (IFFCO Kisan Seva Kendra):** బైపాస్ రోడ్ జంక్షన్, కదిరి రూరల్.\n\n` +
+          `• **అధికారిక సబ్సిడీ రిటైల్ ధరలు (Statutory Subsidized MRP):**\n` +
+          `  - **వేప పూత పూసిన యూరియా (Neem-Coated Urea 46% N):** ₹266.50 / 45 కిలోల బస్తా\n` +
+          `  - **ఇఫ్కో నానో యూరియా లిక్విడ్ (Nano Urea):** ₹225 / 500 మి.లీ సీసా (1 బస్తా యూరియాతో సమానం)\n` +
+          `  - **DAP 18:46:0:** ₹1,350 / 50 కిలోల బస్తా\n` +
+          `  - **MOP (పొటాష్):** ₹1,700 / 50 కిలోల బస్తా\n\n` +
+          `• **అవసరమైన పత్రాలు:** ఈ-పాస్ (e-POS) బయోమెట్రిక్ ప్రామాణీకరణ కోసం మీ **ఆధార్ కార్డు** మరియు **ఈ-పంట (e-Crop) బుకింగ్ / పట్టాదారు పాస్‌బుక్ (1B)** తప్పనిసరిగా వెంట తీసుకువెళ్ళండి.\n\n` +
+          `*సూచన:* మన అగ్రోడెక్స్ యాప్‌లోని **"Agri Store"** ట్యాబ్ ద్వారా కూడా మీరు నేరుగా ఆర్డర్ చేయవచ్చు.`;
+      } else if (isHi) {
+        baseAnswer = `**कदिरी एवं नजदीकी केंद्रों पर यूरिया एवं खाद खरीद केंद्र (श्री सत्य साई जिला)**\n\n` +
+          `• **1. नजदीकी रायथू भरोसा केंद्र (RBK) एवं ग्राम सचिवालय:**\n` +
+          `  - कदिरी मंडल के सभी आरबीके (RBK) केंद्रों पर बायोमेट्रिक ई-पॉस (e-POS) मशीन से सरकारी सब्सिडी पर यूरिया उपलब्ध है।\n\n` +
+          `• **2. प्राथमिक कृषि सहकारी समितियां (PACS):**\n` +
+          `  - कदिरी को-ऑपरेटिव बैंक / पैक्स (PACS Kadiri) केंद्र से सीधे इफको व कृभको यूरिया प्राप्त करें।\n\n` +
+          `• **3. कदिरी में अधिकृत लाइसेंस प्राप्त कृषि डीलर:**\n` +
+          `  - **श्री लक्ष्मी एग्री इनपुट्स (Sri Lakshmi Agri Inputs):** एपीएमसी मार्केट रोड, कदिरी।\n` +
+          `  - **इफको किसान सेवा केंद्र (IFFCO Kisan Seva Kendra):** बाईपास रोड, कदिरी ग्रामीण।\n\n` +
+          `• **सरकारी वैधानिक सब्सिडी दरें (Statutory MRP):**\n` +
+          `  - **नीम कोटेड यूरिया (Neem-Coated Urea 46% N):** ₹266.50 / 45 किग्रा बोरी\n` +
+          `  - **इफको नैनो यूरिया (Nano Urea Liquid):** ₹225 / 500 मिली बोतल (1 बोरी के बराबर)\n` +
+          `  - **डीएपी (DAP 18:46:0):** ₹1,350 / 50 किग्रा बोरी\n` +
+          `  - **पोटाश (MOP):** ₹1,700 / 50 किग्रा बोरी\n\n` +
+          `• **आवश्यक दस्तावेज:** e-POS फिंगरप्रिंट सत्यापन के लिए अपना **आधार कार्ड** और **ई-क्रॉप बुकिंग / किसान पासबुक (1B)** साथ रखें।\n\n` +
+          `*सुझाव:* आप एग्रोडेक्स ऐप में **"Agri Store"** सेक्शन से भी सीधे होम डिलीवरी या स्टोर पिकअप बुक कर सकते हैं।`;
+      } else {
+        baseAnswer = `**Where to Buy Genuine Urea & Certified Fertilizers in Kadiri (Sri Sathya Sai District)**\n\n` +
+          `• **1. Nearest Rythu Bharosa Kendras (RBKs) & Village Secretariats:**\n` +
+          `  - Visit your local village RBK in Kadiri mandal. Government-subsidized fertilizers are allocated transparently via the integrated e-POS digital distribution system.\n\n` +
+          `• **2. Primary Agricultural Credit Societies (PACS):**\n` +
+          `  - **Kadiri Cooperative Society (PACS Kadiri):** Stocked with authorized IFFCO and KRIBHCO fertilizer consignments.\n\n` +
+          `• **3. Licensed Authorized Agro Dealers in Kadiri:**\n` +
+          `  - **Sri Lakshmi Agri Inputs:** APMC Market Road, Kadiri Town.\n` +
+          `  - **IFFCO Kisan Seva Kendra:** Bypass Road Junction, Kadiri Rural.\n\n` +
+          `• **Statutory Subsidized Retail Prices (Government Fixed):**\n` +
+          `  - **Neem-Coated Urea (46% N):** ~₹266.50 / 45 kg bag\n` +
+          `  - **IFFCO Nano Urea Liquid:** ₹225 / 500 ml bottle (1 bottle replaces a 45 kg bag)\n` +
+          `  - **DAP (18:46:0):** ₹1,350 / 50 kg bag\n` +
+          `  - **MOP (Muriate of Potash):** ~₹1,700 / 50 kg bag\n\n` +
+          `• **Mandatory Documents Required:** Carry your **Aadhaar Card** (for e-POS biometric authentication) and **e-Crop booking receipt / Pattadar Passbook (1B record)** to claim subsidized bags.\n\n` +
+          `*AgroDex Quick Access:* You can also tap the **"Agri Store"** tab below to order certified fertilizer bags with doorstep delivery.`;
+      }
+    }
+    // 2. Fertilizer Inquiries (Groundnut / NPK / DAP / Urea Dosage & Soil Needs)
+    else if (
       qLower.includes('fertilizer') ||
       qLower.includes('urea') ||
       qLower.includes('npk') ||
@@ -350,7 +432,7 @@ ${context.soil ? `- Soil Health Data: pH ${context.soil.ph}, N: ${context.soil.n
           `• **Red Loamy Soil Strategy (Kadiri Region):** Due to high drainage and leaching, apply nitrogen in splits. Supplement with Zinc Sulphate @ 10 kg/acre basally, or spray water-soluble 19-19-19 @ 5g/L water at 30-35 DAS for vegetative vigor.`;
       }
     }
-    // 2. Yellow Leaves / Chlorosis Inquiries
+    // 3. Yellow Leaves / Chlorosis Inquiries
     else if (
       qLower.includes('yellow') ||
       qLower.includes('leaves') ||
@@ -358,7 +440,7 @@ ${context.soil ? `- Soil Health Data: pH ${context.soil.ph}, N: ${context.soil.n
       qLower.includes('chlorosis') ||
       qLower.includes('పసుపు') ||
       qLower.includes('ఆకులు') ||
-      qLower.includes('पीली') ||
+      qLower.includes('పీలీ') ||
       qLower.includes('हल्दी') ||
       qLower.includes('ಹಳದಿ')
     ) {
@@ -387,7 +469,7 @@ ${context.soil ? `- Soil Health Data: pH ${context.soil.ph}, N: ${context.soil.n
           `• **4. Root Waterlogging:** Poor drainage suffocates root respiration. Ensure excess standing water is drained out through furrows immediately.`;
       }
     }
-    // 3. Irrigation Schedule Inquiries
+    // 4. Irrigation Schedule Inquiries
     else if (
       qLower.includes('irrigation') ||
       qLower.includes('water') ||
@@ -415,53 +497,6 @@ ${context.soil ? `- Soil Health Data: pH ${context.soil.ph}, N: ${context.soil.n
           `2. **Peg Penetration Stage (40-50 DAS):** The most critical stage! Top 5 cm soil must remain moist and friable to enable pegs to penetrate effortlessly into the soil.\n` +
           `3. **Pod Development & Kernel Filling (65-75 DAS):** Regular, moderate moisture is vital to ensure plump kernels and prevent shriveling.\n\n` +
           `• **Efficiency Tip:** Drip or sprinkler irrigation saves 40-50% water compared to furrow flooding and significantly lowers the incidence of Stem/Collar Rot. Cease irrigation 7-10 days prior to harvest for easy lifting.`;
-      }
-    }
-    // 4. Where to Buy Urea / Fertilizer / Agri Store Inquiries
-    else if (
-      qLower.includes('where') ||
-      qLower.includes('buy') ||
-      qLower.includes('store') ||
-      qLower.includes('shop') ||
-      qLower.includes('కొనాలి') ||
-      qLower.includes('కొనుగోలు') ||
-      qLower.includes('ఎక్కడ') ||
-      qLower.includes('दुकान') ||
-      qLower.includes('खरीदें') ||
-      qLower.includes('ಖರೀದಿ')
-    ) {
-      if (isTe) {
-        baseAnswer = `**యూరియా మరియు ఎరువుల కొనుగోలు మార్గదర్శకం (కదిరి & సమీప కేంద్రాలు)**\n\n` +
-          `• **అగ్రోడెక్స్ ఆన్‌లైన్ అగ్రి స్టోర్ (AgroDex Store):**\n` +
-          `  - మీరు నేరుగా మన యాప్‌లోని **"Agri Store"** ట్యాబ్‌పై క్లిక్ చేసి ధృవీకరించబడిన ఇఫ్కో (IFFCO) యూరియా (45 కిలోల బస్తా - ₹266.50), ఇఫ్కో నానో యూరియా లిక్విడ్ (₹225), DAP మరియు NPK ఎరువులను ఆర్డర్ చేయవచ్చు.\n\n` +
-          `• **కదిరిలోని అధికారిక డీలర్లు & సహకార కేంద్రాలు:**\n` +
-          `  1. కదిరి ప్రాథమిక వ్యవసాయ సహకార సంఘం (PACS - Kadiri Cooperative Bank)\n` +
-          `  2. శ్రీ లక్ష్మి అగ్రి ఇన్‌పుట్స్ (Sri Lakshmi Agri Inputs, Main Bazar, Kadiri)\n` +
-          `  3. ఇఫ్కో కిసాన్ సేవా కేంద్రం (IFFCO Kisan Seva Kendra - Kadiri Rural)\n\n` +
-          `*సూచన:* సబ్సిడీ యూరియా కోసం మీ ఆధార్ మరియు పట్టాదారు పాస్‌బుక్ తీసుకువెళ్లండి.`;
-      } else if (isHi) {
-        baseAnswer = `**यूरिया एवं खाद की उपलब्धता एवं खरीद केंद्र (एग्रोडेक्स एवं नजदीकी केंद्र)**\n\n` +
-          `• **एग्रोडेक्स एग्री स्टोर (AgroDex Store):**\n` +
-          `  - आप ऐप में **"Agri Store"** विकल्प से इफको नीम कोटेड यूरिया (45 किग्रा - ₹266.50), नैनो यूरिया (500 मिली - ₹225), डीएपी और 19-19-19 सीधे ऑर्डर कर सकते हैं।\n\n` +
-          `• **निकटतम अधिकृत खाद केंद्र:**\n` +
-          `  1. प्राथमिक कृषि सहकारी समिति (PACS / लैम्प्स)\n` +
-          `  2. इफको / कृभको किसान सेवा केंद्र (कदिरी एवं नजदीकी मंडी)\n` +
-          `  3. श्री लक्ष्मी एग्री इनपुट्स (कदिरी बाजार)\n\n` +
-          `*नोट:* सरकारी सब्सिडी वाले यूरिया के लिए अपना आधार कार्ड व किसान पासबुक साथ रखें।`;
-      } else {
-        baseAnswer = `**Where to Buy Genuine Urea & Certified Fertilizers Near You**\n\n` +
-          `• **1. AgroDex In-App Agri Store (Guaranteed Genuine Batch):**\n` +
-          `  - Tap the **"Agri Store"** tab in AgroDex to order directly from verified suppliers:\n` +
-          `    * IFFCO Neem Coated Urea (45 kg bag) — MRP ₹266.50 (Govt Subsidized)\n` +
-          `    * IFFCO Nano Urea Liquid (500 ml bottle = equivalent to 1 bag) — ₹225\n` +
-          `    * IFFCO DAP 18:46:0 (50 kg) — ₹1,350\n` +
-          `    * Mahadhan NPK 19-19-19 (1 kg foliar) — ₹170\n` +
-          `    * Coromandel Agriculture Gypsum (50 kg) — ₹380\n\n` +
-          `• **2. Licensed Authorized Dealers in Kadiri Region:**\n` +
-          `  - **PACS Kadiri:** Primary Agricultural Cooperative Credit Society, Kadiri\n` +
-          `  - **Sri Lakshmi Agri Inputs:** Authorized dealer, APMC Market Road, Kadiri\n` +
-          `  - **IFFCO Kisan Seva Kendra:** State Highway Junction, Kadiri Rural\n\n` +
-          `*Tip:* Carry your Aadhaar card and farmer passbook for POS biometric authentication on subsidized bags.`;
       }
     }
     // 5. Mandi Market Prices & Selling
@@ -1071,14 +1106,45 @@ Ensure all advice adheres strictly to Indian agronomy and ICAR crop protection g
   /**
    * Match local certified input products with diagnosed issues or user query
    */
-  private static findMatchingProducts(query: string, replyText: string): Product[] {
+  public static findMatchingProducts(query: string, replyText: string): Product[] {
     const text = (query + ' ' + replyText).toLowerCase();
     const products = db.getTable('products');
+
+    // If query asks about buying urea / fertilizers / Kadiri store
+    if (
+      text.includes('urea') ||
+      text.includes('buy') ||
+      text.includes('store') ||
+      text.includes('shop') ||
+      text.includes('fertilizer') ||
+      text.includes('kadiri') ||
+      text.includes('dap') ||
+      text.includes('npk') ||
+      text.includes('dealer') ||
+      text.includes('pacs') ||
+      text.includes('rbk')
+    ) {
+      const targetedUreaAndFertilizers = products.filter(p => {
+        const id = p.id.toLowerCase();
+        const name = p.name.toLowerCase();
+        return (
+          id.includes('prod-urea-iffco') ||
+          id.includes('prod-urea-nano-iffco') ||
+          id.includes('prod-dap-iffco') ||
+          id.includes('prod-mahadhan-19-19-19') ||
+          name.includes('urea') ||
+          name.includes('dap') ||
+          name.includes('19-19-19')
+        );
+      });
+      if (targetedUreaAndFertilizers.length > 0) {
+        return targetedUreaAndFertilizers.slice(0, 4);
+      }
+    }
 
     const matched = products.filter(p => {
       const name = p.name.toLowerCase();
       const cat = p.category.toLowerCase();
-      const desc = (p.description || '').toLowerCase();
       
       if (text.includes('nitrogen') || text.includes('urea') || text.includes('19-19-19')) {
         if (name.includes('npk') || name.includes('urea') || name.includes('gromor')) return true;
@@ -1090,23 +1156,26 @@ Ensure all advice adheres strictly to Indian agronomy and ICAR crop protection g
         if (name.includes('neem') || name.includes('sprayer') || cat.includes('protection')) return true;
       }
       if (text.includes('gypsum') || text.includes('calcium') || text.includes('dap')) {
-        if (name.includes('dap') || name.includes('fertilizer')) return true;
+        if (name.includes('dap') || name.includes('fertilizer') || name.includes('gypsum')) return true;
       }
       return false;
     });
 
-    return matched.length > 0 ? matched.slice(0, 3) : products.slice(0, 2);
+    return matched.length > 0 ? matched.slice(0, 4) : products.slice(0, 3);
   }
 
   /**
    * Generate actionable smart follow-up suggestions
    */
-  private static generateSmartActions(query: string, cropName?: string): string[] {
+  public static generateSmartActions(query: string, cropName?: string): string[] {
     const q = query.toLowerCase();
+    if (q.includes('where') || q.includes('buy') || q.includes('store') || q.includes('shop') || q.includes('urea') || q.includes('dealer')) {
+      return ['View Kadiri Agri Store', 'Locate Nearest RBK', 'Order Nano Urea Liquid', 'Check Mandi Prices'];
+    }
     if (q.includes('yellow') || q.includes('spot') || q.includes('leaf')) {
       return ['Scan Leaf Photo', 'Buy NPK 19-19-19', 'Inspect Soil Moisture', 'Check Weather Forecast'];
     }
-    if (q.includes('fertilizer') || q.includes('urea') || q.includes('npk')) {
+    if (q.includes('fertilizer') || q.includes('npk') || q.includes('dap')) {
       return ['Calculate Farm Quantity', 'Buy DAP / Urea', 'Find Shops Near Kadiri', 'Soil Intelligence'];
     }
     if (q.includes('price') || q.includes('mandi') || q.includes('sell')) {

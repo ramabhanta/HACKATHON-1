@@ -85,9 +85,16 @@ aiRouter.post('/chat/stream', optionalAuthenticate, async (req: AuthenticatedReq
     res.setHeader('Connection', 'keep-alive');
     res.flushHeaders?.();
 
+    let fullReply = '';
     for await (const chunk of AiService.streamGeminiChat(message, language || req.user?.language || 'en', { farm, crop, soil })) {
+      fullReply += chunk;
       res.write(`data: ${JSON.stringify({ text: chunk })}\n\n`);
     }
+
+    // Emit matched certified inputs and smart follow-up suggestions before stream completion
+    const matchedProducts = AiService.findMatchingProducts(message, fullReply);
+    const suggestedActions = AiService.generateSmartActions(message, crop?.cropName);
+    res.write(`data: ${JSON.stringify({ meta: { matchedProducts, suggestedActions } })}\n\n`);
 
     res.write('data: [DONE]\n\n');
     return res.end();
@@ -100,7 +107,11 @@ aiRouter.post('/chat/stream', optionalAuthenticate, async (req: AuthenticatedReq
   }
 });
 
-aiRouter.post('/crop-disease', optionalAuthenticate, upload.single('image'), async (req: AuthenticatedRequest, res: Response) => {
+/**
+ * Core Crop Disease Diagnostic Handler
+ * Handles leaf photo upload, Supabase Storage persistence, Gemini Vision AI inference, and ICAR treatment recommendation
+ */
+export async function handleCropDiseaseDiagnosis(req: AuthenticatedRequest, res: Response) {
   try {
     const userId = req.user?.id || 'usr-farmer-1';
     const { cropName, farmId, photoMetadata, imageUrl: bodyImageUrl } = req.body;
@@ -239,6 +250,24 @@ aiRouter.post('/crop-disease', optionalAuthenticate, upload.single('image'), asy
     console.error('Crop disease diagnostic route error:', err);
     return res.status(500).json({ error: err.message || 'Crop disease diagnostic failed' });
   }
+}
+
+// 2. Crop disease leaf diagnosis endpoint supporting aliases (/crop-disease, /diagnose, /scan)
+aiRouter.post('/crop-disease', optionalAuthenticate, upload.single('image'), handleCropDiseaseDiagnosis);
+aiRouter.post('/diagnose', optionalAuthenticate, upload.single('image'), handleCropDiseaseDiagnosis);
+aiRouter.post('/scan', optionalAuthenticate, upload.single('image'), handleCropDiseaseDiagnosis);
+
+// Explicit OPTIONS preflight handling for diagnosis endpoints
+aiRouter.options(['/crop-disease', '/diagnose', '/scan'], (_req, res) => res.sendStatus(204));
+
+// Explicit HTTP 405 Method Not Allowed handler for non-POST methods
+aiRouter.all(['/crop-disease', '/diagnose', '/scan'], (req, res, next) => {
+  if (req.method !== 'POST' && req.method !== 'OPTIONS') {
+    return res.status(405).json({
+      error: `Method ${req.method} Not Allowed on diagnosis endpoint. Please send a POST request with leaf image.`
+    });
+  }
+  next();
 });
 
 // 3. AI Engine Configuration status & settings

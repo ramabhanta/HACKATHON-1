@@ -91,7 +91,121 @@ export const AiAssistant: React.FC<AiAssistantProps> = ({ onOpenVoice, setActive
     ];
     let matchedProducts: any[] = [];
 
-    if (
+    const isProcurement =
+      qLower.includes('where') ||
+      qLower.includes('buy') ||
+      qLower.includes('store') ||
+      qLower.includes('shop') ||
+      qLower.includes('dealer') ||
+      qLower.includes('pacs') ||
+      qLower.includes('rbk') ||
+      qLower.includes('near me') ||
+      qLower.includes('near') ||
+      qLower.includes('purchase') ||
+      qLower.includes('dokan') ||
+      qLower.includes('కొనాలి') ||
+      qLower.includes('కొనుగోలు') ||
+      qLower.includes('ఎక్కడ') ||
+      qLower.includes('దొరుకుతుంది') ||
+      qLower.includes('లభిస్తుంది') ||
+      qLower.includes('दुकान') ||
+      qLower.includes('खरीदें') ||
+      qLower.includes('ఖరీది') ||
+      (qLower.includes('urea') && (qLower.includes('get') || qLower.includes('find') || qLower.includes('price') || qLower.includes('near') || qLower.includes('bag') || qLower.includes('cost')));
+
+    // 1. Where to Buy Urea & Fertilizers in Kadiri (PRIORITIZED FIRST)
+    if (isProcurement) {
+      if (isTe) {
+        reply = `**కదిరి మరియు సమీప ప్రాంతాల్లో యూరియా & ఎరువుల కొనుగోలు మార్గదర్శకం (శ్రీ సత్యసాయి జిల్లా)**\n\n` +
+          `• **1. సమీప రైతు భరోసా కేంద్రాలు (RBKs) & గ్రామ సచివాలయాలు:**\n` +
+          `  - కదిరి మండలం పరిధిలోని మీ గ్రామ రైతు భరోసా కేంద్రం (RBK) వద్ద ప్రభుత్వం నిర్దేశించిన సబ్సిడీ ధరలకే ధృవీకరించిన ఎరువులు లభిస్తాయి. గ్రామ వ్యవసాయ సహాయకులు (VAAs) ద్వారా డిజిటల్ రిజిస్ట్రేషన్ జరుగుతుంది.\n\n` +
+          `• **2. ప్రాథమిక వ్యవసాయ సహకార సంఘాలు (PACS):**\n` +
+          `  - కదిరి కో-ఆపరేటివ్ సొసైటీ (PACS Kadiri) వద్ద ఇఫ్కో (IFFCO) మరియు క్రిభ్కో (KRIBHCO) అధికారిక ఎరువుల నిల్వలు అందుబాటులో ఉంటాయి.\n\n` +
+          `• **3. కదిరిలోని లైసెన్స్ పొందిన అధీకృత డీలర్లు:**\n` +
+          `  - **శ్రీ లక్ష్మి అగ్రి ఇన్‌పుట్స్ (Sri Lakshmi Agri Inputs):** APMC మార్కెట్ రోడ్, కదిరి టౌన్.\n` +
+          `  - **ఇఫ్కో కిసాన్ సేవా కేంద్రం (IFFCO Kisan Seva Kendra):** బైపాస్ రోడ్ జంక్షన్, కదిరి రూరల్.\n\n` +
+          `• **అధికారిక సబ్సిడీ రిటైల్ ధరలు (Statutory Subsidized MRP):**\n` +
+          `  - **వేప పూత పూసిన యూరియా (Neem-Coated Urea 46% N):** ₹266.50 / 45 కిలోల బస్తా\n` +
+          `  - **ఇఫ్కో నానో యూరియా లిక్విడ్ (Nano Urea):** ₹225 / 500 మి.లీ సీసా (1 బస్తా యూరియాతో సమానం)\n` +
+          `  - **DAP 18:46:0:** ₹1,350 / 50 కిలోల బస్తా\n` +
+          `  - **MOP (పొటాష్):** ₹1,700 / 50 కిలోల బస్తా\n\n` +
+          `• **అవసరమైన పత్రాలు:** ఈ-పాస్ (e-POS) బయోమెట్రిక్ ప్రామాణీకరణ కోసం మీ **ఆధార్ కార్డు** మరియు **ఈ-పంట (e-Crop) బుకింగ్ / పట్టాదారు పాస్‌బుక్ (1B)** తప్పనిసరిగా వెంట తీసుకువెళ్ళండి.\n\n` +
+          `*సూచన:* మన అగ్రోడెక్స్ యాప్‌లోని **"Agri Store"** ట్యాబ్ ద్వారా కూడా మీరు నేరుగా ఆర్డర్ చేయవచ్చు.`;
+      } else if (isHi) {
+        reply = `**कदिरी एवं नजदीकी केंद्रों पर यूरिया एवं खाद खरीद केंद्र (श्री सत्य साई जिला)**\n\n` +
+          `• **1. नजदीकी रायथू भरोसा केंद्र (RBK) एवं ग्राम सचिवालय:**\n` +
+          `  - कदिरी मंडल के सभी आरबीके (RBK) केंद्रों पर बायोमेट्रिक ई-पॉस (e-POS) मशीन से सरकारी सब्सिडी पर यूरिया उपलब्ध है।\n\n` +
+          `• **2. प्राथमिक कृषि सहकारी समितियां (PACS):**\n` +
+          `  - कदिरी को-ऑपरेटिव बैंक / पैक्स (PACS Kadiri) केंद्र से सीधे इफको व कृभको यूरिया प्राप्त करें।\n\n` +
+          `• **3. कदिरी में अधिकृत लाइसेंस प्राप्त कृषि डीलर:**\n` +
+          `  - **श्री लक्ष्मी एग्री इनपुट्स (Sri Lakshmi Agri Inputs):** एपीएमसी मार्केट रोड, कदिरी।\n` +
+          `  - **इफको किसान सेवा केंद्र (IFFCO Kisan Seva Kendra):** बाईपास रोड, कदिरी ग्रामीण।\n\n` +
+          `• **सरकारी वैधानिक सब्सिडी दरें (Statutory MRP):**\n` +
+          `  - **नीम कोटेड यूरिया (Neem-Coated Urea 46% N):** ₹266.50 / 45 किग्रा बोरी\n` +
+          `  - **इफको नैनो यूरिया (Nano Urea Liquid):** ₹225 / 500 मिली बोतल (1 बोरी के बराबर)\n` +
+          `  - **डीएपी (DAP 18:46:0):** ₹1,350 / 50 किग्रा बोरी\n` +
+          `  - **पोटाश (MOP):** ₹1,700 / 50 किग्रा बोरी\n\n` +
+          `• **आवश्यक दस्तावेज:** e-POS फिंगरप्रिंट सत्यापन के लिए अपना **आधार कार्ड** और **ई-क्रॉप बुकिंग / किसान पासबुक (1B)** साथ रखें।\n\n` +
+          `*सुझाव:* आप एग्रोडेक्स ऐप में **"Agri Store"** सेक्शन से भी सीधे होम डिलीवरी या स्टोर पिकअप बुक कर सकते हैं।`;
+      } else {
+        reply = `**Where to Buy Genuine Urea & Certified Fertilizers in Kadiri (Sri Sathya Sai District)**\n\n` +
+          `• **1. Nearest Rythu Bharosa Kendras (RBKs) & Village Secretariats:**\n` +
+          `  - Visit your local village RBK in Kadiri mandal. Government-subsidized fertilizers are allocated transparently via the integrated e-POS digital distribution system.\n\n` +
+          `• **2. Primary Agricultural Credit Societies (PACS):**\n` +
+          `  - **Kadiri Cooperative Society (PACS Kadiri):** Stocked with authorized IFFCO and KRIBHCO fertilizer consignments.\n\n` +
+          `• **3. Licensed Authorized Agro Dealers in Kadiri:**\n` +
+          `  - **Sri Lakshmi Agri Inputs:** APMC Market Road, Kadiri Town.\n` +
+          `  - **IFFCO Kisan Seva Kendra:** Bypass Road Junction, Kadiri Rural.\n\n` +
+          `• **Statutory Subsidized Retail Prices (Government Fixed):**\n` +
+          `  - **Neem-Coated Urea (46% N):** ~₹266.50 / 45 kg bag\n` +
+          `  - **IFFCO Nano Urea Liquid:** ₹225 / 500 ml bottle (1 bottle replaces a 45 kg bag)\n` +
+          `  - **DAP (18:46:0):** ₹1,350 / 50 kg bag\n` +
+          `  - **MOP (Muriate of Potash):** ~₹1,700 / 50 kg bag\n\n` +
+          `• **Mandatory Documents Required:** Carry your **Aadhaar Card** (for e-POS biometric authentication) and **e-Crop booking receipt / Pattadar Passbook (1B record)** to claim subsidized bags.\n\n` +
+          `*AgroDex Quick Access:* You can also tap the **"Agri Store"** tab below to order certified fertilizer bags with doorstep delivery.`;
+      }
+      suggestedActions = ['View Kadiri Agri Store', 'Locate Nearest RBK', 'Order Nano Urea Liquid', 'Check Mandi Prices'];
+      matchedProducts = [
+        {
+          id: 'prod-urea-iffco',
+          name: 'IFFCO Neem Coated Urea 46% N (45 kg Bag)',
+          brand: 'IFFCO',
+          price: 266.50,
+          packSize: '45 kg Bag',
+          images: ['https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80'],
+          category: 'UREA'
+        },
+        {
+          id: 'prod-urea-nano-iffco',
+          name: 'IFFCO Nano Urea Liquid (500 ml Bottle)',
+          brand: 'IFFCO',
+          price: 225.00,
+          packSize: '500 ml Bottle',
+          images: ['https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80'],
+          category: 'UREA'
+        },
+        {
+          id: 'prod-dap-iffco',
+          name: 'IFFCO DAP 18:46:0 (50 kg Bag)',
+          brand: 'IFFCO',
+          price: 1350.00,
+          packSize: '50 kg Bag',
+          images: ['https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80'],
+          category: 'DAP'
+        },
+        {
+          id: 'prod-mahadhan-19-19-19',
+          name: 'Mahadhan 19-19-19 100% Water Soluble (1 kg)',
+          brand: 'Mahadhan',
+          price: 170.00,
+          packSize: '1 kg Pouch',
+          images: ['https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?w=600&auto=format&fit=crop&q=80'],
+          category: 'NPK'
+        }
+      ];
+    }
+    // 2. Crop Fertilizer Dosage & Soil Programs
+    else if (
       qLower.includes('fertilizer') ||
       qLower.includes('urea') ||
       qLower.includes('npk') ||
@@ -123,9 +237,33 @@ export const AiAssistant: React.FC<AiAssistantProps> = ({ onOpenVoice, setActive
       }
       suggestedActions = ['Order Gypsum on Agri Store', 'How to test soil pH?', 'View Groundnut disease calendar'];
       matchedProducts = [
-        { id: 'prod-iffco-urea-45kg', name: 'IFFCO Neem Coated Urea (45kg)', brand: 'IFFCO', price: 266.5, category: 'Fertilizer' },
-        { id: 'prod-iffco-dap-50kg', name: 'IFFCO DAP 18:46:0 (50kg)', brand: 'IFFCO', price: 1350, category: 'Fertilizer' },
-        { id: 'prod-mahadhan-19-19-19', name: 'Mahadhan 19-19-19 100% Water Soluble (1kg)', brand: 'Mahadhan', price: 170, category: 'Fertilizer' }
+        {
+          id: 'prod-urea-iffco',
+          name: 'IFFCO Neem Coated Urea 46% N (45 kg Bag)',
+          brand: 'IFFCO',
+          price: 266.50,
+          packSize: '45 kg Bag',
+          images: ['https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80'],
+          category: 'UREA'
+        },
+        {
+          id: 'prod-dap-iffco',
+          name: 'IFFCO DAP 18:46:0 (50 kg Bag)',
+          brand: 'IFFCO',
+          price: 1350.00,
+          packSize: '50 kg Bag',
+          images: ['https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80'],
+          category: 'DAP'
+        },
+        {
+          id: 'prod-mahadhan-19-19-19',
+          name: 'Mahadhan 19-19-19 100% Water Soluble (1 kg)',
+          brand: 'Mahadhan',
+          price: 170.00,
+          packSize: '1 kg Pouch',
+          images: ['https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?w=600&auto=format&fit=crop&q=80'],
+          category: 'NPK'
+        }
       ];
     } else if (
       qLower.includes('yellow') ||
@@ -133,7 +271,7 @@ export const AiAssistant: React.FC<AiAssistantProps> = ({ onOpenVoice, setActive
       qLower.includes('turning yellow') ||
       qLower.includes('chlorosis') ||
       qLower.includes('పసుపు') ||
-      qLower.includes('पीली')
+      qLower.includes('పీలీ')
     ) {
       if (isTe) {
         reply = `**ఆకులు పసుపు రంగులోకి మారడానికి రోగనిర్ధారణ మరియు సత్వర నివారణ**\n\n` +
@@ -159,8 +297,24 @@ export const AiAssistant: React.FC<AiAssistantProps> = ({ onOpenVoice, setActive
       }
       suggestedActions = ['Order 19-19-19 Spray', 'Scan leaf using Crop Scan camera', 'Check Soil Moisture'];
       matchedProducts = [
-        { id: 'prod-mahadhan-19-19-19', name: 'Mahadhan 19-19-19 100% Water Soluble (1kg)', brand: 'Mahadhan', price: 170, category: 'Fertilizer' },
-        { id: 'prod-neem-oil-10000', name: 'Cold Pressed Pure Neem Oil 10,000 PPM (1L)', brand: 'Multiplex', price: 420, category: 'Bio-Organic' }
+        {
+          id: 'prod-mahadhan-19-19-19',
+          name: 'Mahadhan 19-19-19 100% Water Soluble (1 kg)',
+          brand: 'Mahadhan',
+          price: 170.00,
+          packSize: '1 kg Pouch',
+          images: ['https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?w=600&auto=format&fit=crop&q=80'],
+          category: 'NPK'
+        },
+        {
+          id: 'prod-neem-oil-10000',
+          name: 'Cold Pressed Pure Neem Oil 10,000 PPM (1 L)',
+          brand: 'Multiplex',
+          price: 420.00,
+          packSize: '1 L Bottle',
+          images: ['https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80'],
+          category: 'Bio-Organic'
+        }
       ];
     } else if (
       qLower.includes('irrigation') ||
@@ -188,55 +342,6 @@ export const AiAssistant: React.FC<AiAssistantProps> = ({ onOpenVoice, setActive
           `• **Efficiency Tip:** Drip or sprinkler irrigation saves 40-50% water compared to furrow flooding and significantly lowers the incidence of Stem/Collar Rot. Cease irrigation 7-10 days prior to harvest for easy lifting.`;
       }
       suggestedActions = ['Check weather forecast', 'View soil moisture tips', 'Drip fertigation guides'];
-    } else if (
-      qLower.includes('where') ||
-      qLower.includes('buy') ||
-      qLower.includes('store') ||
-      qLower.includes('shop') ||
-      qLower.includes('urea') ||
-      qLower.includes('కొనాలి') ||
-      qLower.includes('खरीदें')
-    ) {
-      if (isTe) {
-        reply = `**యూరియా మరియు ఎరువుల కొనుగోలు మార్గదర్శకం (కదిరి & సమీప కేంద్రాలు)**\n\n` +
-          `• **అగ్రోడెక్స్ ఆన్‌లైన్ అగ్రి స్టోర్ (AgroDex Store):**\n` +
-          `  - మీరు నేరుగా మన యాప్‌లోని **"Agri Store"** ట్యాబ్‌పై క్లిక్ చేసి ధృవీకరించబడిన ఇఫ్కో (IFFCO) యూరియా (45 కిలోల బస్తా - ₹266.50), ఇఫ్కో నానో యూరియా లిక్విడ్ (₹225), DAP మరియు NPK ఎరువులను ఆర్డర్ చేయవచ్చు.\n\n` +
-          `• **కదిరిలోని అధికారిక డీలర్లు & సహకార కేంద్రాలు:**\n` +
-          `  1. కదిరి ప్రాథమిక వ్యవసాయ సహకార సంఘం (PACS)\n` +
-          `  2. శ్రీ లక్ష్మి అగ్రి ఇన్‌పుట్స్ (Sri Lakshmi Agri Inputs, Main Bazar, Kadiri)\n` +
-          `  3. ఇఫ్కో కిసాన్ సేవా కేంద్రం (IFFCO Kisan Seva Kendra - Kadiri Rural)\n\n` +
-          `*సూచన:* సబ్సిడీ యూరియా కోసం మీ ఆధార్ మరియు పట్టాదారు పాస్‌బుక్ తీసుకువెళ్లండి.`;
-      } else if (isHi) {
-        reply = `**यूरिया एवं खाद की उपलब्धता एवं खरीद केंद्र (एग्रोडेक्स एवं नजदीकी केंद्र)**\n\n` +
-          `• **एग्रोडेक्स एग्री स्टोर (AgroDex Store):**\n` +
-          `  - आप ऐप में **"Agri Store"** विकल्प से इफको नीम कोटेड यूरिया (45 किग्रा - ₹266.50), नैनो यूरिया (500 मिली - ₹225), डीएपी और 19-19-19 सीधे ऑर्डर कर सकते हैं।\n\n` +
-          `• **निकटतम अधिकृत खाद केंद्र:**\n` +
-          `  1. प्राथमिक कृषि सहकारी समिति (PACS / लैम्प्स)\n` +
-          `  2. इफको / कृभको किसान सेवा केंद्र (कदिरी एवं नजदीकी मंडी)\n` +
-          `  3. श्री लक्ष्मी एग्री इनपुट्स (कदिरी बाजार)\n\n` +
-          `*नोट:* सरकारी सब्सिडी वाले यूरिया के लिए अपना आधार कार्ड व किसान पासबुक साथ रखें।`;
-      } else {
-        reply = `**Where to Buy Genuine Urea & Certified Fertilizers Near You**\n\n` +
-          `• **1. AgroDex In-App Agri Store (Guaranteed Genuine Batch):**\n` +
-          `  - Tap the **"Agri Store"** tab in AgroDex to order directly from verified suppliers:\n` +
-          `    * IFFCO Neem Coated Urea (45 kg bag) — MRP ₹266.50 (Govt Subsidized)\n` +
-          `    * IFFCO Nano Urea Liquid (500 ml bottle = equivalent to 1 bag) — ₹225\n` +
-          `    * IFFCO DAP 18:46:0 (50 kg) — ₹1,350\n` +
-          `    * Mahadhan NPK 19-19-19 (1 kg foliar) — ₹170\n` +
-          `    * Coromandel Agriculture Gypsum (50 kg) — ₹380\n\n` +
-          `• **2. Licensed Authorized Dealers in Kadiri Region:**\n` +
-          `  - **PACS Kadiri:** Primary Agricultural Cooperative Credit Society, Kadiri\n` +
-          `  - **Sri Lakshmi Agri Inputs:** Authorized dealer, APMC Market Road, Kadiri\n` +
-          `  - **IFFCO Kisan Seva Kendra:** State Highway Junction, Kadiri Rural\n\n` +
-          `*Tip:* Carry your Aadhaar card and farmer passbook for POS biometric authentication on subsidized bags.`;
-      }
-      suggestedActions = ['Open Agri Store Catalog', 'Find nearest vendor', 'Check Nano Urea guidelines'];
-      matchedProducts = [
-        { id: 'prod-iffco-urea-45kg', name: 'IFFCO Neem Coated Urea (45kg)', brand: 'IFFCO', price: 266.5, category: 'Fertilizer' },
-        { id: 'prod-iffco-nano-urea-500ml', name: 'IFFCO Nano Urea Liquid (500ml)', brand: 'IFFCO', price: 225, category: 'Fertilizer' },
-        { id: 'prod-iffco-dap-50kg', name: 'IFFCO DAP 18:46:0 (50kg)', brand: 'IFFCO', price: 1350, category: 'Fertilizer' }
-      ];
-    } else {
       reply = `**AgroDex Expert Agronomic Advisory for "${query}"**\n\n` +
         `• **Field Inspection Protocol:** Walk your plots in an 'M' or 'W' pattern to check representative plants across canopy levels.\n` +
         `• **Foliar Protection:** Spray cold-pressed Neem Oil (10,000 PPM) @ 3 ml/L or Trichoderma viride @ 5g/L water for broad-spectrum prophylactic biological defense.\n` +
@@ -325,6 +430,11 @@ export const AiAssistant: React.FC<AiAssistantProps> = ({ onOpenVoice, setActive
                   setMessages(prev =>
                     prev.map(m => (m.id === aiMsgId ? { ...m, text: accumulatedText } : m))
                   );
+                } else if (parsed.meta) {
+                  const { matchedProducts, suggestedActions } = parsed.meta;
+                  setMessages(prev =>
+                    prev.map(m => (m.id === aiMsgId ? { ...m, matchedProducts, suggestedActions } : m))
+                  );
                 }
               } catch {
                 // not JSON chunk
@@ -338,6 +448,20 @@ export const AiAssistant: React.FC<AiAssistantProps> = ({ onOpenVoice, setActive
     }
 
     if (streamSucceeded && accumulatedText.trim()) {
+      // Ensure matchedProducts are populated if meta was missed or empty
+      setMessages(prev =>
+        prev.map(m => {
+          if (m.id === aiMsgId && (!m.matchedProducts || m.matchedProducts.length === 0)) {
+            const fallbackAdvisory = getClientAgriculturalAdvisory(textToSend, language);
+            return {
+              ...m,
+              matchedProducts: fallbackAdvisory.matchedProducts,
+              suggestedActions: m.suggestedActions?.length ? m.suggestedActions : fallbackAdvisory.suggestedActions
+            };
+          }
+          return m;
+        })
+      );
       setIsTyping(false);
       return;
     }

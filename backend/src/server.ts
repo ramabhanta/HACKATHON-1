@@ -5,7 +5,8 @@ import fs from 'fs';
 import { config } from './config/index.js';
 import { authRouter } from './routes/authRoutes.js';
 import { farmRouter } from './routes/farmRoutes.js';
-import { aiRouter } from './routes/aiRoutes.js';
+import { aiRouter, handleCropDiseaseDiagnosis } from './routes/aiRoutes.js';
+import { upload } from './middleware/upload.js';
 import { productRouter } from './routes/productRoutes.js';
 import { orderRouter } from './routes/orderRoutes.js';
 import { produceRouter } from './routes/produceRoutes.js';
@@ -98,6 +99,27 @@ app.use('/api/prices', priceRouter);
 app.use('/api/market-prices', priceRouter);
 app.use('/api/storage', storageRouter);
 app.use('/api/supabase', supabaseRouter);
+
+// Top-level Crop Disease Diagnosis Endpoints (Supports /api/diagnose, /api/scan, /api/crop-disease)
+const diagnosisEndpoints = [
+  '/api/diagnose',
+  '/api/diagnose/',
+  '/api/scan',
+  '/api/scan/',
+  '/api/crop-disease',
+  '/api/crop-disease/'
+];
+
+app.post(diagnosisEndpoints, upload.single('image'), (req, res) => handleCropDiseaseDiagnosis(req as any, res));
+app.options(diagnosisEndpoints, (_req, res) => res.sendStatus(204));
+app.all(diagnosisEndpoints, (req, res, next) => {
+  if (req.method !== 'POST' && req.method !== 'OPTIONS') {
+    return res.status(405).json({
+      error: `Method ${req.method} Not Allowed. Please send a POST request with leaf image.`
+    });
+  }
+  next();
+});
 
 // Production: Serve compiled frontend if frontend/dist exists
 const frontendDistPaths = [

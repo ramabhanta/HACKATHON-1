@@ -216,7 +216,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
       if (res.success) {
         setLoginOtpSent(true);
         if (res.devOtp) {
-          setDevOtpToast(`SMS Verification Code: ${res.devOtp} (Expires in 5m)`);
+          setDevOtpToast(`AgroDex Verification Code: ${res.devOtp} (Valid for 5 mins)`);
         }
         setCountdown(60);
         setIsTimerRunning(true);
@@ -225,7 +225,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
         setError(res.error || 'Failed to send OTP.');
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to send OTP.');
+      setError(err?.message || 'Failed to send OTP. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -274,7 +274,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
       const res = await sendOtp(regPhone);
       if (res.success) {
         if (res.devOtp) {
-          setDevOtpToast(`SMS Verification Code sent to +91 ${regPhone}: ${res.devOtp} (Expires in 5m)`);
+          setDevOtpToast(`AgroDex Verification Code: ${res.devOtp} (Valid for 5 mins)`);
         }
         setRegStep(2);
         setCountdown(60);
@@ -284,7 +284,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
         setError(res.error || 'Could not send SMS OTP.');
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to request OTP.');
+      setError(err?.message || 'Failed to request OTP. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -434,12 +434,17 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
       <div className="w-full max-w-lg">
         {/* Dynamic Dev OTP Toast Notice */}
         {devOtpToast && (
-          <div className="mb-4 bg-emerald-50 border border-emerald-300 rounded-2xl p-3 text-xs text-emerald-950 flex items-center justify-between animate-in fade-in">
-            <div className="flex items-center gap-2 font-bold">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-              <span>{devOtpToast}</span>
+          <div className="mb-4 bg-gradient-to-r from-emerald-500/10 via-amber-500/10 to-emerald-500/10 border-2 border-emerald-500/50 rounded-2xl p-3.5 text-xs text-emerald-950 flex items-center justify-between shadow-md shadow-emerald-500/5 backdrop-blur-sm animate-in fade-in slide-in-from-top-2">
+            <div className="flex items-center gap-2.5 font-bold">
+              <div className="w-7 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+                <KeyRound className="w-4 h-4" />
+              </div>
+              <span className="font-extrabold text-[13px] tracking-wide text-emerald-900">{devOtpToast}</span>
             </div>
-            <button onClick={() => setDevOtpToast(null)} className="text-emerald-700 font-black text-xs hover:underline">
+            <button
+              onClick={() => setDevOtpToast(null)}
+              className="text-emerald-800 bg-emerald-100 hover:bg-emerald-200 px-2.5 py-1 rounded-lg font-black text-xs transition"
+            >
               Dismiss
             </button>
           </div>
@@ -1001,7 +1006,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                             sendOtp(regPhone).then(r => {
                               if (r.success) {
                                 if (r.devOtp) {
-                                  setDevOtpToast(`Dynamic SMS Verification Code sent: ${r.devOtp} (Expires in 5m)`);
+                                  setDevOtpToast(`AgroDex Verification Code: ${r.devOtp} (Valid for 5 mins)`);
                                 }
                                 setCountdown(60);
                                 setIsTimerRunning(true);

@@ -141,18 +141,23 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialTa
       return;
     }
     setIsSubmitting(true);
-    const res = await sendOtp(loginPhone);
-    setIsSubmitting(false);
-    if (res.success) {
-      setLoginOtpSent(true);
-      if (res.devOtp) {
-        setDevOtpToast(`Dynamic SMS Code: ${res.devOtp} (Expires in 5m)`);
+    try {
+      const res = await sendOtp(loginPhone);
+      if (res.success) {
+        setLoginOtpSent(true);
+        if (res.devOtp) {
+          setDevOtpToast(`AgroDex Verification Code: ${res.devOtp} (Valid for 5 mins)`);
+        }
+        setCountdown(60);
+        setIsTimerRunning(true);
+        setTimeout(() => loginOtpRefs.current[0]?.focus(), 100);
+      } else {
+        setError(res.error || 'Failed to send OTP.');
       }
-      setCountdown(60);
-      setIsTimerRunning(true);
-      setTimeout(() => loginOtpRefs.current[0]?.focus(), 100);
-    } else {
-      setError(res.error || 'Failed to send OTP.');
+    } catch (err: any) {
+      setError(err?.message || 'Failed to send OTP. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -166,12 +171,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialTa
       return;
     }
     setIsSubmitting(true);
-    const res = await loginWithOtp(loginPhone, code);
-    setIsSubmitting(false);
-    if (res.success) {
-      onClose();
-    } else {
-      setError(res.error || 'Invalid OTP code.');
+    try {
+      const res = await loginWithOtp(loginPhone, code);
+      if (res.success) {
+        onClose();
+      } else {
+        setError(res.error || 'Invalid OTP code.');
+      }
+    } catch (err: any) {
+      setError(err?.message || 'OTP verification failed.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -184,18 +194,23 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialTa
       return;
     }
     setIsSubmitting(true);
-    const res = await sendOtp(regPhone);
-    setIsSubmitting(false);
-    if (res.success) {
-      if (res.devOtp) {
-        setDevOtpToast(`Dynamic SMS Code sent to +91 ${regPhone}: ${res.devOtp} (Expires in 5m)`);
+    try {
+      const res = await sendOtp(regPhone);
+      if (res.success) {
+        if (res.devOtp) {
+          setDevOtpToast(`AgroDex Verification Code: ${res.devOtp} (Valid for 5 mins)`);
+        }
+        setRegStep(2);
+        setCountdown(60);
+        setIsTimerRunning(true);
+        setTimeout(() => otpInputRefs.current[0]?.focus(), 150);
+      } else {
+        setError(res.error || 'Failed to send OTP.');
       }
-      setRegStep(2);
-      setCountdown(60);
-      setIsTimerRunning(true);
-      setTimeout(() => otpInputRefs.current[0]?.focus(), 150);
-    } else {
-      setError(res.error || 'Failed to send OTP.');
+    } catch (err: any) {
+      setError(err?.message || 'Failed to request OTP. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -284,9 +299,19 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialTa
         </div>
 
         {devOtpToast && (
-          <div className="p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl text-xs font-bold text-emerald-900 flex items-center justify-between">
-            <span>{devOtpToast}</span>
-            <button onClick={() => setDevOtpToast(null)} className="text-emerald-700 hover:underline">Dismiss</button>
+          <div className="p-3 bg-gradient-to-r from-emerald-500/10 via-amber-500/10 to-emerald-500/10 border-2 border-emerald-500/50 rounded-2xl text-xs text-emerald-950 flex items-center justify-between shadow-sm animate-in fade-in">
+            <div className="flex items-center gap-2 font-bold">
+              <div className="w-6 h-6 rounded-lg bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+                <KeyRound className="w-3.5 h-3.5" />
+              </div>
+              <span className="font-extrabold text-xs text-emerald-900">{devOtpToast}</span>
+            </div>
+            <button
+              onClick={() => setDevOtpToast(null)}
+              className="text-emerald-800 bg-emerald-100 hover:bg-emerald-200 px-2 py-0.5 rounded-md font-bold text-[11px] transition"
+            >
+              Dismiss
+            </button>
           </div>
         )}
 
@@ -547,7 +572,29 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialTa
                 </div>
 
                 <div className="flex items-center justify-between text-[11px] text-gray-500 font-bold">
-                  {isTimerRunning ? <span>Resend in {countdown}s</span> : <span className="text-gray-400">Valid for 5 mins</span>}
+                  {isTimerRunning ? (
+                    <span className="flex items-center gap-1">
+                      <Clock className="w-3.5 h-3.5" /> Resend OTP in {countdown}s
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        const r = await sendOtp(regPhone);
+                        if (r.success) {
+                          if (r.devOtp) {
+                            setDevOtpToast(`AgroDex Verification Code: ${r.devOtp} (Valid for 5 mins)`);
+                          }
+                          setCountdown(60);
+                          setIsTimerRunning(true);
+                        }
+                      }}
+                      className="text-emerald-700 hover:underline flex items-center gap-1 font-bold"
+                    >
+                      <RefreshCw className="w-3.5 h-3.5" /> Resend OTP
+                    </button>
+                  )}
+                  <span className="text-gray-400">Valid for 5 mins</span>
                 </div>
 
                 <button

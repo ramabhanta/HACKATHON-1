@@ -1,8 +1,9 @@
 import enLocale from './locales/en.json';
 import teLocale from './locales/te.json';
 import hiLocale from './locales/hi.json';
+import knLocale from './locales/kn.json';
 
-export { enLocale, teLocale, hiLocale };
+export { enLocale, teLocale, hiLocale, knLocale };
 
 export type Language = 'en' | 'hi' | 'te' | 'ta' | 'kn' | 'ml' | 'mr' | 'bn' | 'gu' | 'pa' | 'or';
 
@@ -489,6 +490,7 @@ export const translations: Record<Language, Record<string, string>> = {
   },
 
   kn: {
+    ...knLocale,
     appName: 'ಅಗ್ರೋಡೆಕ್ಸ್ (AgroDex)',
     tagline: 'ಪ್ರತಿ ರೈತನಿಗಾಗಿ AI — ಪತ್ತೆಹಚ್ಚಿ, ನಿರ್ಧರಿಸಿ, ಖರೀದಿಸಿ, ಮಾರಿ ಮತ್ತು ಬೆಳೆಯಿರಿ',
     home: 'ನನ್ನ ಜಮೀನು',

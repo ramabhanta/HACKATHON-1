@@ -799,7 +799,7 @@ export const MarketPrices: React.FC<MarketPricesProps> = ({ setActiveTab }) => {
               <span>All-India Mandi & Floriculture Intelligence</span>
             </div>
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight">
-              🌾 Live APMC Mandi & Flower Rates
+              🌾 {t('Live APMC Mandi & Flower Rates')}
             </h1>
             <p className="text-emerald-100 text-sm sm:text-base leading-relaxed">
               Real-time daily wholesale prices for crops, grains, pulses, spices, and floriculture yards (Jasmine, Marigold, Rose, Crossandra, Chrysanthemum) across all Indian states and districts.
@@ -819,7 +819,7 @@ export const MarketPrices: React.FC<MarketPricesProps> = ({ setActiveTab }) => {
               ) : (
                 <FileDown className="w-4 h-4 text-emerald-300" />
               )}
-              <span>{isExportingCsv ? 'Exporting...' : 'Export Mandi Rates (CSV)'}</span>
+              <span>{isExportingCsv ? 'Exporting...' : t('Export Mandi Rates (CSV)')}</span>
             </button>
 
             <button
@@ -828,7 +828,7 @@ export const MarketPrices: React.FC<MarketPricesProps> = ({ setActiveTab }) => {
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-sm font-semibold transition text-white active:scale-95"
             >
               <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
-              <span>Refresh</span>
+              <span>{t('refresh') || 'Refresh'}</span>
             </button>
 
             <button
@@ -836,7 +836,7 @@ export const MarketPrices: React.FC<MarketPricesProps> = ({ setActiveTab }) => {
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-amber-950 text-sm font-bold shadow-lg shadow-amber-900/30 transition transform active:scale-95"
             >
               <Plus className="w-4 h-4" />
-              <span>+ Report Today's Market Price</span>
+              <span>{t("+ Report Today's Market Price")}</span>
             </button>
           </div>
         </div>
@@ -1320,7 +1320,7 @@ export const MarketPrices: React.FC<MarketPricesProps> = ({ setActiveTab }) => {
                     <div className="flex items-baseline justify-between">
                       <div>
                         <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider block">
-                          Modal Rate (సగటు ధర)
+                          {t('Modal Price')}
                         </span>
                         <div className="flex items-baseline gap-1 mt-0.5">
                           <span className="text-2xl font-black text-emerald-900">
@@ -1403,17 +1403,17 @@ export const MarketPrices: React.FC<MarketPricesProps> = ({ setActiveTab }) => {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-stone-50 border-b border-gray-100 text-xs font-bold text-gray-600 uppercase tracking-wider">
-                  <th className="py-4 px-5">Commodity / Flower</th>
-                  <th className="py-4 px-4">Category</th>
-                  <th className="py-4 px-4">State & District</th>
-                  <th className="py-4 px-4">Mandi / Market Yard</th>
-                  <th className="py-4 px-4 text-center">Arrivals</th>
-                  <th className="py-4 px-4 text-right">Min Rate</th>
-                  <th className="py-4 px-4 text-right">Modal Rate</th>
-                  <th className="py-4 px-4 text-right">Max Rate</th>
-                  <th className="py-4 px-4 text-center">Trend</th>
-                  <th className="py-4 px-4 text-center">Action</th>
-                  <th className="py-4 px-5 text-right">Date</th>
+                  <th className="py-4 px-5">{t('Commodity')}</th>
+                  <th className="py-4 px-4">{t('category') || 'Category'}</th>
+                  <th className="py-4 px-4">{t('State')} & {t('District')}</th>
+                  <th className="py-4 px-4">{t('mandiPrices')}</th>
+                  <th className="py-4 px-4 text-center">{t('Daily Arrivals')}</th>
+                  <th className="py-4 px-4 text-right">{t('minPrice') || 'Min Rate'}</th>
+                  <th className="py-4 px-4 text-right">{t('Modal Price')}</th>
+                  <th className="py-4 px-4 text-right">{t('maxPrice') || 'Max Rate'}</th>
+                  <th className="py-4 px-4 text-center">{t('Price Trend')}</th>
+                  <th className="py-4 px-4 text-center">{t('action') || 'Action'}</th>
+                  <th className="py-4 px-5 text-right">{t('date') || 'Date'}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 text-sm">

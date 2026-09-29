@@ -53,40 +53,40 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab, o
       { id: 'prices', label: t('mandiPrices') || 'Mandi Rates', icon: TrendingUp },
       { id: 'produce', label: t('farmerLots') || 'Procure Lots', icon: Layers, isCenter: true },
       { id: 'chat', label: t('chat') || 'Chat', icon: MessageSquare },
-      { id: 'menu', label: 'All Features', icon: Grid }
+      { id: 'menu', label: t('All Features'), icon: Grid }
     ];
   } else if (role === 'VENDOR') {
     navItems = [
       { id: 'vendor-portal', label: t('vendorDesk') || 'Vendor Desk', icon: Store },
       { id: 'store', label: t('store') || 'Catalog', icon: ShoppingBag, badge: totalItems },
       { id: 'prices', label: t('mandiPrices') || 'Market Rates', icon: TrendingUp, isCenter: true },
-      { id: 'orders', label: 'Orders', icon: ClipboardList },
-      { id: 'menu', label: 'All Features', icon: Grid }
+      { id: 'orders', label: t('Orders'), icon: ClipboardList },
+      { id: 'menu', label: t('All Features'), icon: Grid }
     ];
   } else {
     // Default: Farmer
     navItems = [
-      { id: 'home', label: isSimpleMode ? t('farmerHome') || 'Home' : t('home') || 'Home', icon: Home },
-      { id: 'store', label: t('store') || 'Agri Store', icon: ShoppingBag, badge: totalItems },
-      { id: 'scan', label: t('scanCrop') || 'Scan Crop', icon: Camera, isCenter: true },
-      { id: 'prices', label: t('mandiPrices') || 'Mandi Rates', icon: TrendingUp },
-      { id: 'menu', label: 'All Features', icon: Grid }
+      { id: 'home', label: isSimpleMode ? t('farmerHome') || t('home') : t('home'), icon: Home },
+      { id: 'store', label: t('store'), icon: ShoppingBag, badge: totalItems },
+      { id: 'scan', label: t('scanCrop'), icon: Camera, isCenter: true },
+      { id: 'prices', label: t('mandiPrices'), icon: TrendingUp },
+      { id: 'menu', label: t('All Features'), icon: Grid }
     ];
   }
 
   // Comprehensive drawer actions covering 100% desktop feature parity
   const farmerFeatures = [
-    { id: 'ai', title: t('aiAssistant') || 'AI Agronomist', desc: 'Ask Gemini 2.5 Flash crop & soil questions', icon: Bot, color: 'bg-emerald-500 text-white' },
-    { id: 'scan', title: t('scanCrop') || 'Crop Disease Scan', desc: 'Real-time camera scan & AI leaf diagnosis', icon: Camera, color: 'bg-amber-500 text-white' },
-    { id: 'store', title: t('store') || 'Agri Store Depot', desc: 'Authentic fertilizers, seeds, sprayers & tools', icon: ShoppingBag, color: 'bg-teal-500 text-white', badge: totalItems },
-    { id: 'prices', title: t('mandiPrices') || 'Mandi Live Prices', desc: '100+ APMC live rates & price forecasts', icon: TrendingUp, color: 'bg-blue-500 text-white' },
-    { id: 'produce', title: t('sellProduce') || 'Sell Harvested Produce', desc: 'Connect directly with verified buyers', icon: Layers, color: 'bg-purple-500 text-white' },
+    { id: 'ai', title: t('aiAssistant'), desc: 'Ask Gemini 2.5 Flash crop & soil questions', icon: Bot, color: 'bg-emerald-500 text-white' },
+    { id: 'scan', title: t('scanCrop'), desc: 'Real-time camera scan & AI leaf diagnosis', icon: Camera, color: 'bg-amber-500 text-white' },
+    { id: 'store', title: t('store'), desc: 'Authentic fertilizers, seeds, sprayers & tools', icon: ShoppingBag, color: 'bg-teal-500 text-white', badge: totalItems },
+    { id: 'prices', title: t('mandiPrices'), desc: '100+ APMC live rates & price forecasts', icon: TrendingUp, color: 'bg-blue-500 text-white' },
+    { id: 'produce', title: t('sellProduce'), desc: 'Connect directly with verified buyers', icon: Layers, color: 'bg-purple-500 text-white' },
     { id: 'soil', title: t('soilHealth') || 'Soil Health Card', desc: 'NPK test records & custom fertigation plans', icon: FlaskConical, color: 'bg-amber-600 text-white' },
-    { id: 'farm-manager', title: t('farmManager') || 'Farm & Plot Manager', desc: 'GPS mapped plots & crop growth telemetry', icon: Tractor, color: 'bg-lime-600 text-white' },
-    { id: 'orders', title: 'My Booking Orders', desc: 'Track 24h dealer reservation SLA orders', icon: ClipboardList, color: 'bg-orange-500 text-white' },
-    { id: 'shops', title: 'Nearby Input Retailers', desc: 'Verified local agro dealers within 25km', icon: Store, color: 'bg-indigo-500 text-white' },
-    { id: 'cart', title: 'Cart & Checkout', desc: 'Review selected agricultural inputs', icon: ShoppingBag, color: 'bg-emerald-600 text-white', badge: totalItems },
-    { id: 'chat', title: t('chat') || 'Farmer Community Chat', desc: 'Telugu, Kannada, Hindi & English farmers', icon: MessageSquare, color: 'bg-cyan-600 text-white' }
+    { id: 'farm-manager', title: t('farmManager'), desc: 'GPS mapped plots & crop growth telemetry', icon: Tractor, color: 'bg-lime-600 text-white' },
+    { id: 'orders', title: t('My Booking Orders'), desc: 'Track 24h dealer reservation SLA orders', icon: ClipboardList, color: 'bg-orange-500 text-white' },
+    { id: 'shops', title: t('Nearby Input Retailers'), desc: 'Verified local agro dealers within 25km', icon: Store, color: 'bg-indigo-500 text-white' },
+    { id: 'cart', title: t('Cart & Checkout'), desc: 'Review selected agricultural inputs', icon: ShoppingBag, color: 'bg-emerald-600 text-white', badge: totalItems },
+    { id: 'chat', title: t('chat'), desc: 'Telugu, Kannada, Hindi & English farmers', icon: MessageSquare, color: 'bg-cyan-600 text-white' }
   ];
 
   const handleItemClick = (id: string) => {

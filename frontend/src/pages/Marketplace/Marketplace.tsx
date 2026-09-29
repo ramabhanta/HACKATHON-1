@@ -603,7 +603,7 @@ export const Marketplace: React.FC<MarketplaceProps> = ({ setActiveTab }) => {
               <div className="mt-4 pt-3 border-t border-gray-100">
                 <div className="flex items-end justify-between mb-3">
                   <div>
-                    <span className="text-[10px] text-gray-400 font-bold block">FARMER RATE:</span>
+                    <span className="text-[10px] text-gray-400 font-bold block">{t('FARMER RATE:')}</span>
                     <div className="flex items-baseline gap-1.5">
                       <span className="text-xl font-black text-gray-900">
                         ₹{p.subsidyDiscountedRate || p.price}
@@ -621,7 +621,7 @@ export const Marketplace: React.FC<MarketplaceProps> = ({ setActiveTab }) => {
 
                   {/* Stock Status Badge */}
                   <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800">
-                    ✓ In Stock ({p.stockQuantity || 45})
+                    {t('inStock')} ({p.stockQuantity || 45})
                   </span>
                 </div>
 
@@ -639,7 +639,7 @@ export const Marketplace: React.FC<MarketplaceProps> = ({ setActiveTab }) => {
                     className="flex-1 py-2.5 px-3 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-black shadow-sm transition active:scale-95 flex items-center justify-center gap-1.5"
                   >
                     <ShoppingBag className="w-3.5 h-3.5" />
-                    <span>Book at Nearby Store</span>
+                    <span>{t('Book at Nearby Store')}</span>
                   </button>
                 </div>
               </div>
@@ -830,7 +830,7 @@ export const Marketplace: React.FC<MarketplaceProps> = ({ setActiveTab }) => {
                         ✓
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-black text-gray-900">1. Booked & Reserved</span>
+                        <span className="text-xs font-black text-gray-900">1. {t('Booked & Reserved')}</span>
                         <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800">
                           Completed
                         </span>
@@ -846,7 +846,7 @@ export const Marketplace: React.FC<MarketplaceProps> = ({ setActiveTab }) => {
                         ●
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-black text-amber-950">2. Ready for Depot Pickup</span>
+                        <span className="text-xs font-black text-amber-950">2. {t('Ready for Depot Pickup (Valid for 24h)')}</span>
                         <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-900 border border-amber-300">
                           Valid for 24 Hours
                         </span>
@@ -862,7 +862,7 @@ export const Marketplace: React.FC<MarketplaceProps> = ({ setActiveTab }) => {
                         3
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-gray-600">3. Collected & Paid at Counter</span>
+                        <span className="text-xs font-bold text-gray-600">3. {t('Collected & Paid at Counter')}</span>
                         <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-100 text-gray-500">
                           Pending Pickup
                         </span>
@@ -883,7 +883,7 @@ export const Marketplace: React.FC<MarketplaceProps> = ({ setActiveTab }) => {
                       className="flex-1 py-3 px-4 bg-emerald-800 hover:bg-emerald-900 text-white font-extrabold rounded-2xl shadow transition active:scale-95 text-xs flex items-center justify-center gap-2"
                     >
                       <FileDown className="w-4 h-4 text-emerald-300" />
-                      <span>Download Booking Slip (PDF)</span>
+                      <span>{t('Download Booking Slip PDF')}</span>
                     </button>
 
                     <button
@@ -895,7 +895,7 @@ export const Marketplace: React.FC<MarketplaceProps> = ({ setActiveTab }) => {
                       }}
                       className="flex-1 py-3 px-4 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300 font-extrabold rounded-2xl shadow-xs transition active:scale-95 text-xs flex items-center justify-center gap-1.5"
                     >
-                      <span>View in My Orders</span>
+                      <span>{t('View in My Orders')}</span>
                       <ArrowRight className="w-4 h-4" />
                     </button>
                   </div>
@@ -908,7 +908,7 @@ export const Marketplace: React.FC<MarketplaceProps> = ({ setActiveTab }) => {
                     }}
                     className="w-full py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-2xl transition text-xs"
                   >
-                    Back to Store
+                    {t('Back to Store')}
                   </button>
                 </div>
               </div>

@@ -54,7 +54,7 @@ interface DashboardProps {
 
 export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice }) => {
   const { user } = useAuth();
-  const { t, language } = useLanguage();
+  const { t, language, formatGreeting } = useLanguage();
 
   const [weather, setWeather] = useState<any>(null);
   const [tasks, setTasks] = useState<any[]>([]);
@@ -431,11 +431,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onOpenVoice 
             <span>📍 {user?.village || 'Kadiri Mandal'}, {user?.district || 'Sri Sathya Sai'}</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-            {language === 'te'
-              ? `నమస్కారం, ${user?.name || 'రైతు'} గారు 👋`
-              : language === 'hi'
-              ? `नमस्ते, ${user?.name || 'किसान'} जी 👋`
-              : `Good morning, ${user?.name || 'Farmer'} 👋`}
+            {formatGreeting(user?.name, user?.role)}
           </h1>
           <p className="text-emerald-100 text-sm sm:text-base mt-2">
             {t('subGreeting')}

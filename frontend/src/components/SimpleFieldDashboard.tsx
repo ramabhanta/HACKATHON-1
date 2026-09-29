@@ -36,10 +36,22 @@ export const SimpleFieldDashboard: React.FC<SimpleFieldDashboardProps> = ({
           <span className="text-2xl">🌾</span>
           <div>
             <span className="text-xs font-black uppercase tracking-wider block">
-              రైతు సులభ మోడ్ • Simple Field Mode
+              {language === 'kn'
+                ? 'ರೈತ ಸುಲಭ ಮೋಡ್ • Simple Field Mode'
+                : language === 'te'
+                ? 'రైతు సులభ మోడ్ • Simple Field Mode'
+                : language === 'hi'
+                ? 'किसान सरल मोड • Simple Field Mode'
+                : 'Simple Field Mode'}
             </span>
             <span className="text-xs text-amber-900">
-              High contrast, large buttons, simplified for field use under sunlight.
+              {language === 'kn'
+                ? 'ಬಿಸಿಲಿನಲ್ಲಿ ಸುಲಭವಾಗಿ ಬಳಸಲು ದೊಡ್ಡ ಬಟನ್‌ಗಳು ಮತ್ತು ಸ್ಪಷ್ಟ ವಿನ್ಯಾಸ.'
+                : language === 'te'
+                ? 'ఎండలో సులభంగా ఉపయోగించడానికి పెద్ద బటన్లు మరియు స్పష్టమైన అక్షరాలు.'
+                : language === 'hi'
+                ? 'धूप में उपयोग के लिए बड़े बटन और सरल इंटरफेस।'
+                : 'High contrast, large buttons, simplified for field use under sunlight.'}
             </span>
           </div>
         </div>
@@ -47,7 +59,13 @@ export const SimpleFieldDashboard: React.FC<SimpleFieldDashboardProps> = ({
           onClick={() => setMode('PRO')}
           className="px-3.5 py-2 rounded-xl bg-emerald-800 text-white font-black text-xs shadow-md transition active:scale-95 shrink-0"
         >
-          Switch to Pro Analytics 📊
+          {language === 'kn'
+            ? 'ಪ್ರೊ ಮೋಡ್‌ಗೆ ಬದಲಾಯಿಸಿ 📊'
+            : language === 'te'
+            ? 'ప్రో మోడ్‌కి మారండి 📊'
+            : language === 'hi'
+            ? 'प्रो मोड पर जाएं 📊'
+            : 'Switch to Pro Analytics 📊'}
         </button>
       </div>
 
@@ -62,14 +80,22 @@ export const SimpleFieldDashboard: React.FC<SimpleFieldDashboardProps> = ({
           </div>
           <div>
             <h2 className="text-xl sm:text-2xl font-black text-white">
-              {language === 'te'
+              {language === 'kn'
+                ? 'AI ರೈತ ಸಹಾಯಕರೊಂದಿಗೆ ಮಾತನಾಡಿ'
+                : language === 'te'
                 ? 'AI రైతు సహాయకుడితో మాట్లాడండి'
                 : language === 'hi'
                 ? 'एआई किसान सहायक से बोलकर पूछें'
                 : 'Tap to Speak with AI Assistant'}
             </h2>
             <p className="text-xs sm:text-sm text-amber-100 font-semibold mt-0.5">
-              Ask in Telugu, Hindi or English — pests, crops, weather, mandi
+              {language === 'kn'
+                ? 'ಕನ್ನಡ, ಹಿಂದಿ ಅಥವಾ ಇಂಗ್ಲಿಷ್‌ನಲ್ಲಿ ಕೇಳಿ — ರೋಗಗಳು, ಬೆಳೆಗಳು, ಹವಾಮಾನ, ಮಾರುಕಟ್ಟೆ'
+                : language === 'te'
+                ? 'తెలుగు, హిందీ లేదా ఇంగ్లీషులో అడగండి — తెగుళ్లు, పంటలు, వాతావరణం, మండి'
+                : language === 'hi'
+                ? 'हिंदी, तेलुगु या अंग्रेजी में पूछें — कीट, फसल, मौसम, मंडी भाव'
+                : 'Ask in Telugu, Hindi or English — pests, crops, weather, mandi'}
             </p>
           </div>
         </div>
@@ -85,16 +111,38 @@ export const SimpleFieldDashboard: React.FC<SimpleFieldDashboardProps> = ({
             <span className="text-4xl">🌤️</span>
             <div>
               <span className="text-xs font-bold text-gray-500 uppercase block">
-                {language === 'te' ? 'పొలం వాతావరణం' : 'Farm Weather — Kadiri, AP'}
+                {language === 'kn'
+                  ? 'ಜಮೀನಿನ ಹವಾಮಾನ'
+                  : language === 'te'
+                  ? 'పొలం వాతావరణం'
+                  : language === 'hi'
+                  ? 'खेत का मौसम'
+                  : 'Farm Weather — Kadiri, AP'}
               </span>
               <div className="flex items-baseline gap-2">
                 <span className="text-3xl font-black text-gray-900">31°C</span>
-                <span className="text-sm font-bold text-emerald-700">Partly Cloudy</span>
+                <span className="text-sm font-bold text-emerald-700">
+                  {language === 'kn'
+                    ? 'ಭಾಗಶಃ ಮೋಡ ಕವಿದ ವಾತಾವರಣ'
+                    : language === 'te'
+                    ? 'పాక్షికంగా మేఘావృతం'
+                    : language === 'hi'
+                    ? 'आंशिक रूप से बादल'
+                    : 'Partly Cloudy'}
+                </span>
               </div>
             </div>
           </div>
           <div className="text-right">
-            <span className="text-xs font-bold text-gray-500 block">Rain Chance</span>
+            <span className="text-xs font-bold text-gray-500 block">
+              {language === 'kn'
+                ? 'ಮಳೆಯ ಸಾಧ್ಯತೆ'
+                : language === 'te'
+                ? 'వర్ష సూచన'
+                : language === 'hi'
+                ? 'बारिश की संभावना'
+                : 'Rain Chance'}
+            </span>
             <span className="text-xl font-black text-blue-700">15%</span>
           </div>
         </div>
@@ -102,8 +150,12 @@ export const SimpleFieldDashboard: React.FC<SimpleFieldDashboardProps> = ({
         <div className="mt-4 p-3.5 bg-emerald-50 rounded-2xl border border-emerald-200 text-xs sm:text-sm font-bold text-emerald-900 flex items-center gap-2">
           <span>✅</span>
           <span>
-            {language === 'te'
+            {language === 'kn'
+              ? 'ಇಂದು ಕೀಟನಾಶಕ ಮತ್ತು ಗೊಬ್ಬರ ಸಿಂಪಡಿಸಲು ಸೂಕ್ತ ಹವಾಮಾನವಿದೆ. ಭಾರಿ ಮಳೆಯಿಲ್ಲ.'
+              : language === 'te'
               ? 'ఈరోజు పురుగుమందులు & ఎరువులు చల్లడానికి వాతావరణం అనుకూలంగా ఉంది.'
+              : language === 'hi'
+              ? 'आज कीटनाशक और उर्वरक छिड़काव के लिए मौसम अनुकूल है। भारी बारिश नहीं होगी।'
               : 'Safe for spraying fertilizers and crop protection today. No heavy rain expected.'}
           </span>
         </div>
@@ -121,10 +173,22 @@ export const SimpleFieldDashboard: React.FC<SimpleFieldDashboardProps> = ({
           </div>
           <div>
             <h3 className="text-lg font-black text-gray-900 group-hover:text-emerald-900">
-              {language === 'te' ? 'ఆకు తెగులు స్కాన్ చేయండి' : 'Scan Affected Crop Leaf'}
+              {language === 'kn'
+                ? 'ಬೆಳೆ ರೋಗ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ'
+                : language === 'te'
+                ? 'ఆకు తెగులు స్కాన్ చేయండి'
+                : language === 'hi'
+                ? 'फसल रोग स्कैन करें'
+                : 'Scan Affected Crop Leaf'}
             </h3>
             <p className="text-xs text-gray-500 font-semibold mt-1">
-              Take photo to identify leaf spot, pests & treatment in 5 seconds
+              {language === 'kn'
+                ? '5 ಸೆಕೆಂಡುಗಳಲ್ಲಿ ರೋಗ ಮತ್ತು ಪರಿಹಾರ ತಿಳಿಯಲು ಫೋಟೋ ತೆಗೆಯಿರಿ'
+                : language === 'te'
+                ? '5 సెకన్లలో తెగుళ్లు మరియు నివారణలను గుర్తించడానికి ఫోటో తీయండి'
+                : language === 'hi'
+                ? '5 सेकंड में कीट और उपचार जानने के लिए फोटो लें'
+                : 'Take photo to identify leaf spot, pests & treatment in 5 seconds'}
             </p>
           </div>
         </button>
@@ -139,10 +203,22 @@ export const SimpleFieldDashboard: React.FC<SimpleFieldDashboardProps> = ({
           </div>
           <div>
             <h3 className="text-lg font-black text-gray-900 group-hover:text-pink-900">
-              {language === 'te' ? 'ఈరోజు మార్కెట్ & పూల ధరలు' : "Today's Mandi & Flower Rates"}
+              {language === 'kn'
+                ? 'ಇಂದಿನ ಮಾರುಕಟ್ಟೆ ಮತ್ತು ಹೂವಿನ ದರಗಳು'
+                : language === 'te'
+                ? 'ఈరోజు మార్కెట్ & పూల ధరలు'
+                : language === 'hi'
+                ? 'आज का मंडी व फूल भाव'
+                : "Today's Mandi & Flower Rates"}
             </h3>
             <p className="text-xs text-gray-500 font-semibold mt-1">
-              Live prices: Jasmine (₹450), Chilli (₹21,600), Groundnut (₹7,350)
+              {language === 'kn'
+                ? 'ಲೈವ್ ದರಗಳು: ಮಲ್ಲಿಗೆ (₹450), ಮೆಣಸಿನಕಾಯಿ (₹21,600), ಕಡಲೆಕಾಯಿ (₹7,350)'
+                : language === 'te'
+                ? 'లైవ్ ధరలు: మల్లెపూలు (₹450), మిర్చి (₹21,600), వేరుశనగ (₹7,350)'
+                : language === 'hi'
+                ? 'लाइव भाव: चमेली (₹450), मिर्च (₹21,600), मूंगफली (₹7,350)'
+                : 'Live prices: Jasmine (₹450), Chilli (₹21,600), Groundnut (₹7,350)'}
             </p>
           </div>
         </button>
@@ -157,10 +233,22 @@ export const SimpleFieldDashboard: React.FC<SimpleFieldDashboardProps> = ({
           </div>
           <div>
             <h3 className="text-lg font-black text-gray-900 group-hover:text-teal-900">
-              {language === 'te' ? 'ఎరువులు & విత్తనాలు కొనండి' : 'Buy Fertilizers & Seeds'}
+              {language === 'kn'
+                ? 'ಗೊಬ್ಬರ ಮತ್ತು ಬೀಜಗಳನ್ನು ಖರೀದಿಸಿ'
+                : language === 'te'
+                ? 'ఎరువులు & విత్తనాలు కొనండి'
+                : language === 'hi'
+                ? 'उर्वरक और बीज खरीदें'
+                : 'Buy Fertilizers & Seeds'}
             </h3>
             <p className="text-xs text-gray-500 font-semibold mt-1">
-              Order from certified local dealers in Kadiri with farm delivery
+              {language === 'kn'
+                ? 'ಹತ್ತಿರದ ಅಧಿಕೃತ ಡೀಲರ್‌ಗಳಿಂದ ಜಮೀನಿಗೆ ನೇರ ವಿತರಣೆ'
+                : language === 'te'
+                ? 'పొలం డెలివరీతో సమీప డీలర్ల నుండి ఆర్డర్ చేయండి'
+                : language === 'hi'
+                ? 'खेत तक डिलीवरी के साथ नजदीकी प्रमाणित डीलरों से ऑर्डर करें'
+                : 'Order from certified local dealers in Kadiri with farm delivery'}
             </p>
           </div>
         </button>
@@ -175,10 +263,22 @@ export const SimpleFieldDashboard: React.FC<SimpleFieldDashboardProps> = ({
           </div>
           <div>
             <h3 className="text-lg font-black text-gray-900 group-hover:text-orange-900">
-              {language === 'te' ? 'పంట దిగుబడిని అమ్మండి' : 'Sell Harvest to Buyers'}
+              {language === 'kn'
+                ? 'ಬೆಳೆ ಇಳುವರಿಯನ್ನು ಮಾರಿ'
+                : language === 'te'
+                ? 'పంట దిగుబడిని అమ్మండి'
+                : language === 'hi'
+                ? 'फसल की उपज बेचें'
+                : 'Sell Harvest to Buyers'}
             </h3>
             <p className="text-xs text-gray-500 font-semibold mt-1">
-              Direct mandi traders & buyers with zero middleman commission
+              {language === 'kn'
+                ? 'ಮಧ್ಯವರ್ತಿಗಳಿಲ್ಲದೆ ನೇರವಾಗಿ ವ್ಯಾಪಾರಿಗಳಿಗೆ ಮಾರಾಟ ಮಾಡಿ'
+                : language === 'te'
+                ? 'దళారులు లేకుండా నేరుగా వ్యాపారులకు విక్రయించండి'
+                : language === 'hi'
+                ? 'बिना बिचौलियों के सीधे व्यापारियों को बेचें'
+                : 'Direct mandi traders & buyers with zero middleman commission'}
             </p>
           </div>
         </button>
@@ -188,13 +288,21 @@ export const SimpleFieldDashboard: React.FC<SimpleFieldDashboardProps> = ({
       <div className="bg-white rounded-3xl p-6 border-2 border-gray-200 shadow-sm space-y-3">
         <h3 className="text-base font-black text-gray-900 flex items-center gap-2">
           <span>🌱</span>
-          <span>{language === 'te' ? 'మీ పొలంలో ఉన్న పంటలు' : 'Your Standing Crops (Kadiri Farm)'}</span>
+          <span>
+            {language === 'kn'
+              ? 'ನಿಮ್ಮ ಜಮೀನಿನಲ್ಲಿರುವ ಬೆಳೆಗಳು'
+              : language === 'te'
+              ? 'మీ పొలంలో ఉన్న పంటలు'
+              : language === 'hi'
+              ? 'आपके खेत की खड़ी फसलें'
+              : 'Your Standing Crops (Kadiri Farm)'}
+          </span>
         </h3>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="p-4 rounded-2xl bg-emerald-50/80 border border-emerald-200 flex items-center justify-between">
             <div>
-              <span className="font-extrabold text-gray-900 text-sm block">Groundnut (వేరుశనగ)</span>
+              <span className="font-extrabold text-gray-900 text-sm block">Groundnut (ಕಡಲೆಕಾಯಿ / వేరుశనగ)</span>
               <span className="text-xs text-gray-600">Kadiri-6 • 4.0 Acres • Flowering</span>
             </div>
             <span className="px-2.5 py-1 rounded-full bg-emerald-200 text-emerald-950 font-black text-xs">
@@ -204,7 +312,7 @@ export const SimpleFieldDashboard: React.FC<SimpleFieldDashboardProps> = ({
 
           <div className="p-4 rounded-2xl bg-amber-50/80 border border-amber-200 flex items-center justify-between">
             <div>
-              <span className="font-extrabold text-gray-900 text-sm block">Tomato (టమోటా)</span>
+              <span className="font-extrabold text-gray-900 text-sm block">Tomato (ಟೊಮೆಟೊ / టమోటా)</span>
               <span className="text-xs text-gray-600">Arka Rakshak • 1.5 Acres • Fruit Set</span>
             </div>
             <span className="px-2.5 py-1 rounded-full bg-amber-200 text-amber-950 font-black text-xs">

@@ -43,14 +43,21 @@ import { BookInspectionModal } from './BookInspectionModal';
 
 interface BuyerPortalProps {
   setActiveTab?: (tab: string) => void;
+  initialTab?: 'OFFERS' | 'FARMERS' | 'LOTS' | 'MY_BIDS' | 'LOGISTICS';
 }
 
-export const BuyerPortal: React.FC<BuyerPortalProps> = ({ setActiveTab }) => {
+export const BuyerPortal: React.FC<BuyerPortalProps> = ({ setActiveTab, initialTab = 'OFFERS' }) => {
   const { user } = useAuth();
   const { t } = useLanguage();
 
   // Active Tab: OFFERS (Buyer demands) | FARMERS (Nearby directory) | LOTS (Harvest lots) | MY_BIDS | LOGISTICS
-  const [activeTab, setActiveTabLocal] = useState<'OFFERS' | 'FARMERS' | 'LOTS' | 'MY_BIDS' | 'LOGISTICS'>('OFFERS');
+  const [activeTab, setActiveTabLocal] = useState<'OFFERS' | 'FARMERS' | 'LOTS' | 'MY_BIDS' | 'LOGISTICS'>(initialTab);
+
+  useEffect(() => {
+    if (initialTab) {
+      setActiveTabLocal(initialTab);
+    }
+  }, [initialTab]);
 
   // Primary Data Collections
   const [purchaseOffers, setPurchaseOffers] = useState<PurchaseOffer[]>(() => {

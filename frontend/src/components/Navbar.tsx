@@ -24,7 +24,8 @@ import {
   Sparkles,
   Eye,
   Search,
-  RefreshCw
+  RefreshCw,
+  Menu
 } from 'lucide-react';
 import { detectLocation, getCachedLocation } from '../services/geolocationService';
 
@@ -34,9 +35,17 @@ interface NavbarProps {
   onOpenVoice: () => void;
   onOpenAuth: () => void;
   onOpenProfile?: () => void;
+  onOpenMenu?: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenVoice, onOpenAuth, onOpenProfile }) => {
+export const Navbar: React.FC<NavbarProps> = ({
+  activeTab,
+  setActiveTab,
+  onOpenVoice,
+  onOpenAuth,
+  onOpenProfile,
+  onOpenMenu
+}) => {
   const { user, role, switchRole, logout, isAuthenticated, updateProfile } = useAuth();
   const { language, setLanguage, t, languages, currentLangMeta } = useLanguage();
   const { totalItems } = useCart();
@@ -139,8 +148,18 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenV
   ];
 
   const currentModeObj = displayModes.find(m => m.mode === mode) || displayModes[0];
-
   const ModeIcon = currentModeObj.icon;
+
+  const getNavPillClass = (isActive: boolean) =>
+    `px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 flex items-center gap-1.5 shadow-xs ${
+      isActive
+        ? isDarkMode
+          ? 'bg-emerald-500 text-slate-950 font-bold shadow-sm ring-1 ring-emerald-400/50 scale-[1.02]'
+          : 'bg-white text-emerald-950 font-bold shadow-sm ring-1 ring-white/50 scale-[1.02]'
+        : isDarkMode
+        ? 'text-slate-300 hover:text-white hover:bg-slate-800 active:scale-95'
+        : 'text-emerald-100 hover:text-white hover:bg-white/15 active:scale-95'
+    }`;
 
   return (
     <header className={`sticky top-0 z-40 text-white shadow-md transition-colors duration-200 ${
@@ -150,28 +169,45 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenV
         ? 'bg-emerald-900 border-b-4 border-amber-400'
         : 'bg-emerald-800'
     }`}>
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo & Tagline */}
+      <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 gap-2">
+          {/* 1. Left Zone: AgroDex Logo + Active Role Badge */}
           <div
-            className="flex items-center gap-2 cursor-pointer select-none"
+            className="flex items-center gap-2 cursor-pointer select-none shrink-0"
             onClick={() => {
               if (role === 'BUYER') setActiveTab('buyer-portal');
-              else if (role === 'VENDOR') setActiveTab('vendor-portal');
+              else if (role === 'VENDOR') setActiveTab('inventory');
               else if (role === 'ADMIN') setActiveTab('admin-portal');
-              else setActiveTab('home');
+              else setActiveTab(isSimpleMode ? 'simple-dashboard' : 'home');
             }}
           >
-            <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center border border-white/20 shadow-inner">
+            <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center border border-white/20 shadow-inner shrink-0">
               <span className="text-2xl">🌾</span>
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="font-extrabold text-xl tracking-tight text-white">Agro<span className="text-amber-400">Dex</span></span>
-                <span className="text-[10px] bg-amber-400 text-amber-950 font-black px-1.5 py-0.5 rounded shadow-sm uppercase">AI</span>
-                {isSimpleMode && (
-                  <span className="text-[10px] bg-emerald-500/40 text-emerald-200 border border-emerald-400/50 font-black px-1.5 py-0.5 rounded uppercase">
-                    Field Mode
+                <span className="font-extrabold text-lg sm:text-xl tracking-tight text-white">
+                  Agro<span className="text-amber-400">Dex</span>
+                </span>
+                <span className="text-[10px] bg-amber-400 text-amber-950 font-black px-1.5 py-0.5 rounded shadow-sm uppercase">
+                  AI
+                </span>
+                {/* Active Role Badge */}
+                {role === 'BUYER' ? (
+                  <span className="text-[10px] bg-amber-500/20 text-amber-200 border border-amber-400/40 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                    📦 Buyer
+                  </span>
+                ) : role === 'VENDOR' ? (
+                  <span className="text-[10px] bg-teal-500/20 text-teal-200 border border-teal-400/40 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                    🏪 Agro Shop
+                  </span>
+                ) : role === 'ADMIN' ? (
+                  <span className="text-[10px] bg-purple-500/20 text-purple-200 border border-purple-400/40 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                    ⚙️ Admin
+                  </span>
+                ) : (
+                  <span className="text-[10px] bg-emerald-700/80 text-emerald-100 border border-emerald-400/50 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                    🌾 {isSimpleMode ? 'Field Mode' : 'Farmer'}
                   </span>
                 )}
               </div>
@@ -181,165 +217,159 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenV
             </div>
           </div>
 
-          {/* Center Navigation (Desktop) - Adapts intelligently per active role */}
-          <nav className="hidden lg:flex items-center gap-1">
+          {/* 2. Center Zone: Primary Navigation Pills (Desktop) */}
+          <nav className="hidden lg:flex items-center gap-1.5 xl:gap-2 overflow-x-auto scrollbar-none py-1">
             {role === 'BUYER' ? (
               <>
                 <button
+                  type="button"
                   onClick={() => setActiveTab('buyer-portal')}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition flex items-center gap-1.5 ${
-                    activeTab === 'buyer-portal' ? 'bg-amber-500 text-slate-950 font-bold shadow-sm' : 'text-emerald-100 hover:bg-emerald-700/50'
-                  }`}
+                  className={getNavPillClass(activeTab === 'buyer-portal')}
                 >
-                  <span>📦</span> {t('mandiLotsDesk')}
+                  <span>📦</span> {t('procurementDesk') || 'Procurement Desk'}
                 </button>
                 <button
+                  type="button"
+                  onClick={() => setActiveTab('purchase-offers')}
+                  className={getNavPillClass(activeTab === 'purchase-offers')}
+                >
+                  <span>📑</span> {t('purchaseOffers') || 'Purchase Offers'}
+                </button>
+                <button
+                  type="button"
                   onClick={() => setActiveTab('produce')}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition flex items-center gap-1.5 ${
-                    activeTab === 'produce' ? 'bg-amber-500 text-slate-950 font-bold shadow-sm' : 'text-emerald-100 hover:bg-emerald-700/50'
-                  }`}
+                  className={getNavPillClass(activeTab === 'produce')}
                 >
-                  <span>🌾</span> {t('farmerMarket')}
+                  <span>🌾</span> {t('farmerMarket') || 'Farmer Market'}
                 </button>
                 <button
+                  type="button"
                   onClick={() => setActiveTab('prices')}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition flex items-center gap-1.5 ${
-                    activeTab === 'prices' ? 'bg-amber-500 text-slate-950 font-bold shadow-sm' : 'text-emerald-100 hover:bg-emerald-700/50'
-                  }`}
+                  className={getNavPillClass(activeTab === 'prices')}
                 >
-                  <span>📊</span> {t('allIndiaRates')}
-                </button>
-                <button
-                  onClick={() => setActiveTab('chat')}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition flex items-center gap-1.5 ${
-                    activeTab === 'chat' ? 'bg-amber-500 text-slate-950 font-bold shadow-sm' : 'text-emerald-100 hover:bg-emerald-700/50'
-                  }`}
-                >
-                  <span>💬</span> {t('logisticsChat')}
+                  <span>📊</span> {t('mandiRates') || 'Mandi Rates'}
                 </button>
               </>
             ) : role === 'VENDOR' ? (
               <>
                 <button
-                  onClick={() => setActiveTab('vendor-portal')}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition flex items-center gap-1.5 ${
-                    activeTab === 'vendor-portal' ? 'bg-amber-500 text-slate-950 font-bold shadow-sm' : 'text-emerald-100 hover:bg-emerald-700/50'
-                  }`}
+                  type="button"
+                  onClick={() => setActiveTab('inventory')}
+                  className={getNavPillClass(activeTab === 'inventory' || activeTab === 'vendor-portal')}
                 >
-                  <span>🏪</span> {t('vendorDashboard')}
+                  <span>🏪</span> {t('inventoryAndStock') || 'Inventory & Stock'}
                 </button>
                 <button
-                  onClick={() => setActiveTab('store')}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition flex items-center gap-1.5 ${
-                    activeTab === 'store' ? 'bg-amber-500 text-slate-950 font-bold shadow-sm' : 'text-emerald-100 hover:bg-emerald-700/50'
-                  }`}
+                  type="button"
+                  onClick={() => setActiveTab('orders')}
+                  className={getNavPillClass(activeTab === 'orders')}
                 >
-                  <span>🛒</span> {t('productCatalog')}
+                  <span>📦</span> {t('customerOrders') || 'Customer Orders'}
                 </button>
                 <button
-                  onClick={() => setActiveTab('prices')}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition flex items-center gap-1.5 ${
-                    activeTab === 'prices' ? 'bg-amber-500 text-slate-950 font-bold shadow-sm' : 'text-emerald-100 hover:bg-emerald-700/50'
-                  }`}
+                  type="button"
+                  onClick={() => setActiveTab('nearby-requests')}
+                  className={getNavPillClass(activeTab === 'nearby-requests')}
                 >
-                  <span>📊</span> {t('mandiMarketPrices')}
+                  <span>📍</span> {t('nearbyRequests') || 'Nearby Requests'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('analytics')}
+                  className={getNavPillClass(activeTab === 'analytics')}
+                >
+                  <span>📈</span> {t('shopAnalytics') || 'Shop Analytics'}
                 </button>
               </>
             ) : role === 'ADMIN' ? (
               <>
                 <button
+                  type="button"
                   onClick={() => setActiveTab('admin-portal')}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition flex items-center gap-1.5 ${
-                    activeTab === 'admin-portal' ? 'bg-amber-500 text-slate-950 font-bold shadow-sm' : 'text-emerald-100 hover:bg-emerald-700/50'
-                  }`}
+                  className={getNavPillClass(activeTab === 'admin-portal')}
                 >
-                  <span>⚙️</span> {t('platformAdminHub')}
+                  <span>⚙️</span> {t('platformAdminHub') || 'Admin Portal'}
                 </button>
                 <button
+                  type="button"
                   onClick={() => setActiveTab('prices')}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition flex items-center gap-1.5 ${
-                    activeTab === 'prices' ? 'bg-emerald-900/80 text-white' : 'text-emerald-100 hover:bg-emerald-700/50'
-                  }`}
+                  className={getNavPillClass(activeTab === 'prices')}
                 >
-                  <span>📊</span> {t('marketRates')}
+                  <span>📊</span> {t('marketRates') || 'Market Rates'}
                 </button>
               </>
             ) : (
               <>
                 <button
-                  onClick={() => setActiveTab('home')}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition ${
-                    activeTab === 'home' || activeTab === 'simple-dashboard' ? 'bg-emerald-900/80 text-white' : 'text-emerald-100 hover:bg-emerald-700/50'
-                  }`}
+                  type="button"
+                  onClick={() => setActiveTab(isSimpleMode ? 'simple-dashboard' : 'home')}
+                  className={getNavPillClass(activeTab === 'home' || activeTab === 'simple-dashboard')}
                 >
-                  {t('home')}
+                  <span>🌾</span> {t('myFarm') || t('home') || 'My Farm'}
                 </button>
                 <button
+                  type="button"
                   onClick={() => setActiveTab('ai')}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition flex items-center gap-1 ${
-                    activeTab === 'ai' ? 'bg-emerald-900/80 text-white' : 'text-emerald-100 hover:bg-emerald-700/50'
-                  }`}
+                  className={getNavPillClass(activeTab === 'ai')}
                 >
-                  <span>🤖</span> {t('aiAssistant')}
+                  <span>🤖</span> {t('aiAssistant') || 'AI Assistant'}
                 </button>
                 <button
+                  type="button"
                   onClick={() => setActiveTab('scan')}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition flex items-center gap-1 ${
-                    activeTab === 'scan' ? 'bg-emerald-900/80 text-white' : 'text-emerald-100 hover:bg-emerald-700/50'
-                  }`}
+                  className={getNavPillClass(activeTab === 'scan')}
                 >
-                  <span>📷</span> {t('scanCrop')}
+                  <span>📷</span> {t('scanCrop') || 'Scan Crop'}
                 </button>
                 <button
+                  type="button"
                   onClick={() => setActiveTab('store')}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition flex items-center gap-1 ${
-                    activeTab === 'store' ? 'bg-emerald-900/80 text-white' : 'text-emerald-100 hover:bg-emerald-700/50'
-                  }`}
+                  className={getNavPillClass(activeTab === 'store')}
                 >
-                  <span>🛒</span> {t('store')}
+                  <span>🛒</span> {t('agriStore') || t('store') || 'Agri Store'}
                 </button>
                 <button
+                  type="button"
                   onClick={() => setActiveTab('produce')}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition flex items-center gap-1 ${
-                    activeTab === 'produce' ? 'bg-emerald-900/80 text-white' : 'text-emerald-100 hover:bg-emerald-700/50'
-                  }`}
+                  className={getNavPillClass(activeTab === 'produce')}
                 >
-                  <span>📦</span> {t('sellProduce')}
+                  <span>📦</span> {t('sellProduce') || 'Sell Produce'}
                 </button>
                 <button
+                  type="button"
                   onClick={() => setActiveTab('prices')}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition flex items-center gap-1 ${
-                    activeTab === 'prices' ? 'bg-emerald-900/80 text-white' : 'text-emerald-100 hover:bg-emerald-700/50'
-                  }`}
+                  className={getNavPillClass(activeTab === 'prices')}
                 >
-                  <span>📊</span> {t('mandiPrices')}
+                  <span>📊</span> {t('mandiPrices') || 'Mandi Prices'}
                 </button>
                 <button
+                  type="button"
                   onClick={() => setActiveTab('farm-manager')}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition ${
-                    activeTab === 'farm-manager' ? 'bg-emerald-900/80 text-white' : 'text-emerald-100 hover:bg-emerald-700/50'
-                  }`}
+                  className={getNavPillClass(activeTab === 'farm-manager')}
                 >
-                  {t('farmManager')}
+                  <span>🚜</span> {t('farmManager') || 'Farm Manager'}
                 </button>
               </>
             )}
           </nav>
 
-          {/* Right Controls: Voice, Mode Switcher, Language, Role Switcher, Cart, Profile */}
-          <div className="flex items-center gap-2">
-            {/* Voice Assistant Button */}
+          {/* 3. Right Zone: Utility Controls neatly grouped */}
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            {/* Audio Assist (Desktop) */}
             <button
+              type="button"
               onClick={onOpenVoice}
-              title="Voice Farming Assistant"
-              className="p-2 rounded-full bg-emerald-700/80 hover:bg-emerald-600 text-amber-300 border border-emerald-500/50 shadow-sm transition active:scale-95"
+              title="Voice Farming Assistant / Audio Assist"
+              aria-label="Voice Farming Assistant"
+              className="hidden md:flex p-2 rounded-full bg-emerald-700/80 hover:bg-emerald-600 text-amber-300 border border-emerald-500/50 shadow-sm transition active:scale-95"
             >
               <Volume2 className="w-5 h-5" />
             </button>
 
-            {/* Display Mode Switcher (Clean Pro / Simple Field / Dark Night) */}
-            <div className="relative">
+            {/* Display Mode Switcher (Clean Pro / Simple Field / Dark Night) - Desktop */}
+            <div className="relative hidden md:block">
               <button
+                type="button"
                 onClick={() => {
                   setShowModeMenu(!showModeMenu);
                   setShowRoleMenu(false);
@@ -511,11 +541,12 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenV
             )}
 
             {/* User Account / Sign In Dropdown */}
-            <div className="relative">
-              {isAuthenticated && user ? (
+            {isAuthenticated && user && (
+              <div className="relative hidden md:block">
                 <button
+                  type="button"
                   onClick={() => setShowUserMenu(!showUserMenu)}
-                  className="flex items-center gap-1.5 p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg bg-emerald-700/60 hover:bg-emerald-700 text-white transition text-xs font-semibold"
+                  className="flex items-center gap-1.5 p-1.5 sm:px-2.5 sm:py-1.5 rounded-full bg-emerald-700/60 hover:bg-emerald-700 text-white transition text-xs font-semibold shadow-xs"
                 >
                   <div className="w-6 h-6 rounded-full bg-emerald-600 border border-emerald-400 flex items-center justify-center text-[11px] font-black text-white overflow-hidden shrink-0">
                     {user.avatarUrl ? (
@@ -527,15 +558,6 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenV
                   <span className="hidden md:inline max-w-[100px] truncate">{user.name.split(' ')[0]}</span>
                   <ChevronDown className="w-3 h-3 text-emerald-300" />
                 </button>
-              ) : (
-                <button
-                  onClick={() => setActiveTab('login')}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-400 hover:bg-amber-300 text-amber-950 font-bold text-xs transition shadow-sm"
-                >
-                  <LogIn className="w-3.5 h-3.5" />
-                  <span>Sign In</span>
-                </button>
-              )}
 
               {/* User Dropdown Menu */}
               {showUserMenu && user && (
@@ -632,6 +654,19 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenV
                 </div>
               )}
             </div>
+          )}
+
+            {/* Unauthenticated Sign In Button */}
+            {!isAuthenticated && (
+              <button
+                type="button"
+                onClick={() => setActiveTab('login')}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-400 hover:bg-amber-300 text-amber-950 font-bold text-xs transition shadow-sm shrink-0"
+              >
+                <LogIn className="w-3.5 h-3.5" />
+                <span>Sign In</span>
+              </button>
+            )}
 
             {/* Notification Bell with Real-Time Unread Count & Dropdown */}
             <div className="relative">
@@ -714,8 +749,9 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenV
 
             {/* Cart Icon with Counter */}
             <button
+              type="button"
               onClick={() => setActiveTab('cart')}
-              className="relative p-2 rounded-lg bg-emerald-700/60 hover:bg-emerald-700 text-white transition"
+              className="relative p-2 rounded-lg bg-emerald-700/60 hover:bg-emerald-700 text-white transition shrink-0"
               title="Shopping Cart"
             >
               <ShoppingCart className="w-5 h-5" />
@@ -724,6 +760,17 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenV
                   {totalItems}
                 </span>
               )}
+            </button>
+
+            {/* Mobile & Tablet: Responsive Hamburger Menu Button (☰) */}
+            <button
+              type="button"
+              onClick={onOpenMenu}
+              className="lg:hidden p-2 rounded-xl bg-emerald-700/80 hover:bg-emerald-600 text-amber-300 border border-emerald-500/50 shadow-sm transition active:scale-95 min-w-[40px] min-h-[40px] flex items-center justify-center shrink-0"
+              title="Open Navigation Menu"
+              aria-label="Open Navigation Menu"
+            >
+              <Menu className="w-5 h-5" />
             </button>
           </div>
         </div>

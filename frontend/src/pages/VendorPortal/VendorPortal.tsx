@@ -34,12 +34,22 @@ import {
 import { CountdownTimer } from '../../components/CountdownTimer';
 import { subscribeToTable } from '../../services/supabaseClient';
 
-export const VendorPortal: React.FC = () => {
+interface VendorPortalProps {
+  initialTab?: 'ORDERS' | 'INVENTORY' | 'PROCUREMENT' | 'FARMER_OFFERS' | 'LOGISTICS';
+}
+
+export const VendorPortal: React.FC<VendorPortalProps> = ({ initialTab = 'INVENTORY' }) => {
   const { user } = useAuth();
   const { t } = useLanguage();
   const [orders, setOrders] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
-  const [activeTab, setActiveTab] = useState<'ORDERS' | 'INVENTORY' | 'PROCUREMENT' | 'FARMER_OFFERS' | 'LOGISTICS'>('ORDERS');
+  const [activeTab, setActiveTab] = useState<'ORDERS' | 'INVENTORY' | 'PROCUREMENT' | 'FARMER_OFFERS' | 'LOGISTICS'>(initialTab);
+
+  useEffect(() => {
+    if (initialTab) {
+      setActiveTab(initialTab);
+    }
+  }, [initialTab]);
   const [loading, setLoading] = useState(true);
 
   // Status updating state

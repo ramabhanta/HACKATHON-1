@@ -34,6 +34,7 @@ function MainApp() {
   const [isVoiceOpen, setIsVoiceOpen] = useState<boolean>(false);
   const [isAuthOpen, setIsAuthOpen] = useState<boolean>(false);
   const [isProfileOpen, setIsProfileOpen] = useState<boolean>(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
   const [prefilledAiQuery, setPrefilledAiQuery] = useState<string>('');
 
   const handleVoiceQuery = (query: string) => {
@@ -81,7 +82,9 @@ function MainApp() {
     if (role === 'BUYER') {
       switch (activeTab) {
         case 'buyer-portal':
-          return <BuyerPortal setActiveTab={setActiveTab} />;
+          return <BuyerPortal initialTab="OFFERS" setActiveTab={setActiveTab} />;
+        case 'purchase-offers':
+          return <BuyerPortal initialTab="OFFERS" setActiveTab={setActiveTab} />;
         case 'produce':
           return <ProduceMarket setActiveTab={setActiveTab} />;
         case 'prices':
@@ -89,24 +92,30 @@ function MainApp() {
         case 'chat':
           return <Chat />;
         default:
-          return <BuyerPortal setActiveTab={setActiveTab} />;
+          return <BuyerPortal initialTab="OFFERS" setActiveTab={setActiveTab} />;
       }
     }
 
     if (role === 'VENDOR') {
       switch (activeTab) {
         case 'vendor-portal':
-          return <VendorPortal />;
+        case 'inventory':
+          return <VendorPortal initialTab="INVENTORY" />;
+        case 'orders':
+          return <VendorPortal initialTab="ORDERS" />;
+        case 'nearby-requests':
+        case 'requests':
+          return <VendorPortal initialTab="FARMER_OFFERS" />;
+        case 'analytics':
+          return <VendorPortal initialTab="INVENTORY" />;
         case 'store':
           return <Marketplace setActiveTab={setActiveTab} />;
-        case 'orders':
-          return <OrderHistory setActiveTab={setActiveTab} />;
         case 'prices':
           return <MarketPrices setActiveTab={setActiveTab} />;
         case 'chat':
           return <Chat />;
         default:
-          return <VendorPortal />;
+          return <VendorPortal initialTab="INVENTORY" />;
       }
     }
 
@@ -173,6 +182,7 @@ function MainApp() {
         onOpenVoice={() => setIsVoiceOpen(true)}
         onOpenAuth={() => setIsAuthOpen(true)}
         onOpenProfile={() => setIsProfileOpen(true)}
+        onOpenMenu={() => setIsMobileMenuOpen(true)}
       />
 
       <main className="flex-1 w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 pb-28 md:pb-8 overflow-x-hidden">
@@ -184,6 +194,8 @@ function MainApp() {
         setActiveTab={setActiveTab}
         onOpenVoice={() => setIsVoiceOpen(true)}
         onOpenProfile={() => setIsProfileOpen(true)}
+        isDrawerOpen={isMobileMenuOpen}
+        setIsDrawerOpen={setIsMobileMenuOpen}
       />
 
       <VoiceAssistantModal

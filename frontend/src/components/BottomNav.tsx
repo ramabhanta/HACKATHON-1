@@ -29,20 +29,40 @@ import {
   Volume2
 } from 'lucide-react';
 
+interface DrawerFeature {
+  id: string;
+  title: string;
+  desc: string;
+  icon: any;
+  color: string;
+  badge?: number;
+}
+
 interface BottomNavProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
   onOpenVoice?: () => void;
   onOpenProfile?: () => void;
+  isDrawerOpen?: boolean;
+  setIsDrawerOpen?: (open: boolean) => void;
 }
 
-export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab, onOpenVoice, onOpenProfile }) => {
+export const BottomNav: React.FC<BottomNavProps> = ({
+  activeTab,
+  setActiveTab,
+  onOpenVoice,
+  onOpenProfile,
+  isDrawerOpen: controlledDrawerOpen,
+  setIsDrawerOpen: controlledSetDrawerOpen
+}) => {
   const { t, language, setLanguage, languages, currentLangMeta } = useLanguage();
   const { totalItems } = useCart();
   const { role, user, logout } = useAuth();
   const { isDarkMode, isSimpleMode, mode, setMode } = useDisplayMode();
 
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [internalDrawerOpen, setInternalDrawerOpen] = useState(false);
+  const isDrawerOpen = controlledDrawerOpen !== undefined ? controlledDrawerOpen : internalDrawerOpen;
+  const setIsDrawerOpen = controlledSetDrawerOpen || setInternalDrawerOpen;
   const [showLangPicker, setShowLangPicker] = useState(false);
 
   // Universal Escape key listener for BottomNav mobile drawer
@@ -55,50 +75,70 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab, o
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isDrawerOpen]);
 
-  // Prime bottom bar items
+  // Prime bottom bar items (4 daily actions + Menu)
   let navItems: { id: string; label: string; icon: any; isCenter?: boolean; badge?: number }[] = [];
 
   if (role === 'BUYER') {
     navItems = [
-      { id: 'buyer-portal', label: t('buyerPortal') || 'Buyer Desk', icon: Package },
-      { id: 'prices', label: t('mandiPrices') || 'Mandi Rates', icon: TrendingUp },
-      { id: 'produce', label: t('farmerLots') || 'Procure Lots', icon: Layers, isCenter: true },
-      { id: 'chat', label: t('chat') || 'Chat', icon: MessageSquare },
-      { id: 'menu', label: t('All Features'), icon: Grid }
+      { id: 'buyer-portal', label: 'Procurement', icon: Package },
+      { id: 'produce', label: 'Farmer Market', icon: Layers, isCenter: true },
+      { id: 'purchase-offers', label: 'Offers', icon: ClipboardList },
+      { id: 'prices', label: 'Mandi Rates', icon: TrendingUp },
+      { id: 'menu', label: t('All Features') || 'More', icon: Grid }
     ];
   } else if (role === 'VENDOR') {
     navItems = [
-      { id: 'vendor-portal', label: t('vendorDesk') || 'Vendor Desk', icon: Store },
-      { id: 'store', label: t('store') || 'Catalog', icon: ShoppingBag, badge: totalItems },
-      { id: 'prices', label: t('mandiPrices') || 'Market Rates', icon: TrendingUp, isCenter: true },
-      { id: 'orders', label: t('Orders'), icon: ClipboardList },
-      { id: 'menu', label: t('All Features'), icon: Grid }
+      { id: 'vendor-portal', label: 'Inventory', icon: Store },
+      { id: 'orders', label: 'Orders', icon: ClipboardList, isCenter: true },
+      { id: 'store', label: 'Catalog', icon: ShoppingBag, badge: totalItems },
+      { id: 'prices', label: 'Mandi Rates', icon: TrendingUp },
+      { id: 'menu', label: t('All Features') || 'More', icon: Grid }
     ];
   } else {
     // Default: Farmer
     navItems = [
       { id: 'home', label: isSimpleMode ? t('farmerHome') || t('home') : t('home'), icon: Home },
-      { id: 'store', label: t('store'), icon: ShoppingBag, badge: totalItems },
-      { id: 'scan', label: t('scanCrop'), icon: Camera, isCenter: true },
-      { id: 'prices', label: t('mandiPrices'), icon: TrendingUp },
-      { id: 'menu', label: t('All Features'), icon: Grid }
+      { id: 'scan', label: t('scanCrop') || 'Scan Crop', icon: Camera, isCenter: true },
+      { id: 'store', label: t('store') || 'Agri Store', icon: ShoppingBag, badge: totalItems },
+      { id: 'prices', label: t('mandiPrices') || 'Mandi Rates', icon: TrendingUp },
+      { id: 'menu', label: t('All Features') || 'More', icon: Grid }
     ];
   }
 
   // Comprehensive drawer actions covering 100% desktop feature parity
-  const farmerFeatures = [
-    { id: 'ai', title: t('aiAssistant'), desc: 'Ask Gemini 2.5 Flash crop & soil questions', icon: Bot, color: 'bg-emerald-500 text-white' },
-    { id: 'scan', title: t('scanCrop'), desc: 'Real-time camera scan & AI leaf diagnosis', icon: Camera, color: 'bg-amber-500 text-white' },
-    { id: 'store', title: t('store'), desc: 'Authentic fertilizers, seeds, sprayers & tools', icon: ShoppingBag, color: 'bg-teal-500 text-white', badge: totalItems },
-    { id: 'prices', title: t('mandiPrices'), desc: '100+ APMC live rates & price forecasts', icon: TrendingUp, color: 'bg-blue-500 text-white' },
-    { id: 'produce', title: t('sellProduce'), desc: 'Connect directly with verified buyers', icon: Layers, color: 'bg-purple-500 text-white' },
+  const farmerFeatures: DrawerFeature[] = [
+    { id: 'produce', title: t('sellProduce') || 'Sell Produce', desc: 'Connect directly with verified buyers & create harvest lots', icon: Layers, color: 'bg-purple-500 text-white' },
+    { id: 'farm-manager', title: t('farmManager') || 'Farm Manager', desc: 'GPS mapped plots & crop growth telemetry', icon: Tractor, color: 'bg-lime-600 text-white' },
+    { id: 'ai', title: t('aiAssistant') || 'AI Assistant', desc: 'Ask Gemini 2.5 Flash crop & soil questions', icon: Bot, color: 'bg-emerald-500 text-white' },
+    { id: 'scan', title: t('scanCrop') || 'Scan Crop', desc: 'Real-time camera scan & AI leaf diagnosis', icon: Camera, color: 'bg-amber-500 text-white' },
+    { id: 'store', title: t('store') || 'Agri Store', desc: 'Authentic fertilizers, seeds, sprayers & tools', icon: ShoppingBag, color: 'bg-teal-500 text-white', badge: totalItems },
+    { id: 'prices', title: t('mandiPrices') || 'Mandi Prices', desc: '100+ APMC live rates & price forecasts', icon: TrendingUp, color: 'bg-blue-500 text-white' },
     { id: 'soil', title: t('soilHealth') || 'Soil Health Card', desc: 'NPK test records & custom fertigation plans', icon: FlaskConical, color: 'bg-amber-600 text-white' },
-    { id: 'farm-manager', title: t('farmManager'), desc: 'GPS mapped plots & crop growth telemetry', icon: Tractor, color: 'bg-lime-600 text-white' },
-    { id: 'orders', title: t('My Booking Orders'), desc: 'Track 24h dealer reservation SLA orders', icon: ClipboardList, color: 'bg-orange-500 text-white' },
-    { id: 'shops', title: t('Nearby Input Retailers'), desc: 'Verified local agro dealers within 25km', icon: Store, color: 'bg-indigo-500 text-white' },
-    { id: 'cart', title: t('Cart & Checkout'), desc: 'Review selected agricultural inputs', icon: ShoppingBag, color: 'bg-emerald-600 text-white', badge: totalItems },
-    { id: 'chat', title: t('chat'), desc: 'Telugu, Kannada, Hindi & English farmers', icon: MessageSquare, color: 'bg-cyan-600 text-white' }
+    { id: 'orders', title: t('My Booking Orders') || 'My Booking Orders', desc: 'Track 24h dealer reservation SLA orders', icon: ClipboardList, color: 'bg-orange-500 text-white' },
+    { id: 'shops', title: t('Nearby Input Retailers') || 'Nearby Retailers', desc: 'Verified local agro dealers within 25km', icon: Store, color: 'bg-indigo-500 text-white' },
+    { id: 'cart', title: t('Cart & Checkout') || 'Cart & Checkout', desc: 'Review selected agricultural inputs', icon: ShoppingBag, color: 'bg-emerald-600 text-white', badge: totalItems },
+    { id: 'chat', title: t('chat') || 'Farmer Chat', desc: 'Telugu, Kannada, Hindi & English farmers', icon: MessageSquare, color: 'bg-cyan-600 text-white' }
   ];
+
+  const buyerFeatures: DrawerFeature[] = [
+    { id: 'buyer-portal', title: 'Procurement Desk', desc: 'Manage purchase contracts & active demands', icon: Package, color: 'bg-emerald-600 text-white' },
+    { id: 'purchase-offers', title: 'Purchase Offers', desc: 'Post new commodity purchase offers with target rates', icon: ClipboardList, color: 'bg-blue-600 text-white' },
+    { id: 'produce', title: 'Farmer Market Lots', desc: 'Browse verified ready-to-harvest farmer produce', icon: Layers, color: 'bg-purple-600 text-white' },
+    { id: 'prices', title: 'Mandi Rates', desc: '100+ APMC live mandi rates & daily trend graphs', icon: TrendingUp, color: 'bg-amber-600 text-white' },
+    { id: 'chat', title: 'Logistics Chat', desc: 'Direct chat with farmers and transport drivers', icon: MessageSquare, color: 'bg-cyan-600 text-white' }
+  ];
+
+  const vendorFeatures: DrawerFeature[] = [
+    { id: 'vendor-portal', title: 'Inventory & Stock', desc: 'Manage fertilizers, seeds, pesticides & inventory', icon: Store, color: 'bg-emerald-600 text-white' },
+    { id: 'orders', title: 'Customer Orders', desc: 'Farmer booking reservations & pickup status', icon: ClipboardList, color: 'bg-amber-600 text-white' },
+    { id: 'nearby-requests', title: 'Nearby Requests', desc: 'Incoming farmer procurement bids and offers', icon: Layers, color: 'bg-teal-600 text-white' },
+    { id: 'analytics', title: 'Shop Analytics', desc: 'Daily revenue, fast-moving items and analytics', icon: TrendingUp, color: 'bg-purple-600 text-white' },
+    { id: 'store', title: 'Product Catalog', desc: 'Customer-facing catalog of agro inputs', icon: ShoppingBag, color: 'bg-indigo-600 text-white', badge: totalItems },
+    { id: 'prices', title: 'Mandi Benchmarks', desc: 'Live commodity prices for procurement reference', icon: TrendingUp, color: 'bg-blue-600 text-white' },
+    { id: 'chat', title: 'Dealer Support Chat', desc: 'Coordinate with farmers, buyers & distributors', icon: MessageSquare, color: 'bg-cyan-600 text-white' }
+  ];
+
+  const activeFeatures = role === 'BUYER' ? buyerFeatures : role === 'VENDOR' ? vendorFeatures : farmerFeatures;
 
   const handleItemClick = (id: string) => {
     if (id === 'menu') {
@@ -325,7 +365,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab, o
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                {farmerFeatures.map(feat => {
+                {activeFeatures.map(feat => {
                   const Icon = feat.icon;
                   const isCurrent = activeTab === feat.id;
 

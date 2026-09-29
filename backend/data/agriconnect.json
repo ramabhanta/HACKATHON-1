@@ -142,6 +142,38 @@
       "longitude": 78.1634,
       "createdAt": "2026-09-28T20:11:54.330Z",
       "updatedAt": "2026-09-28T20:11:54.330Z"
+    },
+    {
+      "id": "usr-110ad9f7",
+      "name": "User 7882",
+      "phone": "+91 83283 47882",
+      "passwordHash": "$2a$10$7QWPj.2rpL8QjLVsKKBSk.apwZk2WgUXFIS1tmU8PS/Yed5QAdCBq",
+      "role": "FARMER",
+      "language": "en",
+      "village": "Kadiri Rural",
+      "district": "Sri Sathya Sai",
+      "state": "Andhra Pradesh",
+      "pincode": "515591",
+      "latitude": 14.1165,
+      "longitude": 78.1634,
+      "createdAt": "2026-09-29T05:15:15.613Z",
+      "updatedAt": "2026-09-29T05:15:15.613Z"
+    },
+    {
+      "id": "usr-e80de774",
+      "name": "yugandharreddy350@gmail.com",
+      "phone": "+91 86758 96597",
+      "passwordHash": "$2a$10$ltm9YrgnkZSs8Cq/la9.hev/msmX6asX5CVKU8bpBtI1jiA/oD8mu",
+      "role": "BUYER",
+      "language": "en",
+      "village": "Kadiri Rural",
+      "district": "Sri Sathya Sai",
+      "state": "Andhra Pradesh",
+      "pincode": "515591",
+      "latitude": 14.1165,
+      "longitude": 78.1634,
+      "createdAt": "2026-09-29T05:16:16.662Z",
+      "updatedAt": "2026-09-29T05:16:16.662Z"
     }
   ],
   "farmer_profiles": [
@@ -12270,7 +12302,6 @@
       "minQuantity": 20,
       "maxQuantity": 1000,
       "unit": "CRATE",
-      "village": "Kadiri",
       "district": "Bengaluru Urban",
       "state": "Karnataka",
       "paymentTerms": "Same-day Bank Transfer (NEFT/RTGS) post weighment",
@@ -12316,7 +12347,6 @@
       "minQuantity": 15,
       "maxQuantity": 800,
       "unit": "QUINTAL",
-      "village": "Kadiri",
       "district": "Anantapur",
       "state": "Andhra Pradesh",
       "paymentTerms": "Instant weighbridge voucher + Immediate NEFT",
@@ -12368,7 +12398,6 @@
       "minQuantity": 5,
       "maxQuantity": 200,
       "unit": "KG",
-      "village": "Kadiri",
       "district": "Hyderabad",
       "state": "Telangana",
       "paymentTerms": "Daily morning UPI settlement",
@@ -12414,7 +12443,6 @@
       "minQuantity": 25,
       "maxQuantity": 1500,
       "unit": "QUINTAL",
-      "village": "Kadiri",
       "district": "Guntur",
       "state": "Andhra Pradesh",
       "paymentTerms": "Direct bank transfer within 2 hours of gate entry",
@@ -12425,100 +12453,38 @@
     },
     {
       "id": "prof-fa734ae0",
-      "vendorId": "usr-87c3df1d",
-      "vendorName": "Sri Trader",
-      "businessName": "Sri Sai Mandi Wholesalers",
-      "phone": "+91 91234 56780",
-      "avatarUrl": "https://images.unsplash.com/photo-1542838132-92c53300491e?w=150",
-      "cropsBought": [
+      "userId": "usr-87c3df1d",
+      "companyName": "Sri Sai Mandi Wholesalers",
+      "panGst": "37AAAAA0000A1Z5",
+      "preferredCrops": [
         "Groundnut",
         "Tomato",
         "Paddy"
       ],
-      "buyingRates": [
-        {
-          "crop": "Groundnut",
-          "rate": 7450,
-          "unit": "QUINTAL",
-          "note": "Direct APMC rate"
-        },
-        {
-          "crop": "Tomato",
-          "rate": 520,
-          "unit": "CRATE",
-          "note": "Direct APMC rate"
-        },
-        {
-          "crop": "Paddy",
-          "rate": 2400,
-          "unit": "QUINTAL",
-          "note": "Direct APMC rate"
-        }
-      ],
-      "minQuantity": 10,
-      "maxQuantity": 1000,
-      "unit": "QUINTAL",
-      "village": "Kadiri",
-      "district": "Sri Sathya Sai",
-      "state": "Andhra Pradesh",
-      "paymentTerms": "Instant Bank Transfer / Cash on weighment",
-      "pickupAvailable": true,
-      "qualityPreference": "Grade A pods, clean sun-dried",
-      "rating": 4.8,
-      "verified": true
+      "operatingRegion": "Rayalaseema Kadiri AP",
+      "pincode": "515591",
+      "contactPhone": "+91 91234 56780"
     },
     {
       "id": "prof-b52f99aa",
-      "vendorId": "usr-87c3df1d",
-      "vendorName": "Sri Trader",
-      "businessName": "Sri Sai Mandi Wholesalers",
-      "phone": "+91 91234 56780",
-      "avatarUrl": "https://images.unsplash.com/photo-1542838132-92c53300491e?w=150",
-      "cropsBought": [
+      "userId": "usr-87c3df1d",
+      "companyName": "Sri Sai Mandi Wholesalers",
+      "panGst": "37AAAAA0000A1Z5",
+      "preferredCrops": [
         "Groundnut",
         "Tomato",
         "Paddy"
       ],
-      "buyingRates": [
-        {
-          "crop": "Groundnut",
-          "rate": 7450,
-          "unit": "QUINTAL",
-          "note": "Direct APMC rate"
-        },
-        {
-          "crop": "Tomato",
-          "rate": 520,
-          "unit": "CRATE",
-          "note": "Direct APMC rate"
-        },
-        {
-          "crop": "Paddy",
-          "rate": 2400,
-          "unit": "QUINTAL",
-          "note": "Direct APMC rate"
-        }
-      ],
-      "minQuantity": 10,
-      "maxQuantity": 1000,
-      "unit": "QUINTAL",
-      "village": "Kadiri",
-      "district": "Sri Sathya Sai",
-      "state": "Andhra Pradesh",
-      "paymentTerms": "Instant Bank Transfer / Cash on weighment",
-      "pickupAvailable": true,
-      "qualityPreference": "Grade A pods, clean sun-dried",
-      "rating": 4.8,
-      "verified": true
+      "operatingRegion": "Rayalaseema Kadiri AP",
+      "pincode": "515591",
+      "contactPhone": "+91 91234 56780"
     },
     {
       "id": "prof-0ff0588c",
-      "vendorId": "usr-81d2a229",
-      "vendorName": "kisan Trader",
-      "businessName": "kisan mandi rates",
-      "phone": "+91 80735 38499",
-      "avatarUrl": "https://images.unsplash.com/photo-1542838132-92c53300491e?w=150",
-      "cropsBought": [
+      "userId": "usr-81d2a229",
+      "companyName": "kisan mandi rates",
+      "panGst": "hfuf.kkjhf",
+      "preferredCrops": [
         "Groundnut",
         "Tomato",
         "Paddy",
@@ -12527,59 +12493,44 @@
         "Mango",
         "Maize"
       ],
+      "operatingRegion": "Rayalaseema / Kadiri AP",
+      "pincode": "515591",
+      "contactPhone": "+91 80735 38499"
+    },
+    {
+      "id": "proc-ven-ad1adc5e",
+      "vendorId": "usr-e80de774",
+      "vendorName": "yugandharreddy350@gmail.com",
+      "businessName": "kjjfubtg",
+      "phone": "+91 86758 96597",
+      "avatarUrl": "https://images.unsplash.com/photo-1542838132-92c53300491e?w=150",
+      "cropsBought": [
+        "Groundnut",
+        "Tomato"
+      ],
       "buyingRates": [
         {
           "crop": "Groundnut",
           "rate": 7450,
           "unit": "QUINTAL",
-          "note": "Direct APMC rate"
+          "note": "Direct procurement at APMC benchmark rate"
         },
         {
           "crop": "Tomato",
           "rate": 520,
           "unit": "CRATE",
-          "note": "Direct APMC rate"
-        },
-        {
-          "crop": "Paddy",
-          "rate": 2400,
-          "unit": "QUINTAL",
-          "note": "Direct APMC rate"
-        },
-        {
-          "crop": "Chilli",
-          "rate": 19500,
-          "unit": "QUINTAL",
-          "note": "Direct APMC rate"
-        },
-        {
-          "crop": "Cotton",
-          "rate": 2400,
-          "unit": "QUINTAL",
-          "note": "Direct APMC rate"
-        },
-        {
-          "crop": "Mango",
-          "rate": 2400,
-          "unit": "QUINTAL",
-          "note": "Direct APMC rate"
-        },
-        {
-          "crop": "Maize",
-          "rate": 2400,
-          "unit": "QUINTAL",
-          "note": "Direct APMC rate"
+          "note": "Direct procurement at APMC benchmark rate"
         }
       ],
       "minQuantity": 10,
       "maxQuantity": 1000,
       "unit": "QUINTAL",
-      "village": "Kadiri",
+      "village": "Kadiri Rural",
       "district": "Sri Sathya Sai",
       "state": "Andhra Pradesh",
-      "paymentTerms": "Instant Bank Transfer / Cash on weighment",
+      "paymentTerms": "Instant Bank Transfer / Cash upon weighment",
       "pickupAvailable": true,
-      "qualityPreference": "Grade A pods, clean sun-dried",
+      "qualityPreference": "Grade A FAQ produce, clean & sorted",
       "rating": 4.8,
       "verified": true
     }

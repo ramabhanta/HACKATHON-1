@@ -1,4 +1,5 @@
 import { MarketPrice, MandiCommodityType } from '../models/types.js';
+import { getPanIndiaMarketPrices } from './panIndiaMandiData.js';
 
 /**
  * Normalizes commodity category strings (handles plurals, case-insensitivity, combined labels)
@@ -1332,31 +1333,7 @@ export class MandiPriceService {
   private static CACHE_TTL_MS = 12 * 60 * 60 * 1000; // 12 hours
 
   public static getPrices(options: MandiQueryOptions = {}): MarketPrice[] {
-    const today = options.date || new Date().toISOString().split('T')[0];
-    const normCategory = normalizeCategory(options.category);
-    const targetState = (options.state && options.state !== 'ALL') ? options.state.trim() : 'ALL';
-    const targetDistrict = (options.district && options.district !== 'ALL') ? options.district.trim() : 'ALL';
-
-    const cacheKey = `${targetState}:${targetDistrict}:${normCategory}:${today}`;
-    if (!options.refresh) {
-      const cached = this.cache.get(cacheKey);
-      if (cached && Date.now() - cached.timestamp < this.CACHE_TTL_MS) {
-        return this.filterBySearch(cached.data, options.search);
-      }
-    }
-
-    // Generate full dataset for requested parameters
-    let result = this.buildDatasetForDistrict(targetState, targetDistrict, today);
-
-    // Apply normalized category filter
-    if (normCategory !== 'ALL') {
-      result = result.filter(p => normalizeCategory(p.commodityType || p.category) === normCategory);
-    }
-
-    // Cache results
-    this.cache.set(cacheKey, { data: result, timestamp: Date.now() });
-
-    return this.filterBySearch(result, options.search);
+    return getPanIndiaMarketPrices(options);
   }
 
   /**
